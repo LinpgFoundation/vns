@@ -1,16 +1,14 @@
-from os import path as PATH
-
 from linpgtoolbox.builder import Builder
-from linpgtoolbox.organizer import Organizer
 
 # 需要额外包括的文件
-additional_files: tuple[str, ...] = ("README.md", "LICENSE")
+additional_files: tuple[str, ...] = (r"../README.md", r"../LICENSE")
 
 # 编译源代码
 Builder.compile(
     "pyvns",
     additional_files=additional_files,
     update_the_one_in_sitepackages=True,
+    include_pyinstaller_program=True,
     options={
         "enable_multiprocessing": True,
     },

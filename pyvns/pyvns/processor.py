@@ -1,12 +1,9 @@
 import copy
-import json
-import os
-import time
 from typing import Final, NoReturn
 
+from ._exception import ScriptsProcessingException
 from .content import Content
-from .exception import ScriptsProcessingException
-from .naming import CharacterNamingMetaData
+from .naming import Naming
 
 
 # 视觉小说脚本编译器
@@ -28,6 +25,14 @@ class Processor:
         self.__dialog_associate_key: dict[str, str] = {}
         self.__accumulated_comments: list[str] = []
         self.__blocked: bool = False
+
+    # 获取id
+    def get_id(self) -> int:
+        return self.__id
+
+    # 获取语言
+    def get_language(self) -> str:
+        return self.__lang
 
     # 生成一个标准id
     @staticmethod
@@ -160,9 +165,9 @@ class Processor:
                             break
                         # 移除角色
                         for i in range(len(self.__current_data.character_images)):
-                            if CharacterNamingMetaData(
-                                self.__current_data.character_images[i]
-                            ).equal(CharacterNamingMetaData(_name)):
+                            if Naming(self.__current_data.character_images[i]).equal(
+                                _name
+                            ):
                                 self.__current_data.character_images.pop(i)
                                 break
                 # 清空角色列表，然后让角色重新进场
@@ -199,7 +204,7 @@ class Processor:
                 elif _currentLine.startswith("[scene]"):
                     self.__output[self.__section][self.__previous]["next"][
                         "type"
-                    ] = "changeScene"
+                    ] = "scene"
                     self.__current_data.background_image = self.__extract_parameter(
                         _currentLine, "[scene]"
                     )
@@ -250,18 +255,13 @@ class Processor:
                     )
                     # 获取讲述人可能的立绘名称
                     narrator_possible_images: tuple = tuple()
-                    if (
-                        self.__current_data.narrator.lower()
-                        in CharacterNamingMetaData.get_database()
-                    ):
+                    if self.__current_data.narrator.lower() in Naming.get_database():
                         narrator_possible_images = tuple(
-                            CharacterNamingMetaData.get_database()[
-                                self.__current_data.narrator.lower()
-                            ]
+                            Naming.get_database()[self.__current_data.narrator.lower()]
                         )
                     # 检查名称列表，更新character_images以确保不在说话的人处于黑暗状态
                     for i in range(len(self.__current_data.character_images)):
-                        _name_data: CharacterNamingMetaData = CharacterNamingMetaData(
+                        _name_data: Naming = Naming(
                             self.__current_data.character_images[i]
                         )
                         if _name_data.name in narrator_possible_images:
@@ -333,18 +333,3 @@ class Processor:
                 else:
                     self.__terminated("unexpected reason")
             self.__line_index += 1
-
-    # 保存至
-    def save_to(self, out_folder: str) -> None:
-        with open(
-            os.path.join(out_folder, f"chapter{self.__id}_dialogs_{self.__lang}.json"),
-            "w",
-            encoding="utf-8",
-        ) as f:
-            json.dump(
-                {"dialogs": self.__output, "compiledAt": int(time.time())},
-                f,
-                indent=4,
-                ensure_ascii=False,
-                sort_keys=True,
-            )

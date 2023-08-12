@@ -2,7 +2,7 @@ from typing import Final
 
 
 # 角色立绘名称预处理模块
-class CharacterNamingMetaData:
+class Naming:
     # 立绘配置信息数据库
     __DATABASE: Final[dict] = {}
     # 是否立绘配置信息数据库
@@ -31,8 +31,10 @@ class CharacterNamingMetaData:
 
     # 根据文件名判断是否是同一角色名下的图片
     def equal(
-        self, otherNameData: "CharacterNamingMetaData", must_be_the_same: bool = False
+        self, otherNameData: "Naming" | str, must_be_the_same: bool = False
     ) -> bool:
+        if isinstance(otherNameData, str):
+            otherNameData = Naming(otherNameData)
         if self.__name == otherNameData.name:
             return True
         elif self.__IS_DATABASE_ENABLED and not must_be_the_same:

@@ -1,8 +1,10 @@
+import json
 import os
+import time
 from glob import glob
 
 from .content import ContentManager
-from .naming import CharacterNamingMetaData
+from .naming import Naming
 from .processor import Processor
 
 
@@ -19,11 +21,30 @@ class Compiler:
         return processor.get_output()
 
     # 编译
-    @staticmethod
-    def compile(path: str, out_folder: str) -> None:
+    @classmethod
+    def compile(cls, path: str, out_folder: str) -> None:
         processor: Processor = Processor()
         processor.process(path)
-        processor.save_to(out_folder)
+        cls._save_output(processor, out_folder)
+
+    # 保存至
+    @staticmethod
+    def _save_output(_processor: Processor, out_folder: str) -> None:
+        with open(
+            os.path.join(
+                out_folder,
+                f"chapter{_processor.get_id()}_dialogs_{_processor.get_language()}.json",
+            ),
+            "w",
+            encoding="utf-8",
+        ) as f:
+            json.dump(
+                {"dialogs": _processor.get_output(), "compiledAt": int(time.time())},
+                f,
+                indent=4,
+                ensure_ascii=False,
+                sort_keys=True,
+            )
 
     # 编译文件夹内的所有原始视觉小说文件
     @classmethod
@@ -83,7 +104,7 @@ class Compiler:
                     ):
                         if (
                             _content.previous is None
-                            or _content.previous.next.get("type") != "changeScene"
+                            or _content.previous.next.get("type") != "scene"
                         ):
                             _results.append(
                                 "[bgi]"
@@ -127,9 +148,7 @@ class Compiler:
                         ):
                             _line: str = "[display]"
                             for _characterName in _content.current.character_images:
-                                _line += (
-                                    CharacterNamingMetaData(_characterName).name + " "
-                                )
+                                _line += Naming(_characterName).name + " "
                             _results.append(_line.rstrip() + "\n")
 
                     if _content.current.has_next():
