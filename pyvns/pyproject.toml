@@ -22,8 +22,8 @@ classifiers = [
 dependencies = ["mypy"]
 
 [project.urls]
-"Homepage" = "https://github.com/LinpgFoundation/VisualNovelScript"
-"Bug Tracker" = "https://github.com/LinpgFoundation/VisualNovelScript/issues"
+"Homepage" = "https://github.com/LinpgFoundation/vns"
+"Bug Tracker" = "https://github.com/LinpgFoundation/vns/issues"
 
 [tool.mypy]
 python_version = "3.11"

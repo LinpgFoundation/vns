@@ -80,10 +80,10 @@ class Compiler:
                 while True:
                     _current_dialog: dict = _content.get_dialog()
                     # 处理注释
-                    notes: list[str] = _current_dialog.pop("notes", [])
-                    if len(notes) > 0:
+                    comments: list[str] = _current_dialog.pop("comments", [])
+                    if len(comments) > 0:
                         _results.append("\n")
-                        for _note in notes:
+                        for _note in comments:
                             _results.append("// " + _note + "\n")
                     # 写入讲话人名称
                     _results.append(
@@ -104,7 +104,7 @@ class Compiler:
                     ):
                         if (
                             _content.previous is None
-                            or _content.previous.next.get("type") != "scene"
+                            or _content.previous.next.type != "scene"
                         ):
                             _results.append(
                                 "[bgi]"
@@ -152,7 +152,7 @@ class Compiler:
                             _results.append(_line.rstrip() + "\n")
 
                     if _content.current.has_next():
-                        _content.set_id(_content.current.next["target"])
+                        _content.set_id(_content.current.next.target)  # type: ignore
                     else:
                         break
 

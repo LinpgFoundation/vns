@@ -1,4 +1,18 @@
-from typing import Final
+from typing import Any, Final
+
+
+class _Next:
+    def __init__(self, _data: dict | None) -> None:
+        if _data is None:
+            _data = {}
+        self.type: Final[str | None] = _data.get("type")
+        self.target: Final[str | list[dict[str, str]] | None] = _data.get("target")
+
+    def to_dict(self) -> dict[str, str | list[dict[str, str]]]:
+        return {"type": self.type, "target": self.target} if self.is_not_null() else {}  # type: ignore
+
+    def is_not_null(self) -> bool:
+        return self.type is not None and self.target is not None
 
 
 # 视觉小说数据操作接口
@@ -17,12 +31,11 @@ class Content:
         # 讲述人
         self.narrator: str = _data.get("narrator", "")
         # 上一个
-        self.previous: str | None = _data.get("previous", _data.get("last_dialog_id"))
+        self.previous: str | None = _data.get("previous")
         # 下一个
-        _next: dict | None = _data.get("next", _data.get("next_dialog_id"))
-        self.next: dict = _next if _next is not None else {}
+        self.next: _Next = _Next(_data.get("next"))
         # 注释
-        self.notes: list[str] = []
+        self.comments: list[str] = []
 
     @property
     def id(self) -> str:
@@ -30,20 +43,10 @@ class Content:
 
     # 当前对话是否带有合法的下一个对话对象的id
     def has_next(self) -> bool:
-        _target: str | list[dict] | None = (
-            self.next.get("target") if self.next is not None else None
-        )
-        return _target is not None and len(_target) > 0
+        return self.next.is_not_null()
 
-    # 当前对话是否带有多个合法的下一个对话对象的id
-    def has_multiple_next(self) -> bool:
-        _target: str | list[dict] | None = (
-            self.next.get("target") if self.next is not None else None
-        )
-        return isinstance(_target, list) and len(_target) > 1
-
-    def to_dict(self) -> dict:
-        _result: dict = {
+    def to_dict(self) -> dict[str, Any]:
+        _result: dict[str, Any] = {
             "background_image": self.background_image,
             "background_music": self.background_music,
             "character_images": self.character_images,
@@ -52,8 +55,8 @@ class Content:
             "narrator": self.narrator,
             "next": self.next,
         }
-        if len(self.notes) > 0:
-            _result["notes"] = self.notes
+        if len(self.comments) > 0:
+            _result["comments"] = self.comments
         return _result
 
 
@@ -61,7 +64,7 @@ class Content:
 class ContentManager:
     def __init__(self) -> None:
         # 视觉小说数据
-        self.__dialog_data: Final[dict[str, dict[str, dict]]] = {}
+        self.__dialog_data: Final[dict[str, dict[str, dict[str, Any]]]] = {}
         # 当前部分
         self.__section: str = ""
         # 当前对话的id
@@ -105,7 +108,7 @@ class ContentManager:
         return self.__last
 
     # 保存对当前对话的接口的修改
-    def save_current_changes(self) -> None:
+    def save(self) -> None:
         self.__dialog_data[self.__section][self.__id] = self.current.to_dict()
 
     # 是否数据为空
@@ -117,11 +120,11 @@ class ContentManager:
         self.__dialog_data.clear()
 
     # 更新数据
-    def update(self, _data: dict[str, dict[str, dict]]) -> None:
+    def update(self, _data: dict[str, dict[str, dict[str, Any]]]) -> None:
         self.__dialog_data.update(_data)
 
     # 获取数据
-    def get(self) -> dict[str, dict[str, dict]]:
+    def get(self) -> dict[str, dict[str, dict[str, dict[str, Any]]]]:
         return self.__dialog_data
 
     # 获取当前id
@@ -134,11 +137,15 @@ class ContentManager:
         self.__current = None
         self.__last = None
 
-    # 获取当前所在部分
+    # 获取当前段落名称
     def get_section(self) -> str:
         return self.__section
 
-    # 更新当前所在部分
+    # 获取指定段落名称
+    def __get_section(self, _section: str | None) -> str:
+        return self.__section if _section is None else _section
+
+    # 设置当前段落名称
     def set_section(self, _section: str) -> None:
         self.__section = _section
         self.__current = None
@@ -149,23 +156,25 @@ class ContentManager:
         self.__dialog_data[self.__section].pop(self.__id if _id is None else _id)
 
     # 获取段落
-    def get_section_content(self, _section: str | None = None) -> dict:
-        return self.__dialog_data[self.__section if _section is None else _section]
+    def get_section_content(
+        self, _section: str | None = None
+    ) -> dict[str, dict[str, Any]]:
+        return self.__dialog_data[self.__get_section(_section)]
 
     # 设置段落
-    def set_section_content(self, _data: dict, _section: str | None = None) -> None:
-        self.__dialog_data[self.__section if _section is None else _section] = _data
+    def set_section_content(
+        self, _data: dict[str, dict[str, Any]], _section: str | None = None
+    ) -> None:
+        self.__dialog_data[self.__get_section(_section)] = _data
 
     # 获取对话数据
-    def get_dialog(self, _section: str | None = None, _id: str | None = None) -> dict:
-        return self.__dialog_data[self.__section if _section is None else _section][
-            self.__id if _id is None else _id
-        ]
+    def get_dialog(
+        self, _section: str | None = None, _id: str | None = None
+    ) -> dict[str, Any]:
+        return self.get_section_content(_section)[self.__id if _id is None else _id]
 
     # 移除对话数据
     def remove_dialog(
         self, _section: str | None = None, _id: str | None = None
     ) -> None:
-        self.__dialog_data[self.__section if _section is None else _section].pop(
-            self.__id if _id is None else _id
-        )
+        self.get_section_content(_section).pop(self.__id if _id is None else _id)

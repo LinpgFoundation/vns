@@ -1,7 +1,7 @@
 import copy
 from typing import Final, NoReturn
 
-from ._exception import ScriptsProcessingException
+from ._exception import ScriptCompilerException
 from .content import Content
 from .naming import Naming
 
@@ -66,7 +66,7 @@ class Processor:
 
     # 编译失败
     def __terminated(self, _reason: str) -> NoReturn:
-        raise ScriptsProcessingException(
+        raise ScriptCompilerException(
             f'File "{self.__path_in}", line {self.__line_index + 1}\n  {self.__get_current_line()}\nFail to compile due to {_reason}'
         )
 
@@ -124,11 +124,11 @@ class Processor:
         self.__lines.clear()
         # 确保重要参数已被初始化
         if self.__id < 0:
-            ScriptsProcessingException("You have to set a nonnegative id!")
+            ScriptCompilerException("You have to set a nonnegative id!")
         elif len(self.__lang) <= 0:
-            ScriptsProcessingException("You have to set lang!")
+            ScriptCompilerException("You have to set lang!")
         elif self.__section is None:
-            ScriptsProcessingException("You have to set section!")
+            ScriptCompilerException("You have to set section!")
 
     # 转换
     def __convert(self, staring_index: int) -> None:
@@ -317,7 +317,7 @@ class Processor:
                         self.__current_data.previous = None
                     # 添加注释
                     if len(self.__accumulated_comments) > 0:
-                        self.__current_data.notes = self.__accumulated_comments
+                        self.__current_data.comments = self.__accumulated_comments
                         self.__accumulated_comments = []
                     # 更新key
                     self.__previous = self.__dialog_associate_key[
@@ -329,7 +329,7 @@ class Processor:
                         self.__current_data.to_dict()
                     )
                     # 移除注释
-                    self.__current_data.notes.clear()
+                    self.__current_data.comments.clear()
                 else:
                     self.__terminated("unexpected reason")
             self.__line_index += 1
