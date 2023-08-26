@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyvns"
-version = "0.2"
+version = "1.0"
 authors = [
     {name = "Linpg Foundation", email = "yudong9912@gmail.com"},
 ]
@@ -27,7 +27,7 @@ dependencies = ["mypy"]
 
 [tool.mypy]
 python_version = "3.11"
-# disallow_any_generics = true
+disallow_any_generics = true
 disallow_untyped_defs = true
 disallow_untyped_calls = true
 warn_return_any = true
