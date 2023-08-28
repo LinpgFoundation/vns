@@ -16,7 +16,8 @@ class Compiler:
         return text if text is not None else "null"
 
     # 直接加载
-    def load(self, path: str) -> dict:
+    @staticmethod
+    def load(path: str) -> dict:
         processor: Processor = Processor()
         processor.process(path)
         return processor.get_output()
@@ -57,7 +58,7 @@ class Compiler:
     @classmethod
     def decompile(cls, _data: dict[str, dict[str, dict[str, Any]]], out: str) -> None:
         # 如果数据为空，则直接返回
-        if _data is None and len(_data) <= 0:
+        if _data is None or len(_data) <= 0:
             return
         # 初始化视觉小说数据管理模块
         _content: ContentManager = ContentManager()

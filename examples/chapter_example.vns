@@ -1,0 +1,24 @@
+# Fundamental parameters
+[id]1
+[language]English
+
+[section]dialog_example
+
+// section 1
+[bgi]bg1.png
+[bgm]bgm1.ogg
+null:
+- This is a test message.
+null:
+- I hope it works.
+
+// section 2
+[scene]bg2.png
+[bgm]bgm2.ogg
+[display]test_character1.png test_character2.png
+Test Character 1:
+- Hello I am test character 1.
+Test Character 2:
+- Hello I am test character 2.
+
+[end]

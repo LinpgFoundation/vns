@@ -2,7 +2,7 @@ from typing import Any, Final
 
 
 class _Next:
-    def __init__(self, _data: dict | None) -> None:
+    def __init__(self, _data: dict[str, Any] | None) -> None:
         if _data is None:
             _data = {}
         self.type: Final[str | None] = _data.get("type")
@@ -17,7 +17,7 @@ class _Next:
 
 # 视觉小说数据操作接口
 class Content:
-    def __init__(self, _data: dict, _id: str) -> None:
+    def __init__(self, _data: dict[str, Any], _id: str) -> None:
         # id
         self.__id: str = _id
         # 背景图片
@@ -53,7 +53,7 @@ class Content:
             "contents": self.contents,
             "previous": self.previous,
             "narrator": self.narrator,
-            "next": self.next,
+            "next": self.next.to_dict(),
         }
         if len(self.comments) > 0:
             _result["comments"] = self.comments

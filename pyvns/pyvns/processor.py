@@ -1,5 +1,5 @@
 import copy
-from typing import Final, NoReturn
+from typing import Any, Final, NoReturn
 
 from ._exception import ScriptCompilerException
 from .content import Content
@@ -14,11 +14,11 @@ class Processor:
     def __init__(self) -> None:
         self.__path_in: str = ""
         self.__line_index: int = 0
-        self.__output: dict = {}
+        self.__output: dict[str, dict[str, dict[str, Any]]] = {}
         self.__current_data: Content = Content({}, "head")
         self.__id: int = -1
         self.__lang: str = ""
-        self.__section: str | None = None
+        self.__section: str = ""
         self.__previous: str | None = None
         self.__lines: list[str] = []
         self.__branch_labels: dict[str, str] = {}
@@ -33,16 +33,6 @@ class Processor:
     # 获取语言
     def get_language(self) -> str:
         return self.__lang
-
-    # 生成一个标准id
-    @staticmethod
-    def __generate_id(index: int) -> str:
-        if index >= 10:
-            return "id_" + str(index)
-        elif index > 0:
-            return "id_0" + str(index)
-        else:
-            return "head"
 
     # 转换一个str
     @staticmethod
@@ -105,12 +95,9 @@ class Processor:
                     not self.__lines[index].startswith("[")
                     and ":" in self.__lines[index]
                 ):
-                    if current_index > 0:
-                        self.__dialog_associate_key[str(index)] = self.__generate_id(
-                            current_index
-                        )
-                    else:
-                        self.__dialog_associate_key[str(index)] = "head"
+                    self.__dialog_associate_key[str(index)] = (
+                        f"${current_index}" if current_index != 0 else "head"
+                    )
                     current_index += 1
                     # 将id与label关联
                     if last_label is not None:
@@ -127,7 +114,7 @@ class Processor:
             ScriptCompilerException("You have to set a nonnegative id!")
         elif len(self.__lang) <= 0:
             ScriptCompilerException("You have to set lang!")
-        elif self.__section is None:
+        elif len(self.__section) <= 0:
             ScriptCompilerException("You have to set section!")
 
     # 转换
@@ -185,8 +172,8 @@ class Processor:
                     else:
                         self.__terminated("Chapter id cannot be None!")
                 # 语言
-                elif _currentLine.startswith("[lang]"):
-                    self.__lang = self.__extract_string(_currentLine, "[lang]")
+                elif _currentLine.startswith("[language]"):
+                    self.__lang = self.__extract_string(_currentLine, "[language]")
                 # 部分
                 elif _currentLine.startswith("[section]"):
                     if self.__previous is not None:
@@ -229,9 +216,9 @@ class Processor:
                     ):
                         self.__output[self.__section][self.__previous]["next"] = {}
                     # 获取对应的下一个对话字典的指针
-                    dialog_next: dict = self.__output[self.__section][self.__previous][
-                        "next"
-                    ]
+                    dialog_next: dict[str, str | list[dict[str, str]]] = self.__output[
+                        self.__section
+                    ][self.__previous]["next"]
                     if dialog_next.get("type") != "option":
                         dialog_next["type"] = "option"
                         dialog_next["target"] = []
@@ -254,7 +241,7 @@ class Processor:
                         _narrator if _narrator is not None else ""
                     )
                     # 获取讲述人可能的立绘名称
-                    narrator_possible_images: tuple = tuple()
+                    narrator_possible_images: tuple[str, ...] = tuple()
                     if self.__current_data.narrator.lower() in Naming.get_database():
                         narrator_possible_images = tuple(
                             Naming.get_database()[self.__current_data.narrator.lower()]
@@ -281,7 +268,7 @@ class Processor:
                         else:
                             break
                     # 确认section不为None，如果为None，则警告
-                    if self.__section is None:
+                    if len(self.__section) <= 0:
                         self.__terminated("You have to specify section before script")
                     # 如果section未在字典中，则初始化对应section的数据
                     elif self.__section not in self.__output:

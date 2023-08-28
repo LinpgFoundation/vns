@@ -1,0 +1,72 @@
+{
+    "compiledAt": 0,
+    "dialogs": {
+        "dialog_example": {
+            "$1": {
+                "background_image": "bg1.png",
+                "background_music": "bgm1.ogg",
+                "character_images": [],
+                "contents": [
+                    "I hope it works."
+                ],
+                "narrator": "",
+                "next": {
+                    "target": "$2",
+                    "type": "scene"
+                },
+                "previous": "head"
+            },
+            "$2": {
+                "background_image": "bg2.png",
+                "background_music": "bgm2.ogg",
+                "character_images": [
+                    "test_character1.png&silent",
+                    "test_character2.png&silent"
+                ],
+                "comments": [
+                    "section 2"
+                ],
+                "contents": [
+                    "Hello I am test character 1."
+                ],
+                "narrator": "Test Character 1",
+                "next": {
+                    "target": "$3",
+                    "type": "default"
+                },
+                "previous": null
+            },
+            "$3": {
+                "background_image": "bg2.png",
+                "background_music": "bgm2.ogg",
+                "character_images": [
+                    "test_character1.png&silent",
+                    "test_character2.png&silent"
+                ],
+                "contents": [
+                    "Hello I am test character 2."
+                ],
+                "narrator": "Test Character 2",
+                "next": null,
+                "previous": "$2"
+            },
+            "head": {
+                "background_image": "bg1.png",
+                "background_music": "bgm1.ogg",
+                "character_images": [],
+                "comments": [
+                    "section 1"
+                ],
+                "contents": [
+                    "This is a test message."
+                ],
+                "narrator": "",
+                "next": {
+                    "target": "$1",
+                    "type": "default"
+                },
+                "previous": null
+            }
+        }
+    }
+}
