@@ -65,7 +65,7 @@ class Processor:
         return self.__lines[self.__line_index].lstrip()
 
     # 获取输出
-    def get_output(self) -> dict:
+    def get_output(self) -> dict[str, dict[str, dict[str, Any]]]:
         return self.__output
 
     # 处理数据
@@ -185,10 +185,12 @@ class Processor:
                     self.__previous = None
                 # 结束符
                 elif _currentLine.startswith("[end]"):
+                    assert self.__previous is not None
                     self.__output[self.__section][self.__previous]["next"] = None
                     break
                 # 转换场景
                 elif _currentLine.startswith("[scene]"):
+                    assert self.__previous is not None
                     self.__output[self.__section][self.__previous]["next"][
                         "type"
                     ] = "scene"
@@ -203,13 +205,14 @@ class Processor:
                     self.__current_data = Content({}, "id_needed")
                     self.__previous = None
                 # 选项
-                elif _currentLine.startswith("[opt]"):
+                elif _currentLine.startswith("[option]"):
                     # 确认在接下来的一行有branch的label
                     if not self.__lines[self.__line_index + 1].startswith("[br]"):
                         self.__terminated(
                             f"For option on line {self.__line_index + 1}, a branch label is not found on the following line"
                         )
                     # 如果next没被初始化，则初始化
+                    assert self.__previous is not None
                     if (
                         self.__output[self.__section][self.__previous].get("next")
                         is None
@@ -222,9 +225,10 @@ class Processor:
                     if dialog_next.get("type") != "option":
                         dialog_next["type"] = "option"
                         dialog_next["target"] = []
+                    assert isinstance(dialog_next["target"], list)
                     dialog_next["target"].append(
                         {
-                            "text": self.__extract_string(_currentLine, "[opt]"),
+                            "text": self.__extract_string(_currentLine, "[option]"),
                             "id": self.__branch_labels[
                                 self.__extract_string(
                                     self.__lines[self.__line_index + 1], "[br]"
@@ -281,9 +285,9 @@ class Processor:
                             self.__current_data.previous = None
                             self.__blocked = False
                         # 生成数据
-                        last_ref: dict | None = self.__output[self.__section].get(
-                            self.__previous
-                        )
+                        last_ref: dict[str, Any] | None = self.__output[
+                            self.__section
+                        ].get(self.__previous)
                         if last_ref is not None:
                             if last_ref.get("next") is not None:
                                 last_ref["next"][
