@@ -153,3 +153,4 @@ cython_debug/
 
 # Repo specific
 pyvns/src/
+vns-python/src/

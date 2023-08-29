@@ -5,8 +5,8 @@ class _Next:
     def __init__(self, _data: dict[str, Any] | None) -> None:
         if _data is None:
             _data = {}
-        self.type: Final[str | None] = _data.get("type")
-        self.target: Final[str | list[dict[str, str]] | None] = _data.get("target")
+        self.type: str | None = _data.get("type")
+        self.target: str | list[dict[str, str]] | None = _data.get("target")
 
     def to_dict(self) -> dict[str, str | list[dict[str, str]]]:
         return {"type": self.type, "target": self.target} if self.is_not_null() else {}  # type: ignore

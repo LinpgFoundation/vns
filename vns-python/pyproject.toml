@@ -25,6 +25,9 @@ dependencies = ["mypy"]
 "Homepage" = "https://github.com/LinpgFoundation/vns"
 "Bug Tracker" = "https://github.com/LinpgFoundation/vns/issues"
 
+[project.entry-points.pyinstaller40]
+hook-dirs = "pyvns.__pyinstaller:get_hook_dirs"
+
 [tool.mypy]
 python_version = "3.11"
 disallow_any_generics = true

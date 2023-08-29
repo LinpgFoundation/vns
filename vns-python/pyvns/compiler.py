@@ -25,7 +25,9 @@ class Compiler:
     # 编译
     @classmethod
     def compile(cls, path: str, out_dir: str | None = None) -> None:
-        if not os.path.isdir(path):
+        if not os.path.isdir(path) and path.rstrip().endswith(
+            Processor.SCRIPTS_FILE_EXTENSION
+        ):
             _processor: Processor = Processor()
             _processor.process(path)
             cls._save(

@@ -15,18 +15,6 @@ class _Naming:
     def tags(self) -> set[str]:
         return self.__tags
 
-    # 是否有tag
-    def has_tag(self, _tag: str) -> bool:
-        return _tag in self.__tags
-
-    # 移除tag
-    def remove_tag(self, _tag: str) -> None:
-        self.__tags.remove(_tag)
-
-    # 增加tag
-    def add_tag(self, _tag: str) -> None:
-        self.__tags.add(_tag)
-
     # 获取tag和名称结合后的数据名称
     def get_full_name(self) -> str:
         return self.__name + "".join(f"&{_tag}" for _tag in self.__tags)
