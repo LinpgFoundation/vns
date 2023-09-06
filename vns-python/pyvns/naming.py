@@ -7,6 +7,9 @@ class _Naming:
         self.__name: str = _name_data[0]
         self.__tags: set[str] = set(_name_data[1:])
 
+    def __str__(self) -> str:
+        return self.to_string()
+
     @property
     def name(self) -> str:
         return self.__name
@@ -16,7 +19,7 @@ class _Naming:
         return self.__tags
 
     # 获取tag和名称结合后的数据名称
-    def get_full_name(self) -> str:
+    def to_string(self) -> str:
         return self.__name + "".join(f"&{_tag}" for _tag in self.__tags)
 
 

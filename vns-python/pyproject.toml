@@ -7,14 +7,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyvns"
-version = "1.0"
+version = "1.1"
 authors = [
     {name = "Linpg Foundation", email = "yudong9912@gmail.com"},
 ]
 description = "VNS (Visual Novel Script), a universal scripting language for creating scripts for visual novel games."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 classifiers = [
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: Implementation :: CPython",
     "Operating System :: OS Independent",

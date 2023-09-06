@@ -272,7 +272,7 @@ class Processor:
                             _name_data.tags.remove("silent")
                     else:
                         _name_data.tags.add("silent")
-                    self.__current_data.character_images[i] = _name_data.get_full_name()
+                    self.__current_data.character_images[i] = _name_data.to_string()
                 # 更新对话内容
                 self.__current_data.contents.clear()
                 for sub_index in range(self.__line_index + 1, len(self.__lines)):
