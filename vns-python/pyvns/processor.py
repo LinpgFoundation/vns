@@ -88,24 +88,40 @@ class Processor:
             self.__terminated("Cannot convert an empty script file!")
         else:
             last_label: str | None = None
+            last_entry: str | None = None
             # 预处理文件
             for index in range(len(self.__lines)):
                 self.__lines[index] = self.__lines[index].removesuffix("\n")
                 if self.__lines[index].startswith("[label]"):
                     if last_label is not None:
-                        self.__terminated("The label is overwriting the previous one")
+                        self.__terminated("This label is overwriting the previous one")
                     last_label = self.__extract_parameter(
                         self.__lines[index], "[label]"
                     )
-                if self.__lines[index].startswith("[section]"):
+                elif self.__lines[index].startswith("[entry]"):
+                    if last_entry is not None:
+                        self.__terminated("This entry is overwriting the previous one")
+                    last_entry = self.__extract_parameter(
+                        self.__lines[index], "[entry]"
+                    )
+                elif self.__lines[index].startswith("[section]"):
                     current_index = 0
                 elif (
                     not self.__lines[index].startswith("[")
                     and ":" in self.__lines[index]
                 ):
                     self.__dialog_associate_key[index] = (
-                        f"${current_index}" if current_index != 0 else "head"
+                        "head"
+                        if current_index == 0
+                        else (
+                            f"~0{current_index}"
+                            if current_index < 10
+                            else f"~{current_index}"
+                        )
+                        if last_entry is None
+                        else last_entry
                     )
+                    last_entry = None
                     current_index += 1
                     # 将id与label关联
                     if last_label is not None:
@@ -249,6 +265,8 @@ class Processor:
                             }
                         )
                         self.__line_index += 1
+                    case "[label]" | "[entry]":
+                        pass
                     case _:
                         self.__terminated(f"invalid tag {_tag}")
             elif ":" in _currentLine:
