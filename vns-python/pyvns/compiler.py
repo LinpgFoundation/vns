@@ -4,16 +4,21 @@ import time
 from glob import glob
 from typing import Any
 
-from .processor import Processor
+from ._processor import Processor
 
 
 class Compiler:
     # 直接加载
     @staticmethod
-    def load(path: str) -> dict[str, dict[str, dict[str, Any]]]:
-        processor: Processor = Processor()
-        processor.process(path)
-        return processor.get_output()
+    def load(path: str) -> dict[str, Any]:
+        _processor: Processor = Processor()
+        _processor.process(path)
+        return {
+            "dialogs": _processor.get_output(),
+            "compiledAt": int(time.time()),
+            "id": _processor.get_id(),
+            "language": _processor.get_language(),
+        }
 
     # 编译
     @classmethod
@@ -21,15 +26,8 @@ class Compiler:
         if not os.path.isdir(path) and path.rstrip().endswith(
             Processor.SCRIPTS_FILE_EXTENSION
         ):
-            _processor: Processor = Processor()
-            _processor.process(path)
             cls._save(
-                {
-                    "dialogs": _processor.get_output(),
-                    "compiledAt": int(time.time()),
-                    "id": _processor.get_id(),
-                    "language": _processor.get_language(),
-                },
+                cls.load(path),
                 out_dir if out_dir is not None else os.path.dirname(path),
             )
         else:
