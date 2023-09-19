@@ -92,9 +92,7 @@ class Processor:
         last_entry: str | None = None
         # 预处理数据
         for index in range(len(self.__lines)):
-            self.__lines[index] = (
-                self.__lines[index].removesuffix("\n").lstrip().rstrip()
-            )
+            self.__lines[index] = self.__lines[index].removesuffix("\n").strip()
             if self.__lines[index].startswith("[label]"):
                 if last_label is not None:
                     self.__terminated("This label is overwriting the previous one")
@@ -219,6 +217,8 @@ class Processor:
                         self.__current_data.background_image = self.__extract_parameter(
                             _currentLine, _tag
                         )
+                        if len(self.__current_data.background_image) == 0:
+                            self.__current_data.background_image = None
                         self.__blocked = True
                     # 终端
                     case "[block]":

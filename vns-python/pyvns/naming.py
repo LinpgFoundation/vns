@@ -3,7 +3,7 @@ from typing import Final, Sequence
 
 class _Naming:
     def __init__(self, _name: str) -> None:
-        _name_data: list[str] = _name.split("&")
+        _name_data: list[str] = _name.strip().split("&")
         self.__name: str = _name_data[0]
         self.__tags: set[str] = set(_name_data[1:])
 

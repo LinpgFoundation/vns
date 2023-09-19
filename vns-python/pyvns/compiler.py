@@ -1,7 +1,7 @@
 import json
-import os
 import time
 from glob import glob
+from os import path as OS_PATH
 from typing import Any
 
 from ._processor import Processor
@@ -23,22 +23,20 @@ class Compiler:
     # 编译
     @classmethod
     def compile(cls, path: str, out_dir: str | None = None) -> None:
-        if not os.path.isdir(path) and path.rstrip().endswith(
-            Processor.SCRIPTS_FILE_EXTENSION
-        ):
+        if not OS_PATH.isdir(path) and path.endswith(Processor.SCRIPTS_FILE_EXTENSION):
             cls._save(
                 cls.load(path),
-                out_dir if out_dir is not None else os.path.dirname(path),
+                out_dir if out_dir is not None else OS_PATH.dirname(path),
             )
         else:
-            for _file in glob(os.path.join(path, "*")):
+            for _file in glob(OS_PATH.join(path, "*")):
                 cls.compile(_file, out_dir)
 
     # 保存（子类可重写）
     @staticmethod
     def _save(_data: dict[str, Any], _dir: str) -> None:
         with open(
-            os.path.join(
+            OS_PATH.join(
                 _dir, f"chapter{_data['id']}_dialogs_{_data['language']}.json"
             ),
             "w",
