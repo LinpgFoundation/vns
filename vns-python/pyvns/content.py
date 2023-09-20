@@ -9,10 +9,10 @@ class _Next:
         self.target: str | list[dict[str, str]] | None = _data.get("target")
 
     def to_dict(self) -> dict[str, str | list[dict[str, str]]]:
-        return {"type": self.type, "target": self.target} if self.is_not_null() else {}  # type: ignore
+        return {} if self.is_null() else {"type": self.type, "target": self.target}  # type: ignore
 
-    def is_not_null(self) -> bool:
-        return self.type is not None and self.target is not None
+    def is_null(self) -> bool:
+        return self.type is None or self.target is None
 
 
 # 视觉小说数据操作接口
@@ -43,7 +43,7 @@ class Content:
 
     # 当前对话是否带有合法的下一个对话对象的id
     def has_next(self) -> bool:
-        return self.next.is_not_null()
+        return not self.next.is_null()
 
     def to_dict(self) -> dict[str, Any]:
         _result: dict[str, Any] = {

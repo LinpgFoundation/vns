@@ -3,9 +3,13 @@ from typing import Final, Sequence
 
 class _Naming:
     def __init__(self, _name: str) -> None:
-        _name_data: list[str] = _name.split("&")
+        _name_data: list[str] = _name.strip().split("&")
         self.__name: str = _name_data[0]
         self.__tags: set[str] = set(_name_data[1:])
+
+    # 获取tag和名称结合后的数据名称
+    def __str__(self) -> str:
+        return self.__name + "".join(f"&{_tag}" for _tag in self.__tags)
 
     @property
     def name(self) -> str:
@@ -14,10 +18,6 @@ class _Naming:
     @property
     def tags(self) -> set[str]:
         return self.__tags
-
-    # 获取tag和名称结合后的数据名称
-    def get_full_name(self) -> str:
-        return self.__name + "".join(f"&{_tag}" for _tag in self.__tags)
 
 
 # 角色立绘名称预处理模块

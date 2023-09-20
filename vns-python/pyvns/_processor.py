@@ -70,7 +70,7 @@ class Processor:
 
     # 获取当前行
     def __get_current_line(self) -> str:
-        return self.__lines[self.__line_index].lstrip()
+        return self.__lines[self.__line_index]
 
     # 获取输出
     def get_output(self) -> dict[str, dict[str, dict[str, Any]]]:
@@ -86,35 +86,45 @@ class Processor:
         # 如果文件为空
         if len(self.__lines) <= 0:
             self.__terminated("Cannot convert an empty script file!")
-        else:
-            last_label: str | None = None
-            # 预处理文件
-            for index in range(len(self.__lines)):
-                self.__lines[index] = self.__lines[index].removesuffix("\n")
-                if self.__lines[index].startswith("[label]"):
-                    if last_label is not None:
-                        self.__terminated("The label is overwriting the previous one")
-                    last_label = self.__extract_parameter(
-                        self.__lines[index], "[label]"
+        # 上个label
+        last_label: str | None = None
+        # 上个进入点
+        last_entry: str | None = None
+        # 预处理数据
+        for index in range(len(self.__lines)):
+            self.__lines[index] = self.__lines[index].removesuffix("\n").strip()
+            if self.__lines[index].startswith("[label]"):
+                if last_label is not None:
+                    self.__terminated("This label is overwriting the previous one")
+                last_label = self.__extract_parameter(self.__lines[index], "[label]")
+            elif self.__lines[index].startswith("[entry]"):
+                if last_entry is not None:
+                    self.__terminated("This entry is overwriting the previous one")
+                last_entry = self.__extract_parameter(self.__lines[index], "[entry]")
+            elif self.__lines[index].startswith("[section]"):
+                current_index = 0
+            elif not self.__lines[index].startswith("[") and ":" in self.__lines[index]:
+                self.__dialog_associate_key[index] = (
+                    "head"
+                    if current_index == 0
+                    else (
+                        f"~0{current_index}"
+                        if current_index < 10
+                        else f"~{current_index}"
                     )
-                if self.__lines[index].startswith("[section]"):
-                    current_index = 0
-                elif (
-                    not self.__lines[index].startswith("[")
-                    and ":" in self.__lines[index]
-                ):
-                    self.__dialog_associate_key[index] = (
-                        f"${current_index}" if current_index != 0 else "head"
-                    )
-                    current_index += 1
-                    # 将id与label关联
-                    if last_label is not None:
-                        self.__branch_labels[last_label] = self.__dialog_associate_key[
-                            index
-                        ]
-                        last_label = None
-            if last_label is not None:
-                print(f"The last label call {last_label} is not necessary!")
+                    if last_entry is None
+                    else last_entry
+                )
+                last_entry = None
+                current_index += 1
+                # 将id与label关联
+                if last_label is not None:
+                    self.__branch_labels[last_label] = self.__dialog_associate_key[
+                        index
+                    ]
+                    last_label = None
+        if last_label is not None:
+            print(f"The last label call {last_label} is not necessary!")
         self.__convert(0)
         self.__lines.clear()
         # 确保重要参数已被初始化
@@ -207,6 +217,11 @@ class Processor:
                         self.__current_data.background_image = self.__extract_parameter(
                             _currentLine, _tag
                         )
+                        if (
+                            isinstance(self.__current_data.background_image, str)
+                            and len(self.__current_data.background_image) == 0
+                        ):
+                            self.__current_data.background_image = None
                         self.__blocked = True
                     # 终端
                     case "[block]":
@@ -249,11 +264,13 @@ class Processor:
                             }
                         )
                         self.__line_index += 1
+                    case "[label]" | "[entry]":
+                        pass
                     case _:
                         self.__terminated(f"invalid tag {_tag}")
             elif ":" in _currentLine:
                 _narrator: str | None = self.__ensure_not_null(
-                    _currentLine.removesuffix(" ").removesuffix(":")
+                    _currentLine.removesuffix(":")
                 )
                 self.__current_data.narrator = (
                     _narrator if _narrator is not None else ""
@@ -272,7 +289,7 @@ class Processor:
                             _name_data.tags.remove("silent")
                     else:
                         _name_data.tags.add("silent")
-                    self.__current_data.character_images[i] = _name_data.get_full_name()
+                    self.__current_data.character_images[i] = str(_name_data)
                 # 更新对话内容
                 self.__current_data.contents.clear()
                 for sub_index in range(self.__line_index + 1, len(self.__lines)):
