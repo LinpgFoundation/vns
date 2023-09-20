@@ -1,8 +1,25 @@
 {
-    "compiledAt": 0,
+    "compiledAt": 1695246451,
     "dialogs": {
         "dialog_example": {
-            "$1": {
+            "head": {
+                "background_image": "bg1.png",
+                "background_music": "bgm1.ogg",
+                "character_images": [],
+                "comments": [
+                    "section 1"
+                ],
+                "contents": [
+                    "This is a test message."
+                ],
+                "narrator": "",
+                "next": {
+                    "target": "~01",
+                    "type": "default"
+                },
+                "previous": null
+            },
+            "~01": {
                 "background_image": "bg1.png",
                 "background_music": "bgm1.ogg",
                 "character_images": [],
@@ -11,12 +28,12 @@
                 ],
                 "narrator": "",
                 "next": {
-                    "target": "$2",
+                    "target": "~02",
                     "type": "scene"
                 },
                 "previous": "head"
             },
-            "$2": {
+            "~02": {
                 "background_image": "bg2.png",
                 "background_music": "bgm2.ogg",
                 "character_images": [
@@ -31,12 +48,12 @@
                 ],
                 "narrator": "Test Character 1",
                 "next": {
-                    "target": "$3",
+                    "target": "~03",
                     "type": "default"
                 },
                 "previous": null
             },
-            "$3": {
+            "~03": {
                 "background_image": "bg2.png",
                 "background_music": "bgm2.ogg",
                 "character_images": [
@@ -48,25 +65,10 @@
                 ],
                 "narrator": "Test Character 2",
                 "next": null,
-                "previous": "$2"
-            },
-            "head": {
-                "background_image": "bg1.png",
-                "background_music": "bgm1.ogg",
-                "character_images": [],
-                "comments": [
-                    "section 1"
-                ],
-                "contents": [
-                    "This is a test message."
-                ],
-                "narrator": "",
-                "next": {
-                    "target": "$1",
-                    "type": "default"
-                },
-                "previous": null
+                "previous": "~02"
             }
         }
-    }
+    },
+    "id": 1,
+    "language": "English"
 }

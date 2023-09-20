@@ -217,7 +217,10 @@ class Processor:
                         self.__current_data.background_image = self.__extract_parameter(
                             _currentLine, _tag
                         )
-                        if len(self.__current_data.background_image) == 0:
+                        if (
+                            isinstance(self.__current_data.background_image, str)
+                            and len(self.__current_data.background_image) == 0
+                        ):
                             self.__current_data.background_image = None
                         self.__blocked = True
                     # 终端
