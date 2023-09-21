@@ -1,0 +1,25 @@
+{
+  "name": "vns-syntax-highlight",
+  "displayName": "Visual Novel Script Syntax Highlight",
+  "description": "Syntax highlighting for VNS scripts",
+  "version": "1.1.0",
+  "engines": {
+    "vscode": "^1.82.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "vns",
+      "aliases": ["Visual Novel Script", "vns"],
+      "extensions": [".vns"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "vns",
+      "scopeName": "source.vns",
+      "path": "./syntaxes/vns.tmLanguage.json"
+    }]
+  }
+}
