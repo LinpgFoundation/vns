@@ -7,6 +7,15 @@
 		},
 		{
 			"include": "#strings"
+		},
+		{
+			"include": "#heading"
+		},
+		{
+			"include": "#number-sign"
+		},
+		{
+			"include": "#double-slash"
 		}
 	],
 	"repository": {
@@ -19,6 +28,20 @@
 		"strings": {
 			"name": "string.unquoted.vns",
 			"begin":"- ",
+			"end": "\n"
+		},
+		"heading": {
+			"name": "markup.heading.vns",
+			"match": "(.*?):"
+		},
+		"number-sign":{
+			"name": "comment.line.number-sign",
+			"begin": "\\#",
+			"end": "\n"
+		},
+		"double-slash":{
+			"name": "comment.line.double-slash",
+			"begin": "\\/",
 			"end": "\n"
 		}
 	},
