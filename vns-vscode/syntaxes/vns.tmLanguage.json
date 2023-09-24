@@ -1,49 +1,51 @@
 {
-	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-	"name": "Visual Novel Script",
-	"patterns": [
-		{
-			"include": "#keywords"
-		},
-		{
-			"include": "#strings"
-		},
-		{
-			"include": "#heading"
-		},
-		{
-			"include": "#number-sign"
-		},
-		{
-			"include": "#double-slash"
-		}
-	],
-	"repository": {
-		"keywords": {
-			"patterns": [{
-                "name": "keyword.control.vns",
-                "match": "\\[(.*?)\\]"
-            }]
-		},
-		"strings": {
-			"name": "string.unquoted.vns",
-			"begin":"- ",
-			"end": "\n"
-		},
-		"heading": {
-			"name": "markup.heading.vns",
-			"match": "(.*?):"
-		},
-		"number-sign":{
-			"name": "comment.line.number-sign",
-			"begin": "\\#",
-			"end": "\n"
-		},
-		"double-slash":{
-			"name": "comment.line.double-slash",
-			"begin": "\\/",
-			"end": "\n"
-		}
-	},
-	"scopeName": "source.vns"
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "Visual Novel Script",
+    "patterns": [
+        {
+            "include": "#keywords"
+        },
+        {
+            "include": "#strings"
+        },
+        {
+            "include": "#heading"
+        },
+        {
+            "include": "#number-sign"
+        },
+        {
+            "include": "#double-slash"
+        }
+    ],
+    "repository": {
+        "double-slash": {
+            "begin": "\\/",
+            "end": "\n",
+            "name": "comment.line.double-slash"
+        },
+        "heading": {
+            "match": "(.*?):",
+            "name": "markup.heading.vns"
+        },
+        "keywords": {
+            "patterns": [
+                {
+                    "match": "\\[(.*?)\\]",
+                    "name": "keyword.control.vns"
+                }
+            ]
+        },
+        "number-sign": {
+            "begin": "\\#",
+            "end": "\n",
+            "name": "comment.line.number-sign"
+        },
+        "strings": {
+            "begin": "- ",
+            "end": "\n",
+            "name": "string.unquoted.vns"
+        }
+    },
+    "scopeName": "source.vns"
 }
