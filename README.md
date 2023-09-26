@@ -8,7 +8,50 @@ VNS provides a number of features that make it easy to create visual novels, suc
 - Support for branching dialogue and choices
 - Support for music and sound effects
 
-Unlike Ren'py, the visual novel script is more like writing a story instead of a program, and the developers also have the choice to create their own implementation.
+Unlike Ren'py, writing visual novel script is more like writing a story instead of a program, and the developers also have the choice to create their own implementation.
+
+# How it started:
+
+The development of the VNS can be traced back to when Linpg was just developed. At that time, the team was searching for a way to store the dialogue. Ultimately, the team decided to use a dictionary (HashMap for Java forks) to store the data, which can be easily saved in the form of either JSON or YAML, while maintaining the readability. As a result, we end up with the following form today, which is almost identical to what we had in the very beginning, with only a few minor differences:
+
+```yaml
+compiledAt: ...
+dialogs:
+  dialog1:
+    head:
+      background_image: bg1.jpg
+      background_music: bgm1.mp3
+      character_images:
+      - alice.png
+      contents:
+      - Hello
+      narrator: Alice
+      next:
+        target: ~01
+        type: default
+      previous: null
+    ~01:
+      background_image: bg1.jpg
+      background_music: bgm1.mp3
+      character_images:
+      - alice.png
+      contents:
+      - Can you hear me?
+      narrator: Alice
+      next:
+        target: ~02
+        type: default
+      previous: head
+    ~02:
+    ...
+  dialog2:
+    ...
+  ...
+id: 1
+language: English
+```
+
+Although the overall data is easy to read, it is somewhat inconvenient to write. We came up with a dedicated dialogue editor to resolve the issue, but it's still a bit of a hassle. That is the reason why we begin to inquire about the possibility of simplifying the process. Would it be possible to make it feel like we're writing the dialogue in a Microsoft Word document? Thus, VNS is born.
 
 # Tutorials:
 
