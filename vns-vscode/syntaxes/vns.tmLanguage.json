@@ -1,0 +1,51 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "Visual Novel Script",
+    "patterns": [
+        {
+            "include": "#keywords"
+        },
+        {
+            "include": "#strings"
+        },
+        {
+            "include": "#heading"
+        },
+        {
+            "include": "#number-sign"
+        },
+        {
+            "include": "#double-slash"
+        }
+    ],
+    "repository": {
+        "double-slash": {
+            "begin": "\\/",
+            "end": "\n",
+            "name": "comment.line.double-slash"
+        },
+        "heading": {
+            "match": "(.*?):",
+            "name": "markup.heading.vns"
+        },
+        "keywords": {
+            "patterns": [
+                {
+                    "match": "\\[(.*?)\\]",
+                    "name": "keyword.control.vns"
+                }
+            ]
+        },
+        "number-sign": {
+            "begin": "\\#",
+            "end": "\n",
+            "name": "comment.line.number-sign"
+        },
+        "strings": {
+            "begin": "- ",
+            "end": "\n",
+            "name": "string.unquoted.vns"
+        }
+    },
+    "scopeName": "source.vns"
+}

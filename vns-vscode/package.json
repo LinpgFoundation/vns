@@ -1,0 +1,38 @@
+{
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "grammars": [
+            {
+                "language": "vns",
+                "path": "./syntaxes/vns.tmLanguage.json",
+                "scopeName": "source.vns"
+            }
+        ],
+        "languages": [
+            {
+                "aliases": [
+                    "Visual Novel Script",
+                    "vns"
+                ],
+                "configuration": "./language-configuration.json",
+                "extensions": [
+                    ".vns"
+                ],
+                "id": "vns"
+            }
+        ]
+    },
+    "description": "Syntax highlighting for VNS scripts",
+    "displayName": "Visual Novel Script Syntax Highlight",
+    "engines": {
+        "vscode": "^1.82.0"
+    },
+    "name": "vns-syntax-highlight",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/LinpgFoundation/vns"
+    },
+    "version": "1.1.0"
+}
