@@ -55,7 +55,7 @@ Although the overall data is easy to read, it is somewhat inconvenient to write.
 
 # Tutorials:
 
-VNS are written in a plain text file with the `. vns` extension. The script file contains a series of tags, which are used to specify the different elements of the visual novel, such as the characters, backgrounds, dialogue, music, and so on.
+VNS are written in a plain text file with the `.vns` extension. The script file contains a series of tags, which are used to specify the different elements of the visual novel, such as the characters, backgrounds, dialogue, music, and so on.
 
 ## Tags with value
 
@@ -93,13 +93,13 @@ Specifies the background image for the current and following dialogues.
 
 Specifies the background music for the current and following dialogues.
 
-### Display characters
+### Display character(s)
 
 `[display]*str`, ex: `[display]character1.png character2.png`
 
 Displays the character(s) for the current and following dialogues.
 
-### Hide characters
+### Hide character(s)
 
 `[hide]*str`, ex: `[hide]character1.png character2.png` or `[hide]*` for hiding all.
 
@@ -111,17 +111,17 @@ Hides the character(s) for the current and following dialogues.
 
 Enters a new scene and displays the specified background image.
 
+### Option(s)
+
+`[option]message->label`, ex: `[scene]Can you hear me?->yes_reply`
+
+Adding option(s) to current dialogues, and branch to the specified label according to the option chosen by the player. 
+
 ### Label
 
 `[label]str`, ex: `[label]jump_point1`
 
-Creates a label for the branch command.
-
-### Entry
-
-`[entry]str`, ex: `[label]ifPickUpItem`
-
-Utilizes the value as the key for the subsequent conversation.
+Creates a label for the branch command. The value will be used as the key for the subsequent conversation.
 
 ## Tags without value
 
@@ -147,7 +147,7 @@ Commenting the script to make it easier to understand.
 
 `// this is a note`
 
-Notes are very similar to comments. But usually, it's used to make a note for a specific conversation and is saved in the file that was made.
+Notes are very similar to comments. But usually, it's used to make a note for a specific conversation and is saved in the file that is compiled.
 
 ## Dialogues:
 

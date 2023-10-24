@@ -10,12 +10,14 @@ from .naming import Naming
 class Processor:
     # 文件格式后缀
     SCRIPTS_FILE_EXTENSION: Final[str] = ".vns"
-
-    __ALTER: dict[str, str] = {
+    # short forms of words
+    __ALTERNATIVES: dict[str, str] = {
         "[lang]": "[language]",
         "[opt]": "[option]",
         "[disp]": "[display]",
     }
+    # reserved words that cannot be used as label
+    __RESERVED_WORDS: tuple[str, ...] = ("null", "none", "head")
 
     def __init__(self) -> None:
         self.__path_in: str = ""
@@ -27,7 +29,6 @@ class Processor:
         self.__section: str = ""
         self.__previous: str | None = None
         self.__lines: list[str] = []
-        self.__branch_labels: dict[str, str] = {}
         self.__dialog_associate_key: dict[int, str] = {}
         self.__accumulated_comments: list[str] = []
         self.__blocked: bool = False
@@ -88,8 +89,6 @@ class Processor:
             self.__terminated("Cannot convert an empty script file!")
         # 上个label
         last_label: str | None = None
-        # 上个进入点
-        last_entry: str | None = None
         # 预处理数据
         for index in range(len(self.__lines)):
             self.__lines[index] = self.__lines[index].removesuffix("\n").strip()
@@ -97,10 +96,10 @@ class Processor:
                 if last_label is not None:
                     self.__terminated("This label is overwriting the previous one")
                 last_label = self.__extract_parameter(self.__lines[index], "[label]")
-            elif self.__lines[index].startswith("[entry]"):
-                if last_entry is not None:
-                    self.__terminated("This entry is overwriting the previous one")
-                last_entry = self.__extract_parameter(self.__lines[index], "[entry]")
+                if last_label in self.__RESERVED_WORDS:
+                    self.__terminated(
+                        f"You cannot use reserved work '{last_label}' as a label"
+                    )
             elif self.__lines[index].startswith("[section]"):
                 current_index = 0
             elif not self.__lines[index].startswith("[") and ":" in self.__lines[index]:
@@ -112,19 +111,11 @@ class Processor:
                         if current_index < 10
                         else f"~{current_index}"
                     )
-                    if last_entry is None
-                    else last_entry
+                    if last_label is None
+                    else last_label
                 )
-                last_entry = None
+                last_label = None
                 current_index += 1
-                # 将id与label关联
-                if last_label is not None:
-                    self.__branch_labels[last_label] = self.__dialog_associate_key[
-                        index
-                    ]
-                    last_label = None
-        if last_label is not None:
-            print(f"The last label call {last_label} is not necessary!")
         self.__convert(0)
         self.__lines.clear()
         # 确保重要参数已被初始化
@@ -148,7 +139,7 @@ class Processor:
                 self.__accumulated_comments.append(_currentLine.lstrip("//").lstrip())
             elif _currentLine.startswith("["):
                 _tag: str = _currentLine[: _currentLine.index("]") + 1]
-                match self.__ALTER.get(_tag, _tag):
+                match self.__ALTERNATIVES.get(_tag, _tag):
                     # 背景图片
                     case "[bgi]":
                         self.__current_data.background_image = self.__extract_parameter(
@@ -233,10 +224,10 @@ class Processor:
                         self.__previous = None
                     # 选项
                     case "[option]":
-                        # 确认在接下来的一行有branch的label
-                        if not self.__lines[self.__line_index + 1].startswith("[br]"):
+                        # 确认有目标
+                        if "->" not in _currentLine:
                             self.__terminated(
-                                f"For option on line {self.__line_index + 1}, a branch label is not found on the following line"
+                                "Invalid option syntax: '->' cannot be found!"
                             )
                         # 如果next没被初始化，则初始化
                         assert self.__previous is not None
@@ -246,25 +237,29 @@ class Processor:
                         ):
                             self.__output[self.__section][self.__previous]["next"] = {}
                         # 获取对应的下一个对话字典的指针
-                        dialog_next: dict[
-                            str, str | list[dict[str, str]]
-                        ] = self.__output[self.__section][self.__previous]["next"]
-                        if dialog_next.get("type") != "option":
-                            dialog_next["type"] = "option"
-                            dialog_next["target"] = []
-                        assert isinstance(dialog_next["target"], list)
-                        dialog_next["target"].append(
+                        next_ref: dict = self.__output[self.__section][self.__previous][
+                            "next"
+                        ]
+                        if next_ref.get("type") != "options":
+                            next_ref["type"] = "options"
+                            next_ref["target"] = []
+                        assert isinstance(next_ref["target"], list)
+                        src_to_target: str = self.__extract_string(
+                            _currentLine, "[option]"
+                        )
+                        next_ref["target"].append(
                             {
-                                "text": self.__extract_string(_currentLine, "[option]"),
-                                "id": self.__branch_labels[
-                                    self.__extract_string(
-                                        self.__lines[self.__line_index + 1], "[br]"
-                                    )
-                                ],
+                                "text": src_to_target[
+                                    : src_to_target.index("->")
+                                ].strip(),
+                                "id": self.__ensure_not_null(
+                                    src_to_target[
+                                        src_to_target.index("->") + 2 :
+                                    ].strip()
+                                ),
                             }
                         )
-                        self.__line_index += 1
-                    case "[label]" | "[entry]":
+                    case "[label]":
                         pass
                     case _:
                         self.__terminated(f"invalid tag {_tag}")
@@ -318,11 +313,12 @@ class Processor:
                     )
                     if last_ref is not None:
                         if last_ref.get("next") is not None:
-                            last_ref["next"]["target"] = self.__dialog_associate_key[
-                                self.__line_index
-                            ]
-                            if "type" not in last_ref["next"]:
-                                last_ref["next"]["type"] = "default"
+                            if last_ref["next"].get("type") != "options":
+                                last_ref["next"][
+                                    "target"
+                                ] = self.__dialog_associate_key[self.__line_index]
+                                if "type" not in last_ref["next"]:
+                                    last_ref["next"]["type"] = "default"
                         else:
                             last_ref["next"] = {
                                 "target": self.__dialog_associate_key[

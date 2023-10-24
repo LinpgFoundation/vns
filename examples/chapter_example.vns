@@ -20,5 +20,11 @@ Test Character 1:
 - Hello I am test character 1.
 Test Character 2:
 - Hello I am test character 2.
+[option]click here to go to jump point 1 -> jumping_point1
+[option]click here to go to the end -> null
+
+[label]jumping_point1
+Test Character 3:
+- Welcome to jump point 1
 
 [end]

@@ -1,5 +1,5 @@
 {
-    "compiledAt": 1695246451,
+    "compiledAt": 1698108963,
     "dialogs": {
         "dialog_example": {
             "head": {
@@ -18,6 +18,20 @@
                     "type": "default"
                 },
                 "previous": null
+            },
+            "jumping_point1": {
+                "background_image": "bg2.png",
+                "background_music": "bgm2.ogg",
+                "character_images": [
+                    "test_character1.png&silent",
+                    "test_character2.png&silent"
+                ],
+                "contents": [
+                    "Welcome to jump point 1"
+                ],
+                "narrator": "Test Character 3",
+                "next": null,
+                "previous": "~03"
             },
             "~01": {
                 "background_image": "bg1.png",
@@ -64,7 +78,19 @@
                     "Hello I am test character 2."
                 ],
                 "narrator": "Test Character 2",
-                "next": null,
+                "next": {
+                    "target": [
+                        {
+                            "id": "jumping_point1",
+                            "text": "click here to go to jump point 1"
+                        },
+                        {
+                            "id": null,
+                            "text": "click here to go to the end"
+                        }
+                    ],
+                    "type": "options"
+                },
                 "previous": "~02"
             }
         }
