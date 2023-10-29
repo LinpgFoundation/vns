@@ -1,5 +1,9 @@
 {
-    "compiledAt": 1698108963,
+    "compiler": {
+        "compiledAt": 1698556009,
+        "reversion": 0,
+        "version": 2
+    },
     "dialogs": {
         "dialog_example": {
             "head": {
