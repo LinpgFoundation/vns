@@ -12,6 +12,10 @@ null:
 null:
 - I hope it works.
 
+[block]
+null:
+- you cannot go back
+
 // section 2
 [scene]bg2.png
 [bgm]bgm2.ogg

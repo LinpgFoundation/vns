@@ -8,16 +8,19 @@ from .naming import Naming
 
 # 视觉小说脚本编译器
 class Processor:
-    # 文件格式后缀
+    # file extension for vns
     SCRIPTS_FILE_EXTENSION: Final[str] = ".vns"
     # short forms of words
     __ALTERNATIVES: dict[str, str] = {
-        "[lang]": "[language]",
-        "[opt]": "[option]",
-        "[disp]": "[display]",
+        "lang": "language",
+        "opt": "option",
+        "disp": "display",
     }
     # reserved words that cannot be used as label
     __RESERVED_WORDS: tuple[str, ...] = ("null", "none", "head")
+    # tag formate
+    TAG_STARTS: str = "["
+    TAG_ENDS: str = "]"
 
     def __init__(self) -> None:
         self.__path_in: str = ""
@@ -48,18 +51,18 @@ class Processor:
 
     # 将参数分离出来
     @classmethod
-    def __extract_parameter(cls, text: str, prefix: str) -> str | None:
-        return cls.__ensure_not_null(cls.__extract_string(text, prefix))
+    def __extract_parameter(cls, text: str) -> str | None:
+        return cls.__ensure_not_null(cls.__extract_string(text))
+
+    # extract label from given string
+    @classmethod
+    def __extract_tag(cls, text: str) -> str:
+        return text[text.index(cls.TAG_STARTS) + 1 : text.index(cls.TAG_ENDS)]
 
     # 将字符串内容分离出来
-    @staticmethod
-    def __extract_string(text: str, prefix: str) -> str:
-        sharp_index: int = text.find("#")
-        return (
-            text.removeprefix(prefix)
-            if sharp_index < 0
-            else text[:sharp_index].removeprefix(prefix)
-        )
+    @classmethod
+    def __extract_string(cls, text: str) -> str:
+        return text[text.index(cls.TAG_ENDS) + 1 :].strip()
 
     # 编译失败
     def __terminated(self, _reason: str) -> NoReturn:
@@ -92,17 +95,21 @@ class Processor:
         # 预处理数据
         for index in range(len(self.__lines)):
             self.__lines[index] = self.__lines[index].removesuffix("\n").strip()
-            if self.__lines[index].startswith("[label]"):
-                if last_label is not None:
-                    self.__terminated("This label is overwriting the previous one")
-                last_label = self.__extract_parameter(self.__lines[index], "[label]")
-                if last_label in self.__RESERVED_WORDS:
-                    self.__terminated(
-                        f"You cannot use reserved work '{last_label}' as a label"
-                    )
-            elif self.__lines[index].startswith("[section]"):
-                current_index = 0
-            elif not self.__lines[index].startswith("[") and ":" in self.__lines[index]:
+            if self.__lines[index].startswith(self.TAG_STARTS):
+                match self.__extract_tag(self.__lines[index]):
+                    case "label":
+                        if last_label is not None:
+                            self.__terminated(
+                                "This label is overwriting the previous one"
+                            )
+                        last_label = self.__extract_parameter(self.__lines[index])
+                        if last_label in self.__RESERVED_WORDS:
+                            self.__terminated(
+                                f"You cannot use reserved work '{last_label}' as a label"
+                            )
+                    case "section":
+                        current_index = 0
+            elif ":" in self.__lines[index]:
                 self.__dialog_associate_key[index] = (
                     "head"
                     if current_index == 0
@@ -137,26 +144,26 @@ class Processor:
                 pass
             elif _currentLine.startswith("//"):
                 self.__accumulated_comments.append(_currentLine.lstrip("//").lstrip())
-            elif _currentLine.startswith("["):
-                _tag: str = _currentLine[: _currentLine.index("]") + 1]
+            elif _currentLine.startswith(self.TAG_STARTS):
+                _tag: str = self.__extract_tag(_currentLine)
                 match self.__ALTERNATIVES.get(_tag, _tag):
                     # 背景图片
-                    case "[bgi]":
+                    case "bgi":
                         self.__current_data.background_image = self.__extract_parameter(
-                            _currentLine, _tag
+                            _currentLine
                         )
                     # 背景音乐
-                    case "[bgm]":
+                    case "bgm":
                         self.__current_data.background_music = self.__extract_parameter(
-                            _currentLine, _tag
+                            _currentLine
                         )
                     # 角色进场
-                    case "[show]":
-                        for _name in self.__extract_string(_currentLine, _tag).split():
+                    case "show":
+                        for _name in self.__extract_string(_currentLine).split():
                             self.__current_data.character_images.append(_name)
                     # 角色退场
-                    case "[hide]":
-                        for _name in self.__extract_string(_currentLine, _tag).split():
+                    case "hide":
+                        for _name in self.__extract_string(_currentLine).split():
                             # 清空角色列表
                             if _name == "*":
                                 self.__current_data.character_images.clear()
@@ -169,44 +176,44 @@ class Processor:
                                     self.__current_data.character_images.pop(i)
                                     break
                     # 清空角色列表，然后让角色重新进场
-                    case "[display]":
+                    case "display":
                         self.__current_data.character_images.clear()
-                        for _name in self.__extract_string(_currentLine, _tag).split():
+                        for _name in self.__extract_string(_currentLine).split():
                             self.__current_data.character_images.append(_name)
                     # 章节id
-                    case "[id]":
-                        _id: str | None = self.__extract_parameter(_currentLine, _tag)
+                    case "id":
+                        _id: str | None = self.__extract_parameter(_currentLine)
                         if _id is not None:
                             self.__id = int(_id)
                         else:
                             self.__terminated("Chapter id cannot be None!")
                     # 语言
-                    case "[language]":
-                        self.__lang = self.__extract_string(_currentLine, _tag)
+                    case "language":
+                        self.__lang = self.__extract_string(_currentLine)
                     # 部分
-                    case "[section]":
+                    case "section":
                         if self.__previous is not None:
                             self.__output[self.__section][self.__previous][
                                 "next"
                             ] = None
-                        self.__section = self.__extract_string(_currentLine, _tag)
+                        self.__section = self.__extract_string(_currentLine)
                         self.__output[self.__section] = {}
                         self.__output[self.__section]["head"] = {}
                         self.__current_data = Content({}, "head")
                         self.__previous = None
                     # 结束符
-                    case "[end]":
+                    case "end":
                         assert self.__previous is not None
                         self.__output[self.__section][self.__previous]["next"] = None
                         break
                     # 转换场景
-                    case "[scene]":
+                    case "scene":
                         assert self.__previous is not None
                         self.__output[self.__section][self.__previous]["next"][
                             "type"
                         ] = "scene"
                         self.__current_data.background_image = self.__extract_parameter(
-                            _currentLine, _tag
+                            _currentLine
                         )
                         if (
                             isinstance(self.__current_data.background_image, str)
@@ -215,7 +222,7 @@ class Processor:
                             self.__current_data.background_image = None
                         self.__blocked = True
                     # 终端
-                    case "[block]":
+                    case "block":
                         if self.__previous is not None:
                             self.__output[self.__section][self.__previous][
                                 "next"
@@ -223,7 +230,7 @@ class Processor:
                         self.__current_data = Content({}, "id_needed")
                         self.__previous = None
                     # 选项
-                    case "[option]":
+                    case "option":
                         # 确认有目标
                         if "->" not in _currentLine:
                             self.__terminated(
@@ -244,9 +251,7 @@ class Processor:
                             next_ref["type"] = "options"
                             next_ref["target"] = []
                         assert isinstance(next_ref["target"], list)
-                        src_to_target: str = self.__extract_string(
-                            _currentLine, "[option]"
-                        )
+                        src_to_target: str = self.__extract_string(_currentLine)
                         next_ref["target"].append(
                             {
                                 "text": src_to_target[
@@ -259,7 +264,7 @@ class Processor:
                                 ),
                             }
                         )
-                    case "[label]":
+                    case "label":
                         pass
                     case _:
                         self.__terminated(f"invalid tag {_tag}")
@@ -290,7 +295,7 @@ class Processor:
                 for sub_index in range(self.__line_index + 1, len(self.__lines)):
                     if self.__lines[sub_index].startswith("- "):
                         self.__current_data.contents.append(
-                            self.__extract_string(self.__lines[sub_index], "- ")
+                            self.__lines[sub_index].removeprefix("- ").strip()
                         )
                     else:
                         break

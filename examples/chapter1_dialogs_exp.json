@@ -1,6 +1,6 @@
 {
     "compiler": {
-        "compiledAt": 1698556009,
+        "compiledAt": 1699907243,
         "reversion": 0,
         "version": 2
     },
@@ -35,7 +35,7 @@
                 ],
                 "narrator": "Test Character 3",
                 "next": null,
-                "previous": "~03"
+                "previous": "~04"
             },
             "~01": {
                 "background_image": "bg1.png",
@@ -45,13 +45,24 @@
                     "I hope it works."
                 ],
                 "narrator": "",
-                "next": {
-                    "target": "~02",
-                    "type": "scene"
-                },
+                "next": null,
                 "previous": "head"
             },
             "~02": {
+                "background_image": null,
+                "background_music": null,
+                "character_images": [],
+                "contents": [
+                    "you cannot go back"
+                ],
+                "narrator": "",
+                "next": {
+                    "target": "~03",
+                    "type": "scene"
+                },
+                "previous": null
+            },
+            "~03": {
                 "background_image": "bg2.png",
                 "background_music": "bgm2.ogg",
                 "character_images": [
@@ -66,12 +77,12 @@
                 ],
                 "narrator": "Test Character 1",
                 "next": {
-                    "target": "~03",
+                    "target": "~04",
                     "type": "default"
                 },
                 "previous": null
             },
-            "~03": {
+            "~04": {
                 "background_image": "bg2.png",
                 "background_music": "bgm2.ogg",
                 "character_images": [
@@ -95,7 +106,7 @@
                     ],
                     "type": "options"
                 },
-                "previous": "~02"
+                "previous": "~03"
             }
         }
     },
