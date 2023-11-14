@@ -244,9 +244,9 @@ class Processor:
                         ):
                             self.__output[self.__section][self.__previous]["next"] = {}
                         # 获取对应的下一个对话字典的指针
-                        next_ref: dict = self.__output[self.__section][self.__previous][
-                            "next"
-                        ]
+                        next_ref: dict[str, Any] = self.__output[self.__section][
+                            self.__previous
+                        ]["next"]
                         if next_ref.get("type") != "options":
                             next_ref["type"] = "options"
                             next_ref["target"] = []
