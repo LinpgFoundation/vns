@@ -12,7 +12,11 @@ Unlike Ren'py, writing visual novel script is more like writing a story instead 
 
 # How it started:
 
-The development of the VNS can be traced back to when Linpg was just developed. At that time, the team was searching for a way to store the dialogue. Ultimately, the team decided to use a dictionary (HashMap for Java forks) to store the data, which can be easily saved in the form of either JSON or YAML, while maintaining the readability. As a result, we end up with the following form today, which is almost identical to what we had in the very beginning, with only a few minor differences:
+The development of the VNS can be traced all the way back to the initial stages of Linpg's development. During this period, the team faced the challenge of finding an efficient method to store the dialogue. Each conversation required the storage of multiple variables, including the narrator, the actual dialogue content, associated character images, ambient background music, and various other components:
+
+![example](doc\readme_conv_ex.png)
+
+Ultimately, the team opted for a design inspired by doubly linked list, but implemented using dictionary (HashMap for Java forks). This approach not only facilitated easier access to the data but also  streamlined the saving process, enabling compatibility with formats like JSON or YAML. This method preserved readability while efficiently  managing the dialogue. Today, the current system closely resembles our initial design, with only a few subtle refinements:
 
 ```yaml
 compiledAt: ...
@@ -51,7 +55,9 @@ id: 1
 language: English
 ```
 
-Although the overall data is easy to read, it is somewhat inconvenient to write. We came up with a dedicated dialogue editor to resolve the issue, but it's still a bit of a hassle. That is the reason why we begin to inquire about the possibility of simplifying the process. Would it be possible to make it feel like we're writing the dialogue in a Microsoft Word document? Thus, VNS is born.
+Although the overall data is easy to read, it is somewhat inconvenient to write. We came up with a dedicated dialogue editor to resolve the issue, but it's still a bit of a hassle. That is the reason why we begin to inquire about the possibility of simplifying the process.
+
+Would it be possible to make it feel like we're writing the dialogue in a Microsoft Word document? Thus, VNS is born.
 
 # Tutorials:
 
@@ -65,9 +71,9 @@ The `[tag]` represents the kind of value you are trying to represent, and the va
 
 ### ID:
 
-`[id]number`, ex: `[id]1`
+`[id]str`, ex: `[id]1`
 
-Specifies the ID of the current dialogue file. Every script file must have an ID.
+Specifies a (unique) ID for the current dialogue file. Every script file must have an ID.
 
 ### Language:
 
@@ -129,13 +135,13 @@ Creates a label for the branch command. The value will be used as the key for th
 
 `[end]`
 
-Marks the end of the dialogue. Although the compiler will stop compiling immediately after reaching the end, it is still recommended that you add this tag to the end of your script file.
+Marks the end of the script.
 
 ### **Block**
 
 `[block]`
 
-The player can't go back to the previous dialogue.
+The player can't go back to the previous conversation.
 
 ### Comments:
 
@@ -147,11 +153,11 @@ Commenting the script to make it easier to understand.
 
 `// this is a note`
 
-Notes are very similar to comments. But usually, it's used to make a note for a specific conversation and is saved in the file that is compiled.
+Notes are very similar to comments. It's used to make a note for a specific conversation and is saved to the file that is compiled.
 
-## Dialogues:
+## Dialogue:
 
-Dialogues are written in the form of this:
+Conversations are written in the form of this:
 
 ```vns
 Character name:
@@ -181,8 +187,6 @@ Mabel:
 
 Dipper:
 - Hi Mabel! I'm doing well, thanks for asking.
-
-[end]
 ```
 
 This script would display the background image `bg1.png` and the character images `character1.png` and `character2.png`. Mabel would then say "Hello my name is Mabel!" and "How are you doing today!". Next, `character1.png` would be hidden and Dipper would say "Hi Mabel! I'm doing well, thanks for asking." Finally, the script would end.
