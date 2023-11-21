@@ -5,6 +5,7 @@ from os import path as OS_PATH
 from typing import Any
 
 from ._processor import Processor
+from ._version import REVISION, VERSION
 
 
 class Compiler:
@@ -15,7 +16,11 @@ class Compiler:
         _processor.process(path)
         return {
             "dialogs": _processor.get_output(),
-            "compiledAt": int(time.time()),
+            "compiler": {
+                "version": VERSION,
+                "reversion": REVISION,
+                "compiledAt": int(time.time()),
+            },
             "id": _processor.get_id(),
             "language": _processor.get_language(),
         }

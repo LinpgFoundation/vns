@@ -8,14 +8,19 @@ from .naming import Naming
 
 # 视觉小说脚本编译器
 class Processor:
-    # 文件格式后缀
+    # file extension for vns
     SCRIPTS_FILE_EXTENSION: Final[str] = ".vns"
-
-    __ALTER: dict[str, str] = {
-        "[lang]": "[language]",
-        "[opt]": "[option]",
-        "[disp]": "[display]",
+    # short forms of words
+    __ALTERNATIVES: dict[str, str] = {
+        "lang": "language",
+        "opt": "option",
+        "disp": "display",
     }
+    # reserved words that cannot be used as label
+    __RESERVED_WORDS: tuple[str, ...] = ("null", "none", "head")
+    # tag formate
+    TAG_STARTS: str = "["
+    TAG_ENDS: str = "]"
 
     def __init__(self) -> None:
         self.__path_in: str = ""
@@ -27,7 +32,6 @@ class Processor:
         self.__section: str = ""
         self.__previous: str | None = None
         self.__lines: list[str] = []
-        self.__branch_labels: dict[str, str] = {}
         self.__dialog_associate_key: dict[int, str] = {}
         self.__accumulated_comments: list[str] = []
         self.__blocked: bool = False
@@ -47,18 +51,18 @@ class Processor:
 
     # 将参数分离出来
     @classmethod
-    def __extract_parameter(cls, text: str, prefix: str) -> str | None:
-        return cls.__ensure_not_null(cls.__extract_string(text, prefix))
+    def __extract_parameter(cls, text: str) -> str | None:
+        return cls.__ensure_not_null(cls.__extract_string(text))
+
+    # extract label from given string
+    @classmethod
+    def __extract_tag(cls, text: str) -> str:
+        return text[text.index(cls.TAG_STARTS) + 1 : text.index(cls.TAG_ENDS)]
 
     # 将字符串内容分离出来
-    @staticmethod
-    def __extract_string(text: str, prefix: str) -> str:
-        sharp_index: int = text.find("#")
-        return (
-            text.removeprefix(prefix)
-            if sharp_index < 0
-            else text[:sharp_index].removeprefix(prefix)
-        )
+    @classmethod
+    def __extract_string(cls, text: str) -> str:
+        return text[text.index(cls.TAG_ENDS) + 1 :].strip()
 
     # 编译失败
     def __terminated(self, _reason: str) -> NoReturn:
@@ -88,22 +92,24 @@ class Processor:
             self.__terminated("Cannot convert an empty script file!")
         # 上个label
         last_label: str | None = None
-        # 上个进入点
-        last_entry: str | None = None
         # 预处理数据
         for index in range(len(self.__lines)):
             self.__lines[index] = self.__lines[index].removesuffix("\n").strip()
-            if self.__lines[index].startswith("[label]"):
-                if last_label is not None:
-                    self.__terminated("This label is overwriting the previous one")
-                last_label = self.__extract_parameter(self.__lines[index], "[label]")
-            elif self.__lines[index].startswith("[entry]"):
-                if last_entry is not None:
-                    self.__terminated("This entry is overwriting the previous one")
-                last_entry = self.__extract_parameter(self.__lines[index], "[entry]")
-            elif self.__lines[index].startswith("[section]"):
-                current_index = 0
-            elif not self.__lines[index].startswith("[") and ":" in self.__lines[index]:
+            if self.__lines[index].startswith(self.TAG_STARTS):
+                match self.__extract_tag(self.__lines[index]):
+                    case "label":
+                        if last_label is not None:
+                            self.__terminated(
+                                "This label is overwriting the previous one"
+                            )
+                        last_label = self.__extract_parameter(self.__lines[index])
+                        if last_label in self.__RESERVED_WORDS:
+                            self.__terminated(
+                                f"You cannot use reserved work '{last_label}' as a label"
+                            )
+                    case "section":
+                        current_index = 0
+            elif ":" in self.__lines[index]:
                 self.__dialog_associate_key[index] = (
                     "head"
                     if current_index == 0
@@ -112,19 +118,11 @@ class Processor:
                         if current_index < 10
                         else f"~{current_index}"
                     )
-                    if last_entry is None
-                    else last_entry
+                    if last_label is None
+                    else last_label
                 )
-                last_entry = None
+                last_label = None
                 current_index += 1
-                # 将id与label关联
-                if last_label is not None:
-                    self.__branch_labels[last_label] = self.__dialog_associate_key[
-                        index
-                    ]
-                    last_label = None
-        if last_label is not None:
-            print(f"The last label call {last_label} is not necessary!")
         self.__convert(0)
         self.__lines.clear()
         # 确保重要参数已被初始化
@@ -146,26 +144,26 @@ class Processor:
                 pass
             elif _currentLine.startswith("//"):
                 self.__accumulated_comments.append(_currentLine.lstrip("//").lstrip())
-            elif _currentLine.startswith("["):
-                _tag: str = _currentLine[: _currentLine.index("]") + 1]
-                match self.__ALTER.get(_tag, _tag):
+            elif _currentLine.startswith(self.TAG_STARTS):
+                _tag: str = self.__extract_tag(_currentLine)
+                match self.__ALTERNATIVES.get(_tag, _tag):
                     # 背景图片
-                    case "[bgi]":
+                    case "bgi":
                         self.__current_data.background_image = self.__extract_parameter(
-                            _currentLine, _tag
+                            _currentLine
                         )
                     # 背景音乐
-                    case "[bgm]":
+                    case "bgm":
                         self.__current_data.background_music = self.__extract_parameter(
-                            _currentLine, _tag
+                            _currentLine
                         )
                     # 角色进场
-                    case "[show]":
-                        for _name in self.__extract_string(_currentLine, _tag).split():
+                    case "show":
+                        for _name in self.__extract_string(_currentLine).split():
                             self.__current_data.character_images.append(_name)
                     # 角色退场
-                    case "[hide]":
-                        for _name in self.__extract_string(_currentLine, _tag).split():
+                    case "hide":
+                        for _name in self.__extract_string(_currentLine).split():
                             # 清空角色列表
                             if _name == "*":
                                 self.__current_data.character_images.clear()
@@ -178,44 +176,44 @@ class Processor:
                                     self.__current_data.character_images.pop(i)
                                     break
                     # 清空角色列表，然后让角色重新进场
-                    case "[display]":
+                    case "display":
                         self.__current_data.character_images.clear()
-                        for _name in self.__extract_string(_currentLine, _tag).split():
+                        for _name in self.__extract_string(_currentLine).split():
                             self.__current_data.character_images.append(_name)
                     # 章节id
-                    case "[id]":
-                        _id: str | None = self.__extract_parameter(_currentLine, _tag)
+                    case "id":
+                        _id: str | None = self.__extract_parameter(_currentLine)
                         if _id is not None:
                             self.__id = int(_id)
                         else:
                             self.__terminated("Chapter id cannot be None!")
                     # 语言
-                    case "[language]":
-                        self.__lang = self.__extract_string(_currentLine, _tag)
+                    case "language":
+                        self.__lang = self.__extract_string(_currentLine)
                     # 部分
-                    case "[section]":
+                    case "section":
                         if self.__previous is not None:
                             self.__output[self.__section][self.__previous][
                                 "next"
                             ] = None
-                        self.__section = self.__extract_string(_currentLine, _tag)
+                        self.__section = self.__extract_string(_currentLine)
                         self.__output[self.__section] = {}
                         self.__output[self.__section]["head"] = {}
                         self.__current_data = Content({}, "head")
                         self.__previous = None
                     # 结束符
-                    case "[end]":
+                    case "end":
                         assert self.__previous is not None
                         self.__output[self.__section][self.__previous]["next"] = None
                         break
                     # 转换场景
-                    case "[scene]":
+                    case "scene":
                         assert self.__previous is not None
                         self.__output[self.__section][self.__previous]["next"][
                             "type"
                         ] = "scene"
                         self.__current_data.background_image = self.__extract_parameter(
-                            _currentLine, _tag
+                            _currentLine
                         )
                         if (
                             isinstance(self.__current_data.background_image, str)
@@ -224,7 +222,7 @@ class Processor:
                             self.__current_data.background_image = None
                         self.__blocked = True
                     # 终端
-                    case "[block]":
+                    case "block":
                         if self.__previous is not None:
                             self.__output[self.__section][self.__previous][
                                 "next"
@@ -232,11 +230,11 @@ class Processor:
                         self.__current_data = Content({}, "id_needed")
                         self.__previous = None
                     # 选项
-                    case "[option]":
-                        # 确认在接下来的一行有branch的label
-                        if not self.__lines[self.__line_index + 1].startswith("[br]"):
+                    case "option":
+                        # 确认有目标
+                        if "->" not in _currentLine:
                             self.__terminated(
-                                f"For option on line {self.__line_index + 1}, a branch label is not found on the following line"
+                                "Invalid option syntax: '->' cannot be found!"
                             )
                         # 如果next没被初始化，则初始化
                         assert self.__previous is not None
@@ -246,25 +244,27 @@ class Processor:
                         ):
                             self.__output[self.__section][self.__previous]["next"] = {}
                         # 获取对应的下一个对话字典的指针
-                        dialog_next: dict[
-                            str, str | list[dict[str, str]]
-                        ] = self.__output[self.__section][self.__previous]["next"]
-                        if dialog_next.get("type") != "option":
-                            dialog_next["type"] = "option"
-                            dialog_next["target"] = []
-                        assert isinstance(dialog_next["target"], list)
-                        dialog_next["target"].append(
+                        next_ref: dict[str, Any] = self.__output[self.__section][
+                            self.__previous
+                        ]["next"]
+                        if next_ref.get("type") != "options":
+                            next_ref["type"] = "options"
+                            next_ref["target"] = []
+                        assert isinstance(next_ref["target"], list)
+                        src_to_target: str = self.__extract_string(_currentLine)
+                        next_ref["target"].append(
                             {
-                                "text": self.__extract_string(_currentLine, "[option]"),
-                                "id": self.__branch_labels[
-                                    self.__extract_string(
-                                        self.__lines[self.__line_index + 1], "[br]"
-                                    )
-                                ],
+                                "text": src_to_target[
+                                    : src_to_target.index("->")
+                                ].strip(),
+                                "id": self.__ensure_not_null(
+                                    src_to_target[
+                                        src_to_target.index("->") + 2 :
+                                    ].strip()
+                                ),
                             }
                         )
-                        self.__line_index += 1
-                    case "[label]" | "[entry]":
+                    case "label":
                         pass
                     case _:
                         self.__terminated(f"invalid tag {_tag}")
@@ -295,7 +295,7 @@ class Processor:
                 for sub_index in range(self.__line_index + 1, len(self.__lines)):
                     if self.__lines[sub_index].startswith("- "):
                         self.__current_data.contents.append(
-                            self.__extract_string(self.__lines[sub_index], "- ")
+                            self.__lines[sub_index].removeprefix("- ").strip()
                         )
                     else:
                         break
@@ -318,11 +318,12 @@ class Processor:
                     )
                     if last_ref is not None:
                         if last_ref.get("next") is not None:
-                            last_ref["next"]["target"] = self.__dialog_associate_key[
-                                self.__line_index
-                            ]
-                            if "type" not in last_ref["next"]:
-                                last_ref["next"]["type"] = "default"
+                            if last_ref["next"].get("type") != "options":
+                                last_ref["next"][
+                                    "target"
+                                ] = self.__dialog_associate_key[self.__line_index]
+                                if "type" not in last_ref["next"]:
+                                    last_ref["next"]["type"] = "default"
                         else:
                             last_ref["next"] = {
                                 "target": self.__dialog_associate_key[

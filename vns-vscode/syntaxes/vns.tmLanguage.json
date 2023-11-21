@@ -33,6 +33,10 @@
                 {
                     "match": "\\[(.*?)\\]",
                     "name": "keyword.control.vns"
+                },
+                {
+                    "match": "->",
+                    "name": "keyword.control.vns"
                 }
             ]
         },

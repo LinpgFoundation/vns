@@ -1,5 +1,9 @@
 {
-    "compiledAt": 1695246451,
+    "compiler": {
+        "compiledAt": 1699907243,
+        "reversion": 0,
+        "version": 2
+    },
     "dialogs": {
         "dialog_example": {
             "head": {
@@ -19,6 +23,20 @@
                 },
                 "previous": null
             },
+            "jumping_point1": {
+                "background_image": "bg2.png",
+                "background_music": "bgm2.ogg",
+                "character_images": [
+                    "test_character1.png&silent",
+                    "test_character2.png&silent"
+                ],
+                "contents": [
+                    "Welcome to jump point 1"
+                ],
+                "narrator": "Test Character 3",
+                "next": null,
+                "previous": "~04"
+            },
             "~01": {
                 "background_image": "bg1.png",
                 "background_music": "bgm1.ogg",
@@ -27,13 +45,24 @@
                     "I hope it works."
                 ],
                 "narrator": "",
-                "next": {
-                    "target": "~02",
-                    "type": "scene"
-                },
+                "next": null,
                 "previous": "head"
             },
             "~02": {
+                "background_image": null,
+                "background_music": null,
+                "character_images": [],
+                "contents": [
+                    "you cannot go back"
+                ],
+                "narrator": "",
+                "next": {
+                    "target": "~03",
+                    "type": "scene"
+                },
+                "previous": null
+            },
+            "~03": {
                 "background_image": "bg2.png",
                 "background_music": "bgm2.ogg",
                 "character_images": [
@@ -48,12 +77,12 @@
                 ],
                 "narrator": "Test Character 1",
                 "next": {
-                    "target": "~03",
+                    "target": "~04",
                     "type": "default"
                 },
                 "previous": null
             },
-            "~03": {
+            "~04": {
                 "background_image": "bg2.png",
                 "background_music": "bgm2.ogg",
                 "character_images": [
@@ -64,8 +93,20 @@
                     "Hello I am test character 2."
                 ],
                 "narrator": "Test Character 2",
-                "next": null,
-                "previous": "~02"
+                "next": {
+                    "target": [
+                        {
+                            "id": "jumping_point1",
+                            "text": "click here to go to jump point 1"
+                        },
+                        {
+                            "id": null,
+                            "text": "click here to go to the end"
+                        }
+                    ],
+                    "type": "options"
+                },
+                "previous": "~03"
             }
         }
     },

@@ -6,4 +6,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
-- Initial release
+- Initial setup of the project structure.
+
+## [1.1.0] - 2023-09-25
+
+### Added
+- Added fundamental support for the all vns syntax.
+
+## [2.0.0] - 2023-11-20
+
+### Added
+- Added syntax highlight for branch symbol "->".
