@@ -30,6 +30,7 @@
         "vscode": "^1.82.0"
     },
     "name": "vns-syntax-highlight",
+    "publisher": "LinpgFoundation",
     "repository": {
         "type": "git",
         "url": "https://github.com/LinpgFoundation/vns"
