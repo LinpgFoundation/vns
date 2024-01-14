@@ -156,3 +156,4 @@ pyvns/src/
 vns-python/src/
 vns-vscode/*.vsix
 vns-vscode/LICENSE
+.vs/
