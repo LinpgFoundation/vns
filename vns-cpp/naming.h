@@ -1,28 +1,28 @@
-﻿#ifndef NAMING_H_
-#define NAMING_H_
+﻿#ifndef NAMING_H
+#define NAMING_H
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-using namespace std;
 
 // 角色立绘名称预处理模块
 class Naming
 {
-	string name_;
-	unordered_set<string> tags_;
-	static unordered_map<string, vector<string>> DATABASE_;
+	std::string name_;
+	std::unordered_set<std::string> tags_;
+	inline static std::unordered_map<std::string, std::vector<std::string>> DATABASE_ = {};
 
 public:
-	Naming(const string&);
-	string ToString() const;
-	string GetName() const;
-	unordered_set<string> GetTags() const;
+	Naming(const std::string&);
+	std::string ToString() const;
+	std::string GetName() const;
+	std::unordered_set<std::string> GetTags() const;
 	// Class method to access the database
-	static unordered_map<string, vector<string>>& GetDatabase()
+	static std::unordered_map<std::string, std::vector<std::string>>& GetDatabase()
 	{
 		return DATABASE_;
 	}
+
 	bool Equal(const Naming&, bool) const;
 };
 #endif

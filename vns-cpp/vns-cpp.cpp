@@ -11,5 +11,10 @@ int main()
 	Naming testName("maria.png&silent&hide");
 	cout << testName.GetName() << endl;
 	cout << testName.ToString() << endl;
+	cout << "\ntages:" << endl;
+	for (auto v : testName.GetTags())
+	{
+		cout << v << endl;
+	}
 	return 0;
 }
