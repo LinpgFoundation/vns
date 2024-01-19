@@ -12,7 +12,7 @@ endif()
 project ("vns-cpp")
 
 # Add source to this project's executable.
-add_executable (vns-cpp "vns-cpp.cpp" "vns-cpp.h" "processor.cpp" "naming.cpp" "naming.h")
+add_executable (vns-cpp "vns-cpp.cpp" "vns-cpp.h" "processor.cpp" "naming.cpp" "naming.h" "exceptions.h"  "content.h" "content.cpp" "contentNext.h" "contentNext.cpp"  )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET vns-cpp PROPERTY CXX_STANDARD 20)
