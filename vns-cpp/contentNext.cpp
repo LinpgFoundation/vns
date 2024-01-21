@@ -9,7 +9,7 @@ ContentNext::ContentNext(const std::unordered_map<std::string, content_next_valu
 
 ContentNext::ContentNext()
 {
-	type_ = "default";
+	type_ = "null";
 	target_ = "";
 }
 
