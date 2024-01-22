@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <variant>
 #include <vector>
 
 // 角色立绘名称预处理模块
@@ -23,6 +24,6 @@ public:
 		return DATABASE_;
 	}
 
-	bool Equal(const Naming&, bool) const;
+	bool Equal(const std::variant<Naming, std::string>&, bool must_be_the_same = false) const;
 };
 #endif

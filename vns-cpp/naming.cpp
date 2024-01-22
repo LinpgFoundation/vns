@@ -38,8 +38,11 @@ std::unordered_set<std::string> Naming::GetTags() const
 }
 
 // Check if two Naming objects or a Naming object and a string refer to the same character
-bool Naming::Equal(const Naming& other, const bool must_be_the_same = false) const
+bool Naming::Equal(const std::variant<Naming, std::string>& o, const bool must_be_the_same) const
 {
+	const Naming other = std::holds_alternative<std::string>(o)
+		                     ? Naming(std::get<std::string>(o))
+		                     : std::get<Naming>(o);
 	if (name_ == other.GetName())
 	{
 		return true;
