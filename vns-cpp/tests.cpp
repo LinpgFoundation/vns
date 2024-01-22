@@ -3,6 +3,7 @@
 #include "contentNext.h"
 #include "naming.h"
 #include <iostream>
+#include "processor.h"
 
 void TestNameWithoutTag()
 {
@@ -16,11 +17,14 @@ void TestNameWithoutTag()
 void TestNameWithTags()
 {
 	const std::string test_name_str = "maria.png&silent&hide";
+	const std::string test_name_img = "maria.png";
 	const Naming test_name(test_name_str);
-	assert(test_name.GetName() == "maria.png");
+	assert(test_name.GetName() == test_name_img);
 	const std::unordered_set<std::string> expected_tags = {"silent", "hide"};
 	assert(test_name.GetTags() == expected_tags);
 	assert(test_name.ToString() == test_name_str);
+	assert(test_name.Equal(test_name_img));
+	assert(test_name.Equal(Naming(test_name_img)));
 }
 
 void TestNullNext()
@@ -34,7 +38,7 @@ void TestNullNext()
 
 void TestSingleTargetNext()
 {
-	const auto single_target_next = ContentNext({{"type", "default"}, {"target", "~1"}});
+	const ContentNext single_target_next({{"type", "default"}, {"target", "~1"}});
 	assert(!single_target_next.is_null());
 	assert(!single_target_next.has_multi_targets());
 	assert(single_target_next.get_type() == "default");
@@ -43,14 +47,22 @@ void TestSingleTargetNext()
 
 void TestMultiTargetsNext()
 {
-	std::unordered_map<std::string, std::string> t1 = {{"hello1", "world1"}};
-	std::unordered_map<std::string, std::string> t2 = {{"hello2", "world2"}};
-	multi_targets_type target_v = {t1, t2};
-	const auto multi_targets_next = ContentNext({{"type", "default"}, {"target", target_v}});
+	const std::unordered_map<std::string, std::string> t1 = {{"hello1", "world1"}};
+	const std::unordered_map<std::string, std::string> t2 = {{"hello2", "world2"}};
+	const multi_targets_type target_v = {t1, t2};
+	const ContentNext multi_targets_next({{"type", "default"}, {"target", target_v}});
 	assert(!multi_targets_next.is_null());
 	assert(multi_targets_next.has_multi_targets());
 	assert(multi_targets_next.get_type() == "default");
-	assert(multi_targets_next.get_targets().size()==2);
+	assert(multi_targets_next.get_targets().size() == 2);
+}
+
+void TestScriptProcessorAll()
+{
+	auto test_processor = Processor();
+	test_processor.process("../examples/chapter_example.vns");
+	assert(test_processor.get_id() == 1);
+	assert(test_processor.get_language() == "English");
 }
 
 void TestAll()

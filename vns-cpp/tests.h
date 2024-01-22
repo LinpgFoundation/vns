@@ -7,4 +7,5 @@ void TestNullNext();
 void TestSingleTargetNext();
 void TestMultiTargetsNext();
 void TestAll();
+void TestScriptProcessorAll();
 #endif
