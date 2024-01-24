@@ -8,24 +8,25 @@
 #include <vector>
 # include "contentNext.h"
 
-class Content
+struct Content
 {
-public:
 	Content(const std::unordered_map<std::string, std::any>&, const std::string&);
-	std::string id() const;
-	bool has_next() const;
-	std::unordered_map<std::string, std::any> to_map() const;
-	std::string previous_;
-	ContentNext next_;
-	std::string background_image_;
-	std::string background_music_;
-	std::vector<std::string> character_images_;
-	std::vector<std::string> contents_;
-	std::string narrator_;
-	std::vector<std::string> comments_;
 
-private:
-	std::string id_;
+	Content() : Content({}, "head")
+	{
+	}
+
+	[[nodiscard]] bool has_next() const;
+	[[nodiscard]] std::unordered_map<std::string, std::any> to_map() const;
+	std::string previous;
+	ContentNext next;
+	std::string background_image;
+	std::string background_music;
+	std::vector<std::string> character_images;
+	std::vector<std::string> contents;
+	std::string narrator;
+	std::vector<std::string> comments;
+	std::string id;
 };
 
 #endif

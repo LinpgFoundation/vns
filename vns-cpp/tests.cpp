@@ -76,4 +76,5 @@ void TestAll()
 	TestSingleTargetNext();
 	std::cout << "- Test not empty multiple targets next\n";
 	TestMultiTargetsNext();
+	std::cout << "> Done\n";
 }

@@ -1,4 +1,5 @@
 ﻿#include "naming.h"
+#include <ranges>
 
 // Constructor
 Naming::Naming(const std::string& the_name)
@@ -50,10 +51,9 @@ bool Naming::Equal(const std::variant<Naming, std::string>& o, const bool must_b
 
 	if (!must_be_the_same)
 	{
-		for (const auto& [key, value] : DATABASE_)
+		for (const std::vector<std::string>& value : std::views::values(DATABASE_))
 		{
-			auto it = std::ranges::find(value.begin(), value.end(), name_);
-			if (it != value.end())
+			if (std::ranges::find(value.begin(), value.end(), name_) != value.end())
 			{
 				return std::ranges::find(value.begin(), value.end(), other.GetName()) != value.end();
 			}

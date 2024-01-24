@@ -1,18 +1,5 @@
 #include "contentNext.h"
 
-
-ContentNext::ContentNext(const std::unordered_map<std::string, content_next_value_type>& data)
-{
-	type_ = std::get<std::string>(data.at("type"));
-	target_ = data.at("target");
-}
-
-ContentNext::ContentNext()
-{
-	type_ = "null";
-	target_ = "";
-}
-
 std::unordered_map<std::string, content_next_value_type> ContentNext::to_map() const
 {
 	return {
@@ -44,7 +31,7 @@ multi_targets_type ContentNext::get_targets() const
 
 bool ContentNext::is_null() const
 {
-	if (type_.empty())
+	if (type_.empty() || type_ == "null")
 	{
 		return true;
 	}
