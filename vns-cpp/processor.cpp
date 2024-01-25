@@ -1,15 +1,15 @@
 #include <string>
 #include <vector>
-#include "processor.h"
 #include <algorithm>
 #include <cassert>
 #include <stdexcept>
-#include "functions.h"
 #include <fstream>
 #include <sstream>
+#include "functions.h"
+#include "processor.h"
 #include "naming.h"
 
-int Processor::get_id() const
+std::string Processor::get_id() const
 {
 	return id_;
 }
@@ -31,7 +31,7 @@ std::string Processor::extract_parameter(const std::string& text)
 
 std::string Processor::extract_tag(const std::string& text)
 {
-	return text.substr(text.find(TAG_STARTS) + 1, text.find(TAG_ENDS));
+	return text.substr(text.find(TAG_STARTS) + 1, text.find(TAG_ENDS) - 1);
 }
 
 std::string Processor::extract_string(const std::string& text)
@@ -41,8 +41,8 @@ std::string Processor::extract_string(const std::string& text)
 
 [[noreturn]] void Processor::terminated(const std::string& reason) const
 {
-	throw std::runtime_error("File \"" + path_in_ + "\", line " + std::to_string(line_index_ + 1) +
-		"\n  " + get_current_line() + "\nFail to compile due to " + reason);
+	throw std::runtime_error("File \"" + path_in_.string() + "\", line " + std::to_string(line_index_ + 1) +
+		"\n  " + (line_index_ < lines_.size() ? get_current_line() : "") + "\nFail to compile due to " + reason);
 }
 
 std::string Processor::get_current_line() const
@@ -50,11 +50,9 @@ std::string Processor::get_current_line() const
 	return lines_[line_index_];
 }
 
-std::unordered_map<std::string, std::unordered_map<std::string, std::unordered_map<std::string, std::any>>>
-Processor::get_output() const
+ProcessorOutputType Processor::get_output() const
 {
-	std::unordered_map<std::string, std::unordered_map<std::string, std::unordered_map<std::string, std::any>>> output =
-		{};
+	ProcessorOutputType output = {};
 	for (const auto& [section_name, section_contents] : output_)
 	{
 		output[section_name] = {};
@@ -66,19 +64,45 @@ Processor::get_output() const
 	return output;
 }
 
+nlohmann::json Processor::get_output_as_json() const
+{
+	nlohmann::json output;
+	for (const auto& [section_name, section_contents] : output_)
+	{
+		nlohmann::json section;
+		for (const auto& [dialogue_id, dialogue_content] : section_contents)
+		{
+			section[dialogue_id] = dialogue_content.to_json();
+		}
+		output[section_name] = section;
+	}
+	return output;
+}
 
-void Processor::process(const std::string& path)
+
+void Processor::process(const std::filesystem::path& path)
 {
 	path_in_ = path;
 	int current_index = 0;
-
-	if (path_in_.ends_with(SCRIPTS_FILE_EXTENSION))
+	if (!exists(path_in_))
 	{
-		std::ifstream file(path_in_);
-		std::string line;
-		while (std::getline(file, line))
+		terminated("File does not exist!");
+	}
+	if (path_in_.extension().compare(SCRIPTS_FILE_EXTENSION) == 0)
+	{
+		std::ifstream file(path);
+		if (file.is_open())
 		{
-			lines_.emplace_back(line);
+			std::string line;
+			while (std::getline(file, line))
+			{
+				lines_.push_back(line);
+			}
+			file.close();
+		}
+		else
+		{
+			terminated("Cannot open file!");
 		}
 	}
 
@@ -93,7 +117,7 @@ void Processor::process(const std::string& path)
 	{
 		lines_[index] = trim(lines_[index].substr(0, lines_[index].find(NOTE_PREFIX)));
 
-		if (lines_[index].starts_with(TAG_STARTS))
+		if (lines_[index].find(TAG_STARTS) == 0)
 		{
 			if (auto tag = extract_tag(lines_[index]); tag == "label")
 			{
@@ -115,12 +139,13 @@ void Processor::process(const std::string& path)
 		}
 		else if (lines_[index].find(":") != std::string::npos)
 		{
-			dialog_associate_key_[index] = (current_index == 0
-				                                ? "head"
-				                                : (current_index < 10
-					                                   ? "~0" + std::to_string(current_index)
-					                                   : "~" + std::to_string(current_index)));
-
+			dialog_associate_key_[index] = current_index == 0
+				                               ? "head"
+				                               : last_label.empty()
+				                               ? (current_index < 10
+					                                  ? "~0" + std::to_string(current_index)
+					                                  : "~" + std::to_string(current_index))
+				                               : last_label;
 			last_label = "";
 			++current_index;
 		}
@@ -130,9 +155,9 @@ void Processor::process(const std::string& path)
 	lines_.clear();
 
 	// making sure essential instances are init correctly
-	if (id_ < 0)
+	if (id_.empty())
 	{
-		terminated("You have to set a nonnegative id!");
+		terminated("You have to set a id!");
 	}
 	if (lang_.empty())
 	{
@@ -157,10 +182,10 @@ void Processor::convert(int starting_index)
 			// Skip empty lines or lines starting with #
 			// Do nothing
 		}
-		else if (currentLine.starts_with(COMMENT_PREFIX) == 0)
+		else if (currentLine.find(COMMENT_PREFIX) == 0)
 		{
 			// Accumulate comments
-			accumulated_comments_.push_back(currentLine.substr(COMMENT_PREFIX.length()));
+			accumulated_comments_.push_back(currentLine.substr(COMMENT_PREFIX.length() + 1));
 		}
 		else if (currentLine.find(TAG_STARTS) == 0)
 		{
@@ -214,12 +239,8 @@ void Processor::convert(int starting_index)
 			}
 			else if (tag == "id")
 			{
-				std::string id_str = extract_parameter(currentLine);
-				if (!id_str.empty())
-				{
-					id_ = std::stoi(id_str);
-				}
-				else
+				id_ = extract_parameter(currentLine);
+				if (id_.empty())
 				{
 					terminated("Chapter id cannot be None!");
 				}
@@ -248,7 +269,7 @@ void Processor::convert(int starting_index)
 			else if (tag == "scene")
 			{
 				assert(!previous_.empty());
-				output_[section_][previous_].next = ContentNext("scene", {});
+				output_[section_][previous_].next = ContentNext("scene", "");
 				current_data_.background_image = extract_parameter(currentLine);
 
 				if (!current_data_.background_image.empty() && current_data_.background_image.length() == 0)
@@ -272,18 +293,28 @@ void Processor::convert(int starting_index)
 				{
 					terminated("Invalid option syntax: '->' cannot be found!");
 				}
-
+				// storing current targets
+				MultiTargetsType current_targets;
+				// get value string
+				auto src_to_target = extract_string(currentLine);
 				if (output_[section_][previous_].next.get_type() != "options")
 				{
-					output_[section_][previous_].next = ContentNext("options", {});
+					current_targets.push_back({
+						{"text", trim(src_to_target.substr(0, src_to_target.find("->")))},
+						{"id", ensure_not_null(trim(src_to_target.substr(src_to_target.find("->") + 2)))}
+					});
+					output_[section_][previous_].next = ContentNext("options", current_targets);
 				}
-
-				auto src_to_target = extract_string(currentLine);
-
-				output_[section_][previous_].next.get_targets().push_back({
-					{"text", trim(src_to_target.substr(0, src_to_target.find("->")))},
-					{"id", ensure_not_null(trim(src_to_target.substr(src_to_target.find("->") + 2)))}
-				});
+				else
+				{
+					current_targets = output_[section_][previous_].next.get_targets();
+					current_targets.push_back({
+						{"text", trim(src_to_target.substr(0, src_to_target.find("->")))},
+						{"id", ensure_not_null(trim(src_to_target.substr(src_to_target.find("->") + 2)))}
+					});
+					output_[section_][previous_].next = ContentNext(output_[section_][previous_].next.get_type(),
+					                                                current_targets);
+				}
 			}
 			// Placeholder, no action needed for "label" tag
 			else if (tag == "label")
@@ -355,7 +386,7 @@ void Processor::convert(int starting_index)
 				}
 				else
 				{
-					current_data_.previous = nullptr;
+					current_data_.previous = "";
 					blocked_ = false;
 				}
 
@@ -381,7 +412,7 @@ void Processor::convert(int starting_index)
 			}
 			else
 			{
-				current_data_.previous = nullptr;
+				current_data_.previous = "";
 			}
 
 			if (!accumulated_comments_.empty())

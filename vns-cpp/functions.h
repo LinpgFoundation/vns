@@ -4,7 +4,7 @@
 
 bool ichar_equals(char, char);
 
-bool iequals(std::string_view lhs, std::string_view rhs);
+bool iequals(std::string_view, std::string_view);
 
 // trim from start (in place)
 std::string ltrim(std::string);

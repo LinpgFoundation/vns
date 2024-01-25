@@ -4,6 +4,7 @@
 #include "naming.h"
 #include <iostream>
 #include "processor.h"
+#include "compiler.h"
 
 void TestNameWithoutTag()
 {
@@ -49,7 +50,7 @@ void TestMultiTargetsNext()
 {
 	const std::unordered_map<std::string, std::string> t1 = {{"hello1", "world1"}};
 	const std::unordered_map<std::string, std::string> t2 = {{"hello2", "world2"}};
-	const multi_targets_type target_v = {t1, t2};
+	const MultiTargetsType target_v = {t1, t2};
 	const ContentNext multi_targets_next({{"type", "default"}, {"target", target_v}});
 	assert(!multi_targets_next.is_null());
 	assert(multi_targets_next.has_multi_targets());
@@ -57,12 +58,18 @@ void TestMultiTargetsNext()
 	assert(multi_targets_next.get_targets().size() == 2);
 }
 
-void TestScriptProcessorAll()
+void TestScriptProcessor()
 {
 	auto test_processor = Processor();
-	test_processor.process("../examples/chapter_example.vns");
-	assert(test_processor.get_id() == 1);
+	test_processor.process("C:/Users/yudon/Documents/GitHub/vns/examples/chapter_example.vns");
+	assert(test_processor.get_id() == "1");
 	assert(test_processor.get_language() == "English");
+}
+
+void TestCompiler()
+{
+	Compiler::compile("C:/Users/yudon/Documents/GitHub/vns/examples/chapter_example.vns",
+	                  "C:/Users/yudon/Documents/GitHub/vns/examples/out");
 }
 
 void TestAll()
@@ -76,5 +83,9 @@ void TestAll()
 	TestSingleTargetNext();
 	std::cout << "- Test not empty multiple targets next\n";
 	TestMultiTargetsNext();
+	std::cout << "- Test script processor\n";
+	TestScriptProcessor();
+	std::cout << "- Test compiler\n";
+	TestCompiler();
 	std::cout << "> Done\n";
 }

@@ -1,22 +1,23 @@
 #include "content.h"
 
 
-Content::Content(const std::unordered_map<std::string, std::any>& data, const std::string& content_id)
+Content::Content(const std::unordered_map<std::string, ContentValueType>& data, const std::string& content_id)
 {
 	id = content_id;
-	background_image = std::any_cast<std::string>(data.at("background_image"));
-	background_music = std::any_cast<std::string>(data.at("background_music"));
-	character_images = std::any_cast<std::vector<std::string>>(data.at("character_images"));
-	contents = std::any_cast<std::vector<std::string>>(data.at("contents"));
-	narrator = std::any_cast<std::string>(data.at("narrator"));
-	previous = std::any_cast<std::string>(data.at("previous"));
-	next = ContentNext(std::any_cast<std::unordered_map<std::string, content_next_value_type>>(data.at("next")));
-	comments = std::any_cast<std::vector<std::string>>(data.at("comments"));
+	background_image = cast<std::string>(data, "background_image", "");
+	background_music = cast<std::string>(data, "background_music", "");
+	character_images = cast<std::vector<std::string>>(data, "character_images", {});
+	contents = cast<std::vector<std::string>>(data, "contents", {});
+	narrator = cast<std::string>(data, "narrator", "");
+	previous = cast<std::string>(data, "previous", "");
+	next = ContentNext(
+		cast<std::unordered_map<std::string, ContentNextValueType>>(data, "next", {{"type", "null"}, {"target", ""}}));
+	comments = cast<std::vector<std::string>>(data, "comments", {});
 }
 
 bool Content::has_next() const { return !next.is_null(); }
 
-std::unordered_map<std::string, std::any> Content::to_map() const
+std::unordered_map<std::string, ContentValueType> Content::to_map() const
 {
 	return {
 		{"background_image", background_image},
@@ -28,4 +29,18 @@ std::unordered_map<std::string, std::any> Content::to_map() const
 		{"next", next.to_map()},
 		{"comments", comments}
 	};
+}
+
+nlohmann::json Content::to_json() const
+{
+	nlohmann::json json_data;
+	if (!background_image.empty()) json_data["background_image"] = background_image;
+	if (!background_music.empty()) json_data["background_music"] = background_music;
+	if (!character_images.empty()) json_data["character_images"] = character_images;
+	if (!contents.empty()) json_data["contents"] = contents;
+	if (!previous.empty()) json_data["previous"] = previous;
+	if (!narrator.empty()) json_data["narrator"] = narrator;
+	json_data["next"] = next.to_json();
+	if (!comments.empty()) json_data["comments"] = comments;
+	return json_data;
 }

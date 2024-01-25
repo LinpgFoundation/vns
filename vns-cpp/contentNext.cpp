@@ -1,10 +1,26 @@
 #include "contentNext.h"
 
-std::unordered_map<std::string, content_next_value_type> ContentNext::to_map() const
+std::unordered_map<std::string, ContentNextValueType> ContentNext::to_map() const
 {
-	return {
-		{"type", type_}, {"target", target_}
-	};
+	return {{"type", type_}, {"target", target_}};
+}
+
+nlohmann::json ContentNext::to_json() const
+{
+	nlohmann::json json_data;
+	if (!is_null())
+	{
+		json_data["type"] = type_;
+		if (has_multi_targets())
+		{
+			json_data["target"] = get_targets();
+		}
+		else
+		{
+			json_data["target"] = get_target();
+		}
+	}
+	return json_data;
 }
 
 bool ContentNext::has_multi_targets() const
@@ -23,9 +39,9 @@ std::string ContentNext::get_target() const
 	return std::get<std::string>(target_);
 }
 
-multi_targets_type ContentNext::get_targets() const
+MultiTargetsType ContentNext::get_targets() const
 {
-	return std::get<multi_targets_type>(target_);
+	return std::get<MultiTargetsType>(target_);
 }
 
 
@@ -39,5 +55,5 @@ bool ContentNext::is_null() const
 	{
 		return std::get<std::string>(target_).empty();
 	}
-	return std::get<multi_targets_type>(target_).empty();
+	return std::get<MultiTargetsType>(target_).empty();
 }

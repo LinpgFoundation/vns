@@ -3,8 +3,11 @@
 #include <any>
 #include <unordered_map>
 #include <unordered_set>
-
+#include <filesystem>
 #include "content.h"
+
+using ProcessorOutputType = std::unordered_map<std::string, std::unordered_map<
+	                                               std::string, std::unordered_map<std::string, ContentValueType>>>;
 
 class Processor
 {
@@ -19,23 +22,22 @@ public:
 	static const std::string inline NOTE_PREFIX = "#";
 	static const std::string inline COMMENT_PREFIX = "//";
 
-	Processor() : line_index_(0), current_data_({}, "head"), id_(-1), blocked_(false)
+	Processor() : line_index_(0), current_data_({}, "head"), blocked_(false)
 	{
 	}
 
-	[[nodiscard]] int get_id() const;
+	[[nodiscard]] std::string get_id() const;
 	[[nodiscard]] std::string get_language() const;
-	void process(const std::string&);
-	[[nodiscard]] std::unordered_map<std::string, std::unordered_map<
-		                                 std::string, std::unordered_map<std::string, std::any>>>
-	get_output() const;
+	void process(const std::filesystem::path&);
+	[[nodiscard]] ProcessorOutputType get_output() const;
+	[[nodiscard]] nlohmann::json get_output_as_json() const;
 
 private:
-	std::string path_in_;
+	std::filesystem::path path_in_;
 	size_t line_index_;
 	std::unordered_map<std::string, std::unordered_map<std::string, Content>> output_;
 	Content current_data_;
-	int id_;
+	std::string id_;
 	std::string lang_;
 	std::string section_;
 	std::string previous_;

@@ -7,19 +7,22 @@
 #include <variant>
 #include <vector>
 
-using multi_targets_type = std::vector<std::unordered_map<std::string, std::string>>;
+#include "libs/nlohmann/json.hpp"
 
-using content_next_value_type = std::variant<std::string, multi_targets_type>;
+using MultiTargetsType = std::vector<std::unordered_map<std::string, std::string>>;
+
+using ContentNextValueType = std::variant<std::string, MultiTargetsType>;
 
 class ContentNext
 {
 public:
-	ContentNext(const std::string& type, const content_next_value_type& target) : type_(type), target_(target)
+	ContentNext(const std::string& type, const ContentNextValueType& target) : type_(type), target_(target)
 	{
 	}
 
-	ContentNext(const std::unordered_map<std::string, content_next_value_type>& data) : ContentNext(
-		std::get<std::string>(data.at("type")), data.at("target"))
+	ContentNext(const std::unordered_map<std::string, ContentNextValueType>& data) : ContentNext(
+		std::get<std::string>(data.contains("type") ? data.at("type") : "null"),
+		data.contains("target") ? data.at("target") : "")
 	{
 	}
 
@@ -29,14 +32,15 @@ public:
 
 	[[nodiscard]] std::string get_type() const;
 	[[nodiscard]] std::string get_target() const;
-	[[nodiscard]] multi_targets_type get_targets() const;
+	[[nodiscard]] MultiTargetsType get_targets() const;
 	[[nodiscard]] bool has_multi_targets() const;
 	[[nodiscard]] bool is_null() const;
-	[[nodiscard]] std::unordered_map<std::string, content_next_value_type> to_map() const;
+	[[nodiscard]] std::unordered_map<std::string, ContentNextValueType> to_map() const;
+	nlohmann::json to_json() const;
 
 private:
 	std::string type_;
-	content_next_value_type target_;
+	ContentNextValueType target_;
 };
 
 const ContentNext kNullContentNext;
