@@ -1,34 +1,23 @@
 import json
-import time
 from glob import glob
 from os import path as OS_PATH
+from subprocess import check_output
 from typing import Any
-
-from ._processor import Processor
-from ._version import REVISION, VERSION
 
 
 class Compiler:
     # 直接加载
     @staticmethod
     def load(path: str) -> dict[str, Any]:
-        _processor: Processor = Processor()
-        _processor.process(path)
-        return {
-            "dialogs": _processor.get_output(),
-            "compiler": {
-                "version": VERSION,
-                "reversion": REVISION,
-                "compiledAt": int(time.time()),
-            },
-            "id": _processor.get_id(),
-            "language": _processor.get_language(),
-        }
+        output = check_output(
+            [OS_PATH.join(OS_PATH.dirname(__file__), "vns.exe"), "-i", path, "-s"]
+        ).decode()
+        return json.loads(output)
 
     # 编译
     @classmethod
     def compile(cls, path: str, out_dir: str | None = None) -> None:
-        if not OS_PATH.isdir(path) and path.endswith(Processor.SCRIPTS_FILE_EXTENSION):
+        if not OS_PATH.isdir(path) and path.endswith(".vns"):
             cls._save(
                 cls.load(path),
                 out_dir if out_dir is not None else OS_PATH.dirname(path),

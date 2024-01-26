@@ -159,3 +159,4 @@ vns-vscode/LICENSE
 .vs/
 vns-cpp/libs/
 vns-cpp/CMakeUserPresets.json
+vns-python/pyvns/vns.exe
