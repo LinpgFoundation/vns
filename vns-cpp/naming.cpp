@@ -1,5 +1,6 @@
 ﻿#include "naming.h"
 #include <ranges>
+#include <sstream>
 
 // Constructor
 Naming::Naming(const std::string& the_name)
@@ -16,35 +17,57 @@ Naming::Naming(const std::string& the_name)
 }
 
 // Get combined name and tags as a string
-std::string Naming::ToString() const
+std::string Naming::to_string() const
 {
-	std::string result = name_;
+	std::stringstream result;
+	result << name_;
 	for (const auto& tag : tags_)
 	{
-		result += "&" + tag;
+		result << "&" << tag;
 	}
-	return result;
+	return result.str();
 }
 
 // Accessor for name
-std::string Naming::GetName() const
+std::string Naming::get_name() const
 {
 	return name_;
 }
 
 // Accessor for tags
-std::unordered_set<std::string> Naming::GetTags() const
+std::unordered_set<std::string> Naming::get_tags() const
 {
 	return tags_;
 }
 
+// If contains a tag
+bool Naming::contains_tag(const std::string& tag) const
+{
+	return tags_.contains(tag);
+}
+
+// Insert a tag
+void Naming::insert_tag(const std::string& tag)
+{
+	tags_.insert(tag);
+}
+
+// Erase a tag
+void Naming::erase_tag(const std::string& tag)
+{
+	if (tags_.contains(tag))
+	{
+		tags_.erase(tag);
+	}
+}
+
 // Check if two Naming objects or a Naming object and a string refer to the same character
-bool Naming::Equal(const std::variant<Naming, std::string>& o, const bool must_be_the_same) const
+bool Naming::equal(const std::variant<Naming, std::string>& o, const bool must_be_the_same) const
 {
 	const Naming other = std::holds_alternative<std::string>(o)
 		                     ? Naming(std::get<std::string>(o))
 		                     : std::get<Naming>(o);
-	if (name_ == other.GetName())
+	if (name_ == other.get_name())
 	{
 		return true;
 	}
@@ -55,7 +78,7 @@ bool Naming::Equal(const std::variant<Naming, std::string>& o, const bool must_b
 		{
 			if (std::ranges::find(value.begin(), value.end(), name_) != value.end())
 			{
-				return std::ranges::find(value.begin(), value.end(), other.GetName()) != value.end();
+				return std::ranges::find(value.begin(), value.end(), other.get_name()) != value.end();
 			}
 		}
 	}

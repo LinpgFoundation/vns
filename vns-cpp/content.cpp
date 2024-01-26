@@ -11,7 +11,8 @@ Content::Content(const std::unordered_map<std::string, ContentValueType>& data, 
 	narrator = cast<std::string>(data, "narrator", "");
 	previous = cast<std::string>(data, "previous", "");
 	next = ContentNext(
-		cast<std::unordered_map<std::string, ContentNextValueType>>(data, "next", {{"type", "null"}, {"target", ""}}));
+		cast<std::unordered_map<
+			std::string, ContentNextValueType>>(data, "next", {{"type", "default"}, {"target", ""}}));
 	comments = cast<std::vector<std::string>>(data, "comments", {});
 }
 

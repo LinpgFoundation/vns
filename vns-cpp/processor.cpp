@@ -1,6 +1,4 @@
-#include <string>
 #include <vector>
-#include <algorithm>
 #include <cassert>
 #include <stdexcept>
 #include <fstream>
@@ -21,7 +19,7 @@ std::string Processor::get_language() const
 
 std::string Processor::ensure_not_null(const std::string& text)
 {
-	return (iequals(text, "null") || iequals(text, "none")) ? "" : text;
+	return iequals(text, "null") || iequals(text, "none") ? "" : text;
 }
 
 std::string Processor::extract_parameter(const std::string& text)
@@ -41,8 +39,13 @@ std::string Processor::extract_string(const std::string& text)
 
 [[noreturn]] void Processor::terminated(const std::string& reason) const
 {
-	throw std::runtime_error("File \"" + path_in_.string() + "\", line " + std::to_string(line_index_ + 1) +
-		"\n  " + (line_index_ < lines_.size() ? get_current_line() : "") + "\nFail to compile due to " + reason);
+	throw std::runtime_error("File \"" + path_.string() + "\", line " + std::to_string(line_index_ + 1) +
+		"\n  " + get_current_line() + "\nFail to compile due to: " + reason);
+}
+
+[[noreturn]] void Processor::preprocess_terminated(const std::string& reason) const
+{
+	throw std::runtime_error("File \"" + path_.string() + "\" failed to compile due to: " + reason);
 }
 
 std::string Processor::get_current_line() const
@@ -52,7 +55,7 @@ std::string Processor::get_current_line() const
 
 ProcessorOutputType Processor::get_output() const
 {
-	ProcessorOutputType output = {};
+	ProcessorOutputType output;
 	for (const auto& [section_name, section_contents] : output_)
 	{
 		output[section_name] = {};
@@ -82,33 +85,37 @@ nlohmann::json Processor::get_output_as_json() const
 
 void Processor::process(const std::filesystem::path& path)
 {
-	path_in_ = path;
+	path_ = path;
 	int current_index = 0;
-	if (!exists(path_in_))
+
+	//make sure file exists
+	if (!exists(path_))
 	{
-		terminated("File does not exist!");
+		preprocess_terminated("File does not exist!");
 	}
-	if (path_in_.extension().compare(SCRIPTS_FILE_EXTENSION) == 0)
+
+	// read file
+	if (path_.extension().compare(SCRIPTS_FILE_EXTENSION) == 0)
 	{
-		std::ifstream file(path);
-		if (file.is_open())
+		if (std::ifstream f(path_); f.is_open())
 		{
 			std::string line;
-			while (std::getline(file, line))
+			while (std::getline(f, line))
 			{
 				lines_.push_back(line);
 			}
-			file.close();
+			f.close();
 		}
 		else
 		{
-			terminated("Cannot open file!");
+			preprocess_terminated("File is occupied!");
 		}
 	}
 
+	// make sure file is not empty
 	if (lines_.empty())
 	{
-		terminated("Cannot convert an empty script file!");
+		preprocess_terminated("Cannot convert an empty script file!");
 	}
 
 	std::string last_label;
@@ -175,21 +182,20 @@ void Processor::convert(int starting_index)
 
 	while (line_index_ < lines_.size())
 	{
-		std::string currentLine = get_current_line();
-
-		if (currentLine.empty() || lines_[line_index_].find(NOTE_PREFIX) == 0)
+		if (std::string current_line = get_current_line(); current_line.empty() || lines_[line_index_].find(NOTE_PREFIX)
+			== 0)
 		{
 			// Skip empty lines or lines starting with #
 			// Do nothing
 		}
-		else if (currentLine.find(COMMENT_PREFIX) == 0)
+		else if (current_line.find(COMMENT_PREFIX) == 0)
 		{
 			// Accumulate comments
-			accumulated_comments_.push_back(currentLine.substr(COMMENT_PREFIX.length() + 1));
+			accumulated_comments_.push_back(current_line.substr(COMMENT_PREFIX.length() + 1));
 		}
-		else if (currentLine.find(TAG_STARTS) == 0)
+		else if (current_line.find(TAG_STARTS) == 0)
 		{
-			std::string tag = extract_tag(currentLine);
+			std::string tag = extract_tag(current_line);
 
 			if (ALTERNATIVES.contains(tag))
 			{
@@ -198,48 +204,45 @@ void Processor::convert(int starting_index)
 
 			if (tag == "bgi")
 			{
-				current_data_.background_image = extract_parameter(currentLine);
+				current_data_.background_image = extract_parameter(current_line);
 			}
 			else if (tag == "bgm")
 			{
-				current_data_.background_music = extract_parameter(currentLine);
+				current_data_.background_music = extract_parameter(current_line);
 			}
 			else if (tag == "show")
 			{
-				auto names = extract_string(currentLine);
-				std::istringstream iss(names);
-				std::copy(std::istream_iterator<std::string>(iss),
-				          std::istream_iterator<std::string>(),
-				          std::back_inserter(current_data_.character_images));
+				for (const std::string& name : split(extract_string(current_line)))
+				{
+					current_data_.character_images.push_back(name);
+				}
 			}
 			else if (tag == "hide")
 			{
-				auto names = extract_string(currentLine);
-				if (names == "*")
+				for (const std::string& name : split(extract_string(current_line)))
 				{
-					current_data_.character_images.clear();
-				}
-				else
-				{
-					std::erase_if(current_data_.character_images,
-					              [&](const std::string& name)
-					              {
-						              return Naming(name).Equal(names);
-					              });
+					if (name == "*")
+					{
+						current_data_.character_images.clear();
+						break;
+					}
+					std::erase_if(current_data_.character_images, [&](const std::string& n)
+					{
+						return Naming(n).equal(name);
+					});
 				}
 			}
 			else if (tag == "display")
 			{
 				current_data_.character_images.clear();
-				auto names = extract_string(currentLine);
-				std::istringstream iss(names);
-				std::copy(std::istream_iterator<std::string>(iss),
-				          std::istream_iterator<std::string>(),
-				          std::back_inserter(current_data_.character_images));
+				for (const std::string& name : split(extract_string(current_line)))
+				{
+					current_data_.character_images.push_back(name);
+				}
 			}
 			else if (tag == "id")
 			{
-				id_ = extract_parameter(currentLine);
+				id_ = extract_parameter(current_line);
 				if (id_.empty())
 				{
 					terminated("Chapter id cannot be None!");
@@ -247,7 +250,7 @@ void Processor::convert(int starting_index)
 			}
 			else if (tag == "language")
 			{
-				lang_ = extract_string(currentLine);
+				lang_ = extract_string(current_line);
 			}
 			else if (tag == "section")
 			{
@@ -255,7 +258,7 @@ void Processor::convert(int starting_index)
 				{
 					output_[section_][previous_].next = kNullContentNext;
 				}
-				section_ = extract_string(currentLine);
+				section_ = extract_string(current_line);
 				output_[section_] = {};
 				output_[section_]["head"] = Content({}, "head");
 				current_data_ = Content({}, "head");
@@ -269,13 +272,12 @@ void Processor::convert(int starting_index)
 			else if (tag == "scene")
 			{
 				assert(!previous_.empty());
-				output_[section_][previous_].next = ContentNext("scene", "");
-				current_data_.background_image = extract_parameter(currentLine);
-
-				if (!current_data_.background_image.empty() && current_data_.background_image.length() == 0)
-				{
-					current_data_.background_image = nullptr;
-				}
+				output_[section_][previous_].next = output_[section_][previous_].next.has_multi_targets()
+					                                    ? ContentNext(
+						                                    "scene", output_[section_][previous_].next.get_targets())
+					                                    : ContentNext(
+						                                    "scene", output_[section_][previous_].next.get_target());
+				current_data_.background_image = extract_parameter(current_line);
 				blocked_ = true;
 			}
 			else if (tag == "block")
@@ -293,28 +295,21 @@ void Processor::convert(int starting_index)
 				{
 					terminated("Invalid option syntax: '->' cannot be found!");
 				}
-				// storing current targets
+				// get current targets
 				MultiTargetsType current_targets;
-				// get value string
-				auto src_to_target = extract_string(currentLine);
-				if (output_[section_][previous_].next.get_type() != "options")
-				{
-					current_targets.push_back({
-						{"text", trim(src_to_target.substr(0, src_to_target.find("->")))},
-						{"id", ensure_not_null(trim(src_to_target.substr(src_to_target.find("->") + 2)))}
-					});
-					output_[section_][previous_].next = ContentNext("options", current_targets);
-				}
-				else
+				if (output_[section_][previous_].next.get_type() == "options")
 				{
 					current_targets = output_[section_][previous_].next.get_targets();
-					current_targets.push_back({
-						{"text", trim(src_to_target.substr(0, src_to_target.find("->")))},
-						{"id", ensure_not_null(trim(src_to_target.substr(src_to_target.find("->") + 2)))}
-					});
-					output_[section_][previous_].next = ContentNext(output_[section_][previous_].next.get_type(),
-					                                                current_targets);
 				}
+				// get value string
+				auto src_to_target = extract_string(current_line);
+				// push text and id map
+				current_targets.push_back({
+					{"text", trim(src_to_target.substr(0, src_to_target.find("->")))},
+					{"id", ensure_not_null(trim(src_to_target.substr(src_to_target.find("->") + 2)))}
+				});
+				// update next
+				output_[section_][previous_].next = ContentNext("options", current_targets);
 			}
 			// Placeholder, no action needed for "label" tag
 			else if (tag == "label")
@@ -325,34 +320,32 @@ void Processor::convert(int starting_index)
 				terminated("Invalid tag " + tag);
 			}
 		}
-		else if (currentLine.find(':') != std::string::npos)
+		else if (current_line.find(':') != std::string::npos)
 		{
-			std::string narrator = ensure_not_null(currentLine.substr(0, currentLine.size() - 1));
+			std::string narrator = ensure_not_null(current_line.substr(0, current_line.size() - 1));
 			current_data_.narrator = narrator;
 
 			// Rest of the logic for processing dialog content
 			std::vector<std::string> narrator_possible_images;
-			std::string narrator_lower_case = toLowerCase(current_data_.narrator);
-			if (Naming::GetDatabase().contains(narrator_lower_case))
+			if (std::string narrator_lower_case = to_lower(current_data_.narrator); Naming::get_database().contains(
+				narrator_lower_case))
 			{
-				narrator_possible_images = Naming::GetDatabase()[narrator_lower_case];
+				narrator_possible_images = Naming::get_database()[narrator_lower_case];
 			}
 			for (size_t i = 0; i < current_data_.character_images.size(); ++i)
 			{
 				Naming name_data(current_data_.character_images[i]);
-				if (std::find(narrator_possible_images.begin(), narrator_possible_images.end(), name_data.GetName()) !=
+				if (std::ranges::find(narrator_possible_images.begin(), narrator_possible_images.end(),
+				                      name_data.get_name()) !=
 					narrator_possible_images.end())
 				{
-					if (name_data.GetTags().contains("silent"))
-					{
-						name_data.GetTags().erase("silent");
-					}
+					name_data.erase_tag("silent");
 				}
 				else
 				{
-					name_data.GetTags().insert("silent");
+					name_data.insert_tag("silent");
 				}
-				current_data_.character_images[i] = name_data.ToString();
+				current_data_.character_images[i] = name_data.to_string();
 			}
 
 			current_data_.contents.clear();
@@ -402,7 +395,8 @@ void Processor::convert(int starting_index)
 					}
 					else
 					{
-						output_[section_][previous_].next = ContentNext("default", dialog_associate_key_[line_index_]);
+						output_[section_][previous_].next = ContentNext(output_[section_][previous_].next.get_type(),
+						                                                dialog_associate_key_[line_index_]);
 					}
 				}
 				else

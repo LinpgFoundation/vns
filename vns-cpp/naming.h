@@ -11,19 +11,21 @@ class Naming
 {
 	std::string name_;
 	std::unordered_set<std::string> tags_;
-	inline static std::unordered_map<std::string, std::vector<std::string>> DATABASE_ = {};
+	inline static std::unordered_map<std::string, std::vector<std::string>> DATABASE_;
 
 public:
 	Naming(const std::string&);
-	[[nodiscard]] std::string ToString() const;
-	[[nodiscard]] std::string GetName() const;
-	[[nodiscard]] std::unordered_set<std::string> GetTags() const;
+	[[nodiscard]] std::string to_string() const;
+	[[nodiscard]] std::string get_name() const;
+	[[nodiscard]] std::unordered_set<std::string> get_tags() const;
+	[[nodiscard]] bool contains_tag(const std::string&) const;
+	void insert_tag(const std::string&);
+	void erase_tag(const std::string&);
+	[[nodiscard]] bool equal(const std::variant<Naming, std::string>&, bool must_be_the_same = false) const;
 	// Class method to access the database
-	static std::unordered_map<std::string, std::vector<std::string>>& GetDatabase()
+	static std::unordered_map<std::string, std::vector<std::string>>& get_database()
 	{
 		return DATABASE_;
 	}
-
-	[[nodiscard]] bool Equal(const std::variant<Naming, std::string>&, bool must_be_the_same = false) const;
 };
 #endif

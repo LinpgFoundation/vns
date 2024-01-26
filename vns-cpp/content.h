@@ -1,9 +1,7 @@
 #ifndef CONTENT_H
 #define CONTENT_H
 #include <string>
-#include <vector>
 #include <unordered_map>
-#include <string>
 #include <vector>
 #include "contentNext.h"
 

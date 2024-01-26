@@ -23,9 +23,14 @@ nlohmann::json ContentNext::to_json() const
 	return json_data;
 }
 
+bool ContentNext::has_single_target() const
+{
+	return std::holds_alternative<std::string>(target_);
+}
+
 bool ContentNext::has_multi_targets() const
 {
-	return !std::holds_alternative<std::string>(target_);
+	return !has_single_target();
 }
 
 std::string ContentNext::get_type() const
@@ -47,13 +52,5 @@ MultiTargetsType ContentNext::get_targets() const
 
 bool ContentNext::is_null() const
 {
-	if (type_.empty() || type_ == "null")
-	{
-		return true;
-	}
-	if (std::holds_alternative<std::string>(target_))
-	{
-		return std::get<std::string>(target_).empty();
-	}
-	return std::get<MultiTargetsType>(target_).empty();
+	return has_single_target() ? get_target().empty() : get_targets().empty();
 }

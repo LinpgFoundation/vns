@@ -14,7 +14,7 @@ project (vns)
 file(GLOB SOURCES "libs/*/*.h" "libs/*/*.cpp" "libs/*/*.hpp")
 
 # Add source to this project's executable.
-add_executable (vns ${SOURCES} "vns.cpp" "vns.h" "processor.cpp" "naming.cpp" "naming.h" "exceptions.h"  "content.h" "content.cpp" "contentNext.h" "contentNext.cpp"   "processor.h" "functions.h" "tests.h" "tests.cpp" "functions.cpp" "compiler.h" "compiler.cpp" "version.h")
+add_executable (vns ${SOURCES} "vns.cpp" "vns.h" "processor.cpp" "naming.cpp" "naming.h" "content.h" "content.cpp" "contentNext.h" "contentNext.cpp" "processor.h" "functions.h" "tests.h" "tests.cpp" "functions.cpp" "compiler.h" "compiler.cpp" "version.h")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET vns PROPERTY CXX_STANDARD 20)

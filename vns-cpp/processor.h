@@ -33,7 +33,7 @@ public:
 	[[nodiscard]] nlohmann::json get_output_as_json() const;
 
 private:
-	std::filesystem::path path_in_;
+	std::filesystem::path path_;
 	size_t line_index_;
 	std::unordered_map<std::string, std::unordered_map<std::string, Content>> output_;
 	Content current_data_;
@@ -50,6 +50,7 @@ private:
 	static std::string extract_tag(const std::string&);
 	static std::string extract_string(const std::string&);
 	[[noreturn]] void terminated(const std::string&) const;
+	[[noreturn]] void preprocess_terminated(const std::string&) const;
 	[[nodiscard]] std::string get_current_line() const;
 	void convert(int);
 };

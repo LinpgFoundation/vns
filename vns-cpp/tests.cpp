@@ -10,9 +10,9 @@ void TestNameWithoutTag()
 {
 	const std::string test_name_str = "maria.png";
 	const Naming test_name(test_name_str);
-	assert(test_name.GetName() == test_name_str);
-	assert(test_name.GetTags().empty());
-	assert(test_name.ToString() == test_name_str);
+	assert(test_name.get_name() == test_name_str);
+	assert(test_name.get_tags().empty());
+	assert(test_name.to_string() == test_name_str);
 }
 
 void TestNameWithTags()
@@ -20,12 +20,12 @@ void TestNameWithTags()
 	const std::string test_name_str = "maria.png&silent&hide";
 	const std::string test_name_img = "maria.png";
 	const Naming test_name(test_name_str);
-	assert(test_name.GetName() == test_name_img);
+	assert(test_name.get_name() == test_name_img);
 	const std::unordered_set<std::string> expected_tags = {"silent", "hide"};
-	assert(test_name.GetTags() == expected_tags);
-	assert(test_name.ToString() == test_name_str);
-	assert(test_name.Equal(test_name_img));
-	assert(test_name.Equal(Naming(test_name_img)));
+	assert(test_name.get_tags() == expected_tags);
+	assert(test_name.to_string() == test_name_str);
+	assert(test_name.equal(test_name_img));
+	assert(test_name.equal(Naming(test_name_img)));
 }
 
 void TestNullNext()
@@ -33,7 +33,7 @@ void TestNullNext()
 	const ContentNext test_null_next;
 	assert(test_null_next.is_null());
 	assert(!test_null_next.has_multi_targets());
-	assert(test_null_next.get_type() == "null");
+	assert(test_null_next.get_type() == "default");
 	assert(test_null_next.get_target().empty());
 }
 
