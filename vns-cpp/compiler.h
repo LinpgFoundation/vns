@@ -1,6 +1,7 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 #include <filesystem>
+#include "processor.h"
 
 class Compiler
 {

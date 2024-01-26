@@ -1,5 +1,4 @@
 ﻿#include <ctime>
-#include "processor.h"
 #include "version.h"
 #include "compiler.h"
 #include <fstream>
@@ -12,6 +11,7 @@ std::unordered_map<std::string, int> Compiler::get_compiler_info()
 	return {
 		{"version", VERSION},
 		{"reversion", REVISION},
+		{"patch", PATCH},
 		{"compiledAt", static_cast<int>(std::time(nullptr))}
 	};
 }

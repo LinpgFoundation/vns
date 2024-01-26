@@ -69,7 +69,7 @@ void TestScriptProcessor()
 void TestCompiler()
 {
 	Compiler::compile("C:/Users/yudon/Documents/GitHub/vns/examples/chapter_example.vns",
-	                  "C:/Users/yudon/Documents/GitHub/vns/examples/out");
+	                  "C:/Users/yudon/Documents/GitHub/vns/examples");
 }
 
 void TestAll()
