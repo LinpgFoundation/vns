@@ -27,5 +27,8 @@ public:
 	{
 		return DATABASE_;
 	}
+
+	// update database
+	static void update_database(const std::unordered_map<std::string, std::vector<std::string>>&);
 };
 #endif

@@ -6,10 +6,11 @@
 #include <unordered_set>
 #include "tests.h"
 #include "compiler.h"
+#include "naming.h"
 
 int main(int argc, char** argv)
 {
-	const std::unordered_set<std::string> arguments_with_input = {"-i", "-o"};
+	const std::unordered_set<std::string> arguments_with_input = {"-i", "-o", "-n"};
 	const std::unordered_set<std::string> arguments_without_input = {"-h", "-s", "-t"};
 	std::unordered_map<std::string, std::string> arguments_map;
 	for (int i = 1; i < argc; i++)
@@ -23,6 +24,11 @@ int main(int argc, char** argv)
 		{
 			arguments_map[current_arg] = "";
 		}
+	}
+	// update naming database
+	if (arguments_map.contains("-n"))
+	{
+		Naming::update_database(nlohmann::json::parse(arguments_map["-n"]));
 	}
 	// run tests
 	if (arguments_map.contains("-t"))

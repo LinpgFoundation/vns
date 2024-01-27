@@ -4,15 +4,27 @@ from os import path as OS_PATH
 from subprocess import check_output
 from typing import Any
 
+from .naming import Naming
+
 
 class Compiler:
     # 直接加载
     @staticmethod
     def load(path: str) -> dict[str, Any]:
-        output = check_output(
-            [OS_PATH.join(OS_PATH.dirname(__file__), "vns.exe"), "-i", path, "-s"]
-        ).decode()
-        return json.loads(output)
+        return dict(
+            json.loads(
+                check_output(
+                    [
+                        OS_PATH.join(OS_PATH.dirname(__file__), "vns.exe"),
+                        "-i",
+                        path,
+                        "-n",
+                        json.dumps(Naming.get_database()),
+                        "-s",
+                    ]
+                ).decode()
+            )
+        )
 
     # 编译
     @classmethod

@@ -84,3 +84,12 @@ bool Naming::equal(const std::variant<Naming, std::string>& o, const bool must_b
 	}
 	return false;
 }
+
+// update database
+void Naming::update_database(const std::unordered_map<std::string, std::vector<std::string>>& database)
+{
+	for (const auto& pair : database)
+	{
+		DATABASE_[pair.first] = pair.second;
+	}
+}
