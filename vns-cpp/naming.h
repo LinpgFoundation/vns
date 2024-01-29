@@ -6,7 +6,7 @@
 #include <variant>
 #include <vector>
 
-// 角色立绘名称预处理模块
+// Character name preprocessing module
 class Naming
 {
 	std::string name_;

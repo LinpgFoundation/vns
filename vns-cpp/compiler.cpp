@@ -19,13 +19,13 @@ std::unordered_map<std::string, int> Compiler::get_compiler_info()
 // load data from file directly
 std::unordered_map<std::string, std::any> Compiler::load(const std::filesystem::path& path)
 {
-	Processor _processor;
-	_processor.process(path);
+	Processor processor;
+	processor.process(path);
 	return {
-		{"dialogs", _processor.get_output()},
+		{"dialogs", processor.get_output()},
 		{"compiler", get_compiler_info()},
-		{"id", _processor.get_id()},
-		{"language", _processor.get_language()}
+		{"id", processor.get_id()},
+		{"language", processor.get_language()}
 	};
 }
 
