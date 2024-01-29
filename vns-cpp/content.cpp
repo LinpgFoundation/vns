@@ -1,7 +1,7 @@
 #include "content.h"
 
 
-Content::Content(const std::unordered_map<std::string, ContentValueType>& data, const std::string& content_id)
+Content::Content(const ContentDataType& data, const std::string& content_id)
 {
 	id = content_id;
 	background_image = cast<std::string>(data, "background_image", "");
@@ -18,7 +18,7 @@ Content::Content(const std::unordered_map<std::string, ContentValueType>& data, 
 
 bool Content::has_next() const { return !next.is_null(); }
 
-std::unordered_map<std::string, ContentValueType> Content::to_map() const
+ContentDataType Content::to_map() const
 {
 	return {
 		{"background_image", background_image},

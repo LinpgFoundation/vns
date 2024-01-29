@@ -12,6 +12,7 @@ void TestNameWithoutTag()
 	const Naming test_name(test_name_str);
 	assert(test_name.get_name() == test_name_str);
 	assert(test_name.get_tags().empty());
+	assert(!test_name.contains_tag("silent"));
 	assert(test_name.to_string() == test_name_str);
 }
 
@@ -23,6 +24,8 @@ void TestNameWithTags()
 	assert(test_name.get_name() == test_name_img);
 	const std::unordered_set<std::string> expected_tags = {"silent", "hide"};
 	assert(test_name.get_tags() == expected_tags);
+	assert(test_name.contains_tag("hide"));
+	assert(test_name.contains_tag("silent"));
 	assert(test_name.to_string() == test_name_str);
 	assert(test_name.equal(test_name_img));
 	assert(test_name.equal(Naming(test_name_img)));

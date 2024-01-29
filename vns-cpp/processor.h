@@ -6,9 +6,6 @@
 #include <filesystem>
 #include "content.h"
 
-using ProcessorOutputType = std::unordered_map<std::string, std::unordered_map<
-	                                               std::string, std::unordered_map<std::string, ContentValueType>>>;
-
 class Processor
 {
 public:
@@ -29,7 +26,7 @@ public:
 	[[nodiscard]] std::string get_id() const;
 	[[nodiscard]] std::string get_language() const;
 	void process(const std::filesystem::path&);
-	[[nodiscard]] ProcessorOutputType get_output() const;
+	[[nodiscard]] DialogueDataType get_output() const;
 	[[nodiscard]] nlohmann::json get_output_as_json() const;
 
 private:

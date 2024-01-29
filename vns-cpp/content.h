@@ -7,17 +7,22 @@
 
 using ContentValueType = std::variant<std::string, std::vector<std::string>, std::unordered_map<
 	                                      std::string, ContentNextValueType>>;
+using ContentDataType = std::unordered_map<std::string, ContentValueType>;
+
+using SectionDataType = std::unordered_map<std::string, ContentDataType>;
+
+using DialogueDataType = std::unordered_map<std::string, SectionDataType>;
 
 struct Content
 {
-	Content(const std::unordered_map<std::string, ContentValueType>&, const std::string&);
+	Content(const ContentDataType&, const std::string&);
 
 	Content() : Content({}, "head")
 	{
 	}
 
 	[[nodiscard]] bool has_next() const;
-	[[nodiscard]] std::unordered_map<std::string, ContentValueType> to_map() const;
+	[[nodiscard]] ContentDataType to_map() const;
 	[[nodiscard]] nlohmann::json to_json() const;
 	std::string previous;
 	ContentNext next;
@@ -30,7 +35,7 @@ struct Content
 	std::string id;
 
 	template <typename T>
-	static T cast(const std::unordered_map<std::string, ContentValueType>& data, const std::string& k, T default_v)
+	static T cast(const ContentDataType& data, const std::string& k, T default_v)
 	{
 		const auto it = data.find(k);
 		if (it != data.end())

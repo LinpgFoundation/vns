@@ -53,9 +53,9 @@ std::string Processor::get_current_line() const
 	return lines_[line_index_];
 }
 
-ProcessorOutputType Processor::get_output() const
+DialogueDataType Processor::get_output() const
 {
-	ProcessorOutputType output;
+	DialogueDataType output;
 	for (const auto& [section_name, section_contents] : output_)
 	{
 		output[section_name] = {};
