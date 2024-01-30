@@ -2,7 +2,10 @@ from linpgtoolbox.builder import Builder
 from os import path as OS_PATH
 
 # 需要额外包括的文件
-additional_files: tuple[str, ...] = (r"../README.md", r"../LICENSE")
+additional_files: tuple[str, ...] = (
+    OS_PATH.join(OS_PATH.dirname(__file__), r"../README.md"),
+    OS_PATH.join(OS_PATH.dirname(__file__), r"../LICENSE"),
+)
 
 # 编译源代码
 Builder.compile(
@@ -12,6 +15,8 @@ Builder.compile(
     include_pyinstaller_program=True,
     options={
         "enable_multiprocessing": True,
+        "includes": (OS_PATH.join(OS_PATH.dirname(__file__), "..", "vns-cpp"),),
+        "extra_compile_args": {"naming.pyx": ["/std:c++20"]},
     },
 )
 

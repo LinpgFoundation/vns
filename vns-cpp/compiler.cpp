@@ -3,7 +3,7 @@
 #include "compiler.h"
 #include <fstream>
 #include <iostream>
-#include "libs/nlohmann/json.hpp"
+#include "processor.h"
 
 // get the info of compiler
 std::unordered_map<std::string, int> Compiler::get_compiler_info()

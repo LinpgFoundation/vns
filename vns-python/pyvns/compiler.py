@@ -4,7 +4,7 @@ from os import path as OS_PATH
 from subprocess import check_output
 from typing import Any
 
-from .naming import Naming
+from .naming import PyNaming as Naming
 
 
 class Compiler:

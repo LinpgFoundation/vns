@@ -1,6 +1,7 @@
 ﻿#include "naming.h"
 #include <ranges>
 #include <sstream>
+#include "libs/nlohmann/json.hpp"
 
 // Constructor
 Naming::Naming(const std::string& the_name)
@@ -62,11 +63,13 @@ void Naming::erase_tag(const std::string& tag)
 }
 
 // Check if two Naming objects or a Naming object and a string refer to the same character
-bool Naming::equal(const std::variant<Naming, std::string>& o, const bool must_be_the_same) const
+bool Naming::equal(const std::string& other, const bool must_be_the_same) const
 {
-	const Naming other = std::holds_alternative<std::string>(o)
-		                     ? Naming(std::get<std::string>(o))
-		                     : std::get<Naming>(o);
+	return equal(Naming(other), must_be_the_same);
+}
+
+bool Naming::equal(const Naming& other, const bool must_be_the_same) const
+{
 	if (name_ == other.get_name())
 	{
 		return true;
@@ -85,11 +88,28 @@ bool Naming::equal(const std::variant<Naming, std::string>& o, const bool must_b
 	return false;
 }
 
+// access the database
+std::unordered_map<std::string, std::vector<std::string>>& Naming::get_database()
+{
+	return DATABASE_;
+}
+
+std::string Naming::get_database_as_json()
+{
+	const nlohmann::json json_map(DATABASE_);
+	return json_map.dump();
+}
+
 // update database
+void Naming::update_database(std::string& database_str)
+{
+	update_database(nlohmann::json::parse(database_str));
+}
+
 void Naming::update_database(const std::unordered_map<std::string, std::vector<std::string>>& database)
 {
-	for (const auto& pair : database)
+	for (const auto& [k, v] : database)
 	{
-		DATABASE_[pair.first] = pair.second;
+		DATABASE_[k] = v;
 	}
 }

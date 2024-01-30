@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 	// update naming database
 	if (arguments_map.contains("-n"))
 	{
-		Naming::update_database(nlohmann::json::parse(arguments_map["-n"]));
+		Naming::update_database(arguments_map["-n"]);
 	}
 	// run tests
 	if (arguments_map.contains("-t"))

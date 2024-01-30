@@ -1,7 +1,7 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 #include <filesystem>
-#include "processor.h"
+#include "libs/nlohmann/json.hpp"
 
 class Compiler
 {
