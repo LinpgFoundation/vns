@@ -1,8 +1,9 @@
 # distutils: language = c++
 
+import json
+
 from libcpp.string cimport string
 from libcpp.unordered_set cimport unordered_set
-import json
 
 cdef extern from "vns-cpp/naming.cpp":
     pass
@@ -20,11 +21,11 @@ cdef extern from "vns-cpp/naming.h":
         @staticmethod
         string get_database_as_json()
         @staticmethod
-        void update_database(string&)
+        void update_database(string &)
 
 # Wrapper class for Naming
 cdef class PyNaming:
-    cdef Naming *thisptr 
+    cdef Naming *thisptr
 
     def __str__(self) -> str:
         return self.to_string()
@@ -62,7 +63,8 @@ cdef class PyNaming:
         self.thisptr.erase_tag(tag.encode('utf-8', errors='strict'))
 
     def equal(self, tag, bint must_be_the_same = False):
-        return self.thisptr.equal((tag if isinstance(tag, str) else tag.to_string()).encode('utf-8', errors='strict'), must_be_the_same)
+        return self.thisptr.equal((tag if isinstance(tag, str) else tag.to_string()).encode('utf-8', errors='strict'),
+                                  must_be_the_same)
 
     @staticmethod
     def get_database():

@@ -1,5 +1,6 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
+
 #include <string>
 #include <vector>
 
@@ -14,15 +15,15 @@ std::string ltrim(std::string);
 std::string rtrim(std::string);
 
 // trim from both ends
-std::string trim(const std::string&);
+std::string trim(const std::string &);
 
 // convert string to lower case
-std::string to_lower(const std::string&);
+std::string to_lower(const std::string &);
 
 // split by given character
-std::vector<std::string> split(const std::string&, char);
+std::vector<std::string> split(const std::string &, char);
 
 // split by space
-std::vector<std::string> split(const std::string&);
+std::vector<std::string> split(const std::string &);
 
 #endif
