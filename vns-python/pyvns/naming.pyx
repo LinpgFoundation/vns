@@ -66,9 +66,13 @@ cdef class PyNaming:
         return self.thisptr.equal((tag if isinstance(tag, str) else tag.to_string()).encode('utf-8', errors='strict'),
                                   must_be_the_same)
 
+    @classmethod
+    def get_database(cls) -> dict:
+        return dict(json.loads(cls.get_database_as_json()))
+
     @staticmethod
-    def get_database():
-        return json.loads(Naming.get_database_as_json().decode('utf-8'))
+    def get_database_as_json() -> str:
+        return Naming.get_database_as_json().decode('utf-8')
 
     @staticmethod
     def update_database(dict data):

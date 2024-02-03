@@ -2,6 +2,8 @@
 #define COMPILER_H
 
 #include <filesystem>
+#include <unordered_map>
+#include <any>
 #include "libs/nlohmann/json.hpp"
 
 class Compiler

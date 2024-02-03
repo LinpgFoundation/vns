@@ -8,7 +8,6 @@
 #include <string>
 #include <variant>
 #include <vector>
-
 #include "libs/nlohmann/json.hpp"
 
 using MultiTargetsType = std::vector<std::unordered_map<std::string, std::string> >;
@@ -19,15 +18,18 @@ class ContentNext
 {
 public:
     ContentNext(std::string type, ContentNextValueType target) : type_(std::move(type)), target_(std::move(target))
-    {}
+    {
+    }
 
     explicit ContentNext(const std::unordered_map<std::string, ContentNextValueType> &data) : ContentNext(
-            std::get<std::string>(data.contains("type") ? data.at("type") : "default"),
+            data.contains("type") ? std::get<std::string>(data.at("type")) : "default",
             data.contains("target") ? data.at("target") : "")
-    {}
+    {
+    }
 
     ContentNext() : ContentNext("default", "")
-    {}
+    {
+    }
 
     [[nodiscard]] std::string get_type() const;
 

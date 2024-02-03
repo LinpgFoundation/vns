@@ -11,10 +11,10 @@ class Naming
 {
     std::string name_;
     std::unordered_set<std::string> tags_;
-    inline static std::unordered_map<std::string, std::vector<std::string>> DATABASE_;
+    inline static std::unordered_map<std::string, std::unordered_set<std::string>> DATABASE_;
 
 public:
-    Naming(const std::string &);
+    explicit Naming(const std::string &);
 
     [[nodiscard]] std::string to_string() const;
 
@@ -32,11 +32,13 @@ public:
 
     [[nodiscard]] bool equal(const Naming &, bool must_be_the_same = false) const;
 
-    static std::unordered_map<std::string, std::vector<std::string>> &get_database();
+    static std::unordered_map<std::string, std::unordered_set<std::string>> &get_database();
 
     static std::string get_database_as_json();
 
     static void update_database(std::string &);
+
+    static void update_database(const std::unordered_map<std::string, std::unordered_set<std::string>> &);
 
     static void update_database(const std::unordered_map<std::string, std::vector<std::string>> &);
 };

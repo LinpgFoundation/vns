@@ -6,9 +6,7 @@
 #include <vector>
 #include "contentNext.h"
 
-using ContentValueType = std::variant<std::string, std::vector<std::string>, std::unordered_map<
-        std::string, ContentNextValueType>>;
-using ContentDataType = std::unordered_map<std::string, ContentValueType>;
+using ContentDataType = std::unordered_map<std::string, std::variant<std::string, std::vector<std::string>, std::unordered_map<std::string, ContentNextValueType>>>;
 
 using SectionDataType = std::unordered_map<std::string, ContentDataType>;
 
@@ -38,8 +36,7 @@ struct Content
     std::vector<std::string> comments;
     std::string id;
 
-    template<typename T>
-    static T cast(const ContentDataType &data, const std::string &k, T default_v)
+    template<typename T> static T cast(const ContentDataType &data, const std::string &k, T default_v)
     {
         const auto it = data.find(k);
         if (it != data.end())

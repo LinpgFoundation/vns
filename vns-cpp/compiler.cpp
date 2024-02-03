@@ -3,30 +3,26 @@
 #include "compiler.h"
 #include <fstream>
 #include <iostream>
-#include "processor.h"
+#include "scriptProcessor.h"
 
 // get the info of compiler
 std::unordered_map<std::string, int> Compiler::get_compiler_info()
 {
-    return {
-            {"version",    VERSION},
+    return {{"version",    VERSION},
             {"reversion",  REVISION},
             {"patch",      PATCH},
-            {"compiledAt", static_cast<int>(std::time(nullptr))}
-    };
+            {"compiledAt", static_cast<int>(std::time(nullptr))}};
 }
 
 // load data from file directly
 std::unordered_map<std::string, std::any> Compiler::load(const std::filesystem::path &path)
 {
-    Processor processor;
+    ScriptProcessor processor;
     processor.process(path);
-    return {
-            {"dialogs",  processor.get_output()},
+    return {{"dialogs",  processor.get_output()},
             {"compiler", get_compiler_info()},
             {"id",       processor.get_id()},
-            {"language", processor.get_language()}
-    };
+            {"language", processor.get_language()}};
 }
 
 // load data in the form of json string from file directly
@@ -38,13 +34,13 @@ std::string Compiler::load_as_string(const std::filesystem::path &path)
 // load data in the form of json data from file directly
 nlohmann::json Compiler::load_as_json(const std::filesystem::path &path)
 {
-    Processor _processor;
-    _processor.process(path);
+    ScriptProcessor processor;
+    processor.process(path);
     nlohmann::json json_data;
-    json_data["dialogs"] = _processor.get_output_as_json();
+    json_data["dialogs"] = processor.get_output_as_json();
     json_data["compiler"] = get_compiler_info();
-    json_data["id"] = _processor.get_id();
-    json_data["language"] = _processor.get_language();
+    json_data["id"] = processor.get_id();
+    json_data["language"] = processor.get_language();
     return json_data;
 }
 
@@ -58,7 +54,7 @@ void Compiler::compile(const std::filesystem::path &path, const std::filesystem:
     {
         for (const auto &entry: std::filesystem::directory_iterator(path))
         {
-            if (entry.path().extension() == Processor::SCRIPTS_FILE_EXTENSION)
+            if (entry.path().extension() == ScriptProcessor::SCRIPTS_FILE_EXTENSION)
             {
                 compile(entry.path());
             }

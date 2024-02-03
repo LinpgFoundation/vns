@@ -2,58 +2,58 @@
 #include <cassert>
 #include <stdexcept>
 #include <fstream>
-#include <sstream>
 #include "functions.h"
-#include "processor.h"
+#include "scriptProcessor.h"
 #include "naming.h"
 
-std::string Processor::get_id() const
+std::string ScriptProcessor::get_id() const
 {
     return id_;
 }
 
-std::string Processor::get_language() const
+std::string ScriptProcessor::get_language() const
 {
     return lang_;
 }
 
-std::string Processor::ensure_not_null(const std::string &text)
+std::string ScriptProcessor::ensure_not_null(const std::string &text)
 {
     return iequals(text, "null") || iequals(text, "none") ? "" : text;
 }
 
-std::string Processor::extract_parameter(const std::string &text)
+std::string ScriptProcessor::extract_parameter(const std::string &text)
 {
     return ensure_not_null(extract_string(text));
 }
 
-std::string Processor::extract_tag(const std::string &text)
+std::string ScriptProcessor::extract_tag(const std::string &text)
 {
     return text.substr(text.find(TAG_STARTS) + 1, text.find(TAG_ENDS) - 1);
 }
 
-std::string Processor::extract_string(const std::string &text)
+std::string ScriptProcessor::extract_string(const std::string &text)
 {
     return trim(text.substr(text.find(TAG_ENDS) + 1));
 }
 
-[[noreturn]] void Processor::terminated(const std::string &reason) const
+[[noreturn]] void ScriptProcessor::terminated(const std::string &reason) const
 {
-    throw std::runtime_error("File \"" + path_.string() + "\", line " + std::to_string(line_index_ + 1) +
-                             "\n  " + get_current_line() + "\nFail to compile due to: " + reason);
+    throw std::runtime_error(
+            "File \"" + path_.string() + "\", line " + std::to_string(line_index_ + 1) + "\n  " + get_current_line() +
+            "\nFail to compile due to: " + reason);
 }
 
-[[noreturn]] void Processor::preprocess_terminated(const std::string &reason) const
+[[noreturn]] void ScriptProcessor::preprocess_terminated(const std::string &reason) const
 {
     throw std::runtime_error("File \"" + path_.string() + "\" failed to compile due to: " + reason);
 }
 
-std::string Processor::get_current_line() const
+std::string ScriptProcessor::get_current_line() const
 {
     return lines_[line_index_];
 }
 
-DialogueDataType Processor::get_output() const
+DialogueDataType ScriptProcessor::get_output() const
 {
     DialogueDataType output;
     for (const auto &[section_name, section_contents]: output_)
@@ -67,7 +67,7 @@ DialogueDataType Processor::get_output() const
     return output;
 }
 
-nlohmann::json Processor::get_output_as_json() const
+nlohmann::json ScriptProcessor::get_output_as_json() const
 {
     nlohmann::json output;
     for (const auto &[section_name, section_contents]: output_)
@@ -83,7 +83,7 @@ nlohmann::json Processor::get_output_as_json() const
 }
 
 
-void Processor::process(const std::filesystem::path &path)
+void ScriptProcessor::process(const std::filesystem::path &path)
 {
     path_ = path;
     int current_index = 0;
@@ -143,13 +143,9 @@ void Processor::process(const std::filesystem::path &path)
             }
         } else if (lines_[index].find(':') != std::string::npos)
         {
-            dialog_associate_key_[index] = current_index == 0
-                                           ? "head"
-                                           : last_label.empty()
-                                             ? (current_index < 10
-                                                ? "~0" + std::to_string(current_index)
-                                                : "~" + std::to_string(current_index))
-                                             : last_label;
+            dialog_associate_key_[index] =
+                    current_index == 0 ? "head" : last_label.empty() ? (current_index < 10 ? "~0" + std::to_string(
+                            current_index) : "~" + std::to_string(current_index)) : last_label;
             last_label = "";
             ++current_index;
         }
@@ -173,14 +169,14 @@ void Processor::process(const std::filesystem::path &path)
     }
 }
 
-void Processor::convert(const int starting_index)
+void ScriptProcessor::convert(const int starting_index)
 {
     line_index_ = starting_index;
 
     while (line_index_ < lines_.size())
     {
-        if (std::string current_line = get_current_line(); current_line.empty() || lines_[line_index_].find(NOTE_PREFIX)
-                                                                                   == 0)
+        if (std::string current_line = get_current_line(); current_line.empty() ||
+                                                           lines_[line_index_].find(NOTE_PREFIX) == 0)
         {
             // Skip empty lines or lines starting with #
             // Do nothing
@@ -257,11 +253,9 @@ void Processor::convert(const int starting_index)
             } else if (tag == "scene")
             {
                 assert(!previous_.empty());
-                output_[section_][previous_].next = output_[section_][previous_].next.has_multi_targets()
-                                                    ? ContentNext(
-                                "scene", output_[section_][previous_].next.get_targets())
-                                                    : ContentNext(
-                                "scene", output_[section_][previous_].next.get_target());
+                output_[section_][previous_].next = output_[section_][previous_].next.has_multi_targets() ? ContentNext(
+                        "scene", output_[section_][previous_].next.get_targets()) : ContentNext("scene",
+                                                                                                output_[section_][previous_].next.get_target());
                 current_data_.background_image = extract_parameter(current_line);
                 blocked_ = true;
             } else if (tag == "block")
@@ -287,11 +281,9 @@ void Processor::convert(const int starting_index)
                 // get value string
                 auto src_to_target = extract_string(current_line);
                 // push text and id map
-                current_targets.push_back({
-                                                  {"text", trim(src_to_target.substr(0, src_to_target.find("->")))},
-                                                  {"id",   ensure_not_null(
-                                                          trim(src_to_target.substr(src_to_target.find("->") + 2)))}
-                                          });
+                current_targets.push_back({{"text", trim(src_to_target.substr(0, src_to_target.find("->")))},
+                                           {"id",   ensure_not_null(
+                                                   trim(src_to_target.substr(src_to_target.find("->") + 2)))}});
                 // update next
                 output_[section_][previous_].next = ContentNext("options", current_targets);
             }
@@ -307,8 +299,8 @@ void Processor::convert(const int starting_index)
             const std::string narrator = ensure_not_null(current_line.substr(0, current_line.size() - 1));
             current_data_.narrator = narrator;
 
-            // Rest of the logic for processing dialog content
-            std::vector<std::string> narrator_possible_images;
+            // Get the name of the narrator's possible image
+            std::unordered_set<std::string> narrator_possible_images;
             if (std::string narrator_lower_case = to_lower(current_data_.narrator); Naming::get_database().contains(
                     narrator_lower_case))
             {
@@ -317,9 +309,7 @@ void Processor::convert(const int starting_index)
             for (auto &character_image: current_data_.character_images)
             {
                 Naming name_data(character_image);
-                if (std::ranges::find(narrator_possible_images.begin(), narrator_possible_images.end(),
-                                      name_data.get_name()) !=
-                    narrator_possible_images.end())
+                if (narrator_possible_images.contains(name_data.get_name()))
                 {
                     name_data.erase_tag("silent");
                 } else

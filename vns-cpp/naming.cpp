@@ -77,7 +77,7 @@ bool Naming::equal(const Naming &other, const bool must_be_the_same) const
 
     if (!must_be_the_same)
     {
-        for (const std::vector<std::string> &value: std::views::values(DATABASE_))
+        for (const std::unordered_set<std::string> &value: std::views::values(DATABASE_))
         {
             if (std::ranges::find(value.begin(), value.end(), name_) != value.end())
             {
@@ -89,27 +89,40 @@ bool Naming::equal(const Naming &other, const bool must_be_the_same) const
 }
 
 // access the database
-std::unordered_map<std::string, std::vector<std::string>> &Naming::get_database()
+std::unordered_map<std::string, std::unordered_set<std::string>> &Naming::get_database()
 {
     return DATABASE_;
 }
 
 std::string Naming::get_database_as_json()
 {
-    const nlohmann::json json_map(DATABASE_);
+    nlohmann::json json_map;
+    for (const auto &[k, v]: DATABASE_)
+    {
+        json_map[k] = std::vector<std::string>(v.begin(), v.end());
+    }
     return json_map.dump();
 }
 
 // update database
 void Naming::update_database(std::string &database_str)
 {
-    update_database(nlohmann::json::parse(database_str));
+    const std::unordered_map<std::string, std::vector<std::string>> database = nlohmann::json::parse(database_str);
+    update_database(database);
+}
+
+void Naming::update_database(const std::unordered_map<std::string, std::unordered_set<std::string>> &database)
+{
+    for (const auto &[k, v]: database)
+    {
+        DATABASE_[k] = v;
+    }
 }
 
 void Naming::update_database(const std::unordered_map<std::string, std::vector<std::string>> &database)
 {
     for (const auto &[k, v]: database)
     {
-        DATABASE_[k] = v;
+        DATABASE_[k] = std::unordered_set<std::string>(v.begin(), v.end());
     }
 }

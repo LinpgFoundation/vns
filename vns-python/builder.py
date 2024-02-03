@@ -1,5 +1,6 @@
-from linpgtoolbox.builder import Builder
 from os import path as OS_PATH
+
+from linpgtoolbox.builder import Builder
 
 # 需要额外包括的文件
 additional_files: tuple[str, ...] = (

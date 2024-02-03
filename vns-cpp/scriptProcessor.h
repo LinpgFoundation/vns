@@ -6,22 +6,20 @@
 #include <filesystem>
 #include "content.h"
 
-class Processor
+class ScriptProcessor
 {
 public:
     static const std::string inline SCRIPTS_FILE_EXTENSION = ".vns";
-    static const std::unordered_map<std::string, std::string> inline ALTERNATIVES = {
-            {"lang", "language"},
-            {"opt",  "option"},
-            {"disp", "display"}
-    };
+    static const std::unordered_map<std::string, std::string> inline ALTERNATIVES = {{"lang", "language"},
+                                                                                     {"opt",  "option"},
+                                                                                     {"disp", "display"}};
     static const std::unordered_set<std::string> inline RESERVED_WORDS = {"null", "none", "head"};
     static const std::string inline TAG_STARTS = "[";
     static const std::string inline TAG_ENDS = "]";
     static const std::string inline NOTE_PREFIX = "#";
     static const std::string inline COMMENT_PREFIX = "//";
 
-    Processor() : line_index_(0), current_data_({}, "head"), blocked_(false)
+    ScriptProcessor() : line_index_(0), current_data_({}, "head"), blocked_(false)
     {
     }
 

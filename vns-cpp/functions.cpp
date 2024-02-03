@@ -4,8 +4,7 @@
 
 bool ichar_equals(const char a, const char b)
 {
-    return std::tolower(static_cast<unsigned char>(a)) ==
-           std::tolower(static_cast<unsigned char>(b));
+    return std::tolower(static_cast<unsigned char>(a)) == std::tolower(static_cast<unsigned char>(b));
 }
 
 bool iequals(std::string_view lhs, std::string_view rhs)
@@ -44,7 +43,7 @@ std::string to_lower(const std::string &input)
 
     for (char &c: result)
     {
-        c = std::tolower(c);
+        c = static_cast<char>(std::tolower(c));
     }
 
     return result;

@@ -19,7 +19,7 @@ class Compiler:
                         "-i",
                         path,
                         "-n",
-                        json.dumps(Naming.get_database()),
+                        Naming.get_database_as_json(),
                         "-s",
                     ]
                 ).decode()

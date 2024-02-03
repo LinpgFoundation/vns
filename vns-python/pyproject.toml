@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 name = "pyvns"
 version = "2.0"
 authors = [
-    {name = "Linpg Foundation", email = "yudong9912@gmail.com"},
+    { name = "Linpg Foundation", email = "yudong9912@gmail.com" },
 ]
 description = "VNS (Visual Novel Script), a universal scripting language for creating scripts for visual novel games."
 readme = "README.md"

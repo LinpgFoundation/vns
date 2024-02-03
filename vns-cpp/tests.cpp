@@ -3,7 +3,7 @@
 #include "contentNext.h"
 #include "naming.h"
 #include <iostream>
-#include "processor.h"
+#include "scriptProcessor.h"
 #include "compiler.h"
 
 void TestNameWithoutTag()
@@ -66,7 +66,7 @@ void TestMultiTargetsNext()
 
 void TestScriptProcessor()
 {
-    auto test_processor = Processor();
+    auto test_processor = ScriptProcessor();
     test_processor.process("C:/Users/yudon/Documents/GitHub/vns/examples/chapter_example.vns");
     assert(test_processor.get_id() == "1");
     assert(test_processor.get_language() == "English");
