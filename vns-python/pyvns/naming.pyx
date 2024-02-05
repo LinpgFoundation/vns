@@ -21,6 +21,8 @@ cdef extern from "vns-cpp/naming.h":
         @staticmethod
         string get_database_as_json()
         @staticmethod
+        bool empty_database()
+        @staticmethod
         void update_database(string &)
 
 # Wrapper class for Naming
@@ -73,6 +75,10 @@ cdef class PyNaming:
     @staticmethod
     def get_database_as_json() -> str:
         return Naming.get_database_as_json().decode('utf-8')
+
+    @staticmethod
+    def clear_database(dict data):
+        Naming.empty_database()
 
     @staticmethod
     def update_database(dict data):

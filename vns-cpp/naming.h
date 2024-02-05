@@ -36,6 +36,8 @@ public:
 
     static std::string get_database_as_json();
 
+    static bool empty_database();
+
     static void update_database(std::string &);
 
     static void update_database(const std::unordered_map<std::string, std::unordered_set<std::string>> &);
