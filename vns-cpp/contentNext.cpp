@@ -1,4 +1,4 @@
-#include "contentNext.h"
+#include "contentNext.hpp"
 
 std::unordered_map<std::string, ContentNextValueType> ContentNext::to_map() const
 {

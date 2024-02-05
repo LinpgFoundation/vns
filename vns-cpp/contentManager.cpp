@@ -1,4 +1,4 @@
-#include "contentManager.h"
+#include "contentManager.hpp"
 
 // If the pointer to the current dialog data does not exist, set_data the pointer
 void ContentManager::refresh_current()

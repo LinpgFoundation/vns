@@ -1,12 +1,12 @@
 ﻿// vns-cpp.cpp : Defines the entry point for the application.
 //
 
-#include "vns.h"
+#include "vns.hpp"
 #include <unordered_map>
 #include <unordered_set>
-#include "tests.h"
-#include "compiler.h"
-#include "naming.h"
+#include "tests.hpp"
+#include "compiler.hpp"
+#include "naming.hpp"
 
 int main(const int argc, char **argv)
 {

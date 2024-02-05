@@ -1,7 +1,7 @@
 #include <fstream>
 #include <vector>
-#include "naming.h"
-#include "decompiler.h"
+#include "naming.hpp"
+#include "decompiler.hpp"
 
 
 // If input string is nullptr, convert it to "null"

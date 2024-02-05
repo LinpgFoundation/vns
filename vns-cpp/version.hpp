@@ -1,5 +1,5 @@
-#ifndef VERSION_H
-#define VERSION_H
+#ifndef VERSION_HPP
+#define VERSION_HPP
 
 // vns main version
 constexpr int VERSION = 2;

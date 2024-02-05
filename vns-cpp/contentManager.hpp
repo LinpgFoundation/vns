@@ -1,7 +1,7 @@
-#ifndef CONTENT_MANAGER_H
-#define CONTENT_MANAGER_H
+#ifndef CONTENT_MANAGER_HPP
+#define CONTENT_MANAGER_HPP
 
-#include "content.h"
+#include "content.hpp"
 
 class ContentManager
 {

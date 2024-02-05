@@ -8,7 +8,7 @@ from libcpp.unordered_set cimport unordered_set
 cdef extern from "vns-cpp/naming.cpp":
     pass
 
-cdef extern from "vns-cpp/naming.h":
+cdef extern from "vns-cpp/naming.hpp":
     cdef cppclass Naming:
         Naming(string)
         string to_string() const
@@ -21,7 +21,7 @@ cdef extern from "vns-cpp/naming.h":
         @staticmethod
         string get_database_as_json()
         @staticmethod
-        bool empty_database()
+        bint empty_database()
         @staticmethod
         void update_database(string &)
 

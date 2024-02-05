@@ -1,5 +1,5 @@
-#ifndef CONTENT_NEXT_H
-#define CONTENT_NEXT_H
+#ifndef CONTENT_NEXT_HPP
+#define CONTENT_NEXT_HPP
 
 #include <string>
 #include <utility>

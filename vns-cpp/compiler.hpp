@@ -1,5 +1,5 @@
-#ifndef COMPILER_H
-#define COMPILER_H
+#ifndef COMPILER_HPP
+#define COMPILER_HPP
 
 #include <filesystem>
 #include <unordered_map>

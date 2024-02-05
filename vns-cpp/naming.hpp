@@ -1,5 +1,5 @@
-﻿#ifndef NAMING_H
-#define NAMING_H
+﻿#ifndef NAMING_HPP
+#define NAMING_HPP
 
 #include <string>
 #include <unordered_map>

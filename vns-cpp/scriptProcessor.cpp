@@ -2,9 +2,9 @@
 #include <cassert>
 #include <stdexcept>
 #include <fstream>
-#include "functions.h"
-#include "scriptProcessor.h"
-#include "naming.h"
+#include "functions.hpp"
+#include "scriptProcessor.hpp"
+#include "naming.hpp"
 
 std::string ScriptProcessor::get_id() const
 {

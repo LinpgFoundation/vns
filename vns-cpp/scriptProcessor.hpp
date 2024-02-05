@@ -1,10 +1,10 @@
-#ifndef PROCESSOR_H
-#define PROCESSOR_H
+#ifndef PROCESSOR_HPP
+#define PROCESSOR_HPP
 
 #include <unordered_map>
 #include <unordered_set>
 #include <filesystem>
-#include "content.h"
+#include "content.hpp"
 
 class ScriptProcessor
 {

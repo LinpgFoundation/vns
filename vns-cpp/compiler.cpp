@@ -1,9 +1,9 @@
 ﻿#include <ctime>
-#include "version.h"
-#include "compiler.h"
+#include "version.hpp"
+#include "compiler.hpp"
 #include <fstream>
 #include <iostream>
-#include "scriptProcessor.h"
+#include "scriptProcessor.hpp"
 
 // get the info of compiler
 std::unordered_map<std::string, int> Compiler::get_compiler_info()

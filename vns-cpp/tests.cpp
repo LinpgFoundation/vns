@@ -1,10 +1,10 @@
-#include "tests.h"
+#include "tests.hpp"
 #include <cassert>
-#include "contentNext.h"
-#include "naming.h"
+#include "contentNext.hpp"
+#include "naming.hpp"
 #include <iostream>
-#include "scriptProcessor.h"
-#include "compiler.h"
+#include "scriptProcessor.hpp"
+#include "compiler.hpp"
 
 void TestNameWithoutTag()
 {

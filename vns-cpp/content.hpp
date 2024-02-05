@@ -1,10 +1,10 @@
-#ifndef CONTENT_H
-#define CONTENT_H
+#ifndef CONTENT_HPP
+#define CONTENT_HPP
 
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "contentNext.h"
+#include "contentNext.hpp"
 
 using ContentDataType = std::unordered_map<std::string, std::variant<std::string, std::vector<std::string>, std::unordered_map<std::string, ContentNextValueType>>>;
 
