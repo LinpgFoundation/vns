@@ -1,7 +1,7 @@
 ﻿# CMakeList.txt : CMake project for vns, include source and define
 # project specific logic here.
 #
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.25)
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)

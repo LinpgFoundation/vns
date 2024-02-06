@@ -104,9 +104,9 @@ std::string Naming::get_database_as_json()
     return json_map.dump();
 }
 
-bool Naming::empty_database()
+void Naming::clear_database()
 {
-    return DATABASE_.empty();
+    return DATABASE_.clear();
 }
 
 // update database

@@ -36,7 +36,7 @@ public:
 
     static std::string get_database_as_json();
 
-    static bool empty_database();
+    static void clear_database();
 
     static void update_database(std::string &);
 

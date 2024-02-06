@@ -77,7 +77,10 @@ nlohmann::json ScriptProcessor::get_output_as_json() const
         {
             section[dialogue_id] = dialogue_content.to_json();
         }
-        output[section_name] = section;
+        if (!section.empty())
+        {
+            output[section_name] = section;
+        }
     }
     return output;
 }
@@ -240,6 +243,11 @@ void ScriptProcessor::convert(const int starting_index)
                 if (!previous_.empty())
                 {
                     output_[section_][previous_].next = kNullContentNext;
+                }
+                // if section has no content, then remove head
+                if (output_[section_].size() == 1 && output_[section_]["head"].to_json().empty())
+                {
+                    output_[section_].clear();
                 }
                 section_ = extract_string(current_line);
                 output_[section_] = {};

@@ -21,7 +21,7 @@ cdef extern from "vns-cpp/naming.hpp":
         @staticmethod
         string get_database_as_json()
         @staticmethod
-        bint empty_database()
+        void clear_database()
         @staticmethod
         void update_database(string &)
 
@@ -78,7 +78,7 @@ cdef class PyNaming:
 
     @staticmethod
     def clear_database(dict data):
-        Naming.empty_database()
+        Naming.clear_database()
 
     @staticmethod
     def update_database(dict data):
