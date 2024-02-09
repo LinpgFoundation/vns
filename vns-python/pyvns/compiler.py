@@ -3,16 +3,16 @@ from glob import glob
 from os import path as OS_PATH
 from typing import Any
 
-from . import vns_python_wrapper
+from .vns_python_wrapper import Compiler as _Compiler
 
 
 class Compiler:
-    # 直接加载
+    # load file directly
     @staticmethod
     def load(path: str) -> dict[str, Any]:
-        return vns_python_wrapper.Compiler.load(path)
+        return _Compiler.load(path)
 
-    # 编译
+    # compile
     @classmethod
     def compile(cls, path: str, out_dir: str | None = None) -> None:
         if not OS_PATH.isdir(path) and path.endswith(".vns"):
@@ -24,7 +24,7 @@ class Compiler:
             for _file in glob(OS_PATH.join(path, "*")):
                 cls.compile(_file, out_dir)
 
-    # 保存（子类可重写）
+    # save (can be overridden by child classes)
     @staticmethod
     def _save(_data: dict[str, Any], _dir: str) -> None:
         with open(

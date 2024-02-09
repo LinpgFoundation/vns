@@ -1,6 +1,6 @@
 {
     "compiler": {
-        "compiledAt": 1699907243,
+        "compiledAt": 1707468310,
         "reversion": 0,
         "version": 2
     },
@@ -9,19 +9,16 @@
             "head": {
                 "background_image": "bg1.png",
                 "background_music": "bgm1.ogg",
-                "character_images": [],
                 "comments": [
                     "section 1"
                 ],
                 "contents": [
                     "This is a test message."
                 ],
-                "narrator": "",
                 "next": {
                     "target": "~01",
                     "type": "default"
-                },
-                "previous": null
+                }
             },
             "jumping_point1": {
                 "background_image": "bg2.png",
@@ -34,33 +31,24 @@
                     "Welcome to jump point 1"
                 ],
                 "narrator": "Test Character 3",
-                "next": null,
                 "previous": "~04"
             },
             "~01": {
                 "background_image": "bg1.png",
                 "background_music": "bgm1.ogg",
-                "character_images": [],
                 "contents": [
                     "I hope it works."
                 ],
-                "narrator": "",
-                "next": null,
                 "previous": "head"
             },
             "~02": {
-                "background_image": null,
-                "background_music": null,
-                "character_images": [],
                 "contents": [
                     "you cannot go back"
                 ],
-                "narrator": "",
                 "next": {
                     "target": "~03",
                     "type": "scene"
-                },
-                "previous": null
+                }
             },
             "~03": {
                 "background_image": "bg2.png",
@@ -79,8 +67,7 @@
                 "next": {
                     "target": "~04",
                     "type": "default"
-                },
-                "previous": null
+                }
             },
             "~04": {
                 "background_image": "bg2.png",
@@ -100,7 +87,7 @@
                             "text": "click here to go to jump point 1"
                         },
                         {
-                            "id": null,
+                            "id": "",
                             "text": "click here to go to the end"
                         }
                     ],
@@ -110,6 +97,6 @@
             }
         }
     },
-    "id": 1,
+    "id": "1",
     "language": "English"
 }
