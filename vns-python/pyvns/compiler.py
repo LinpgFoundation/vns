@@ -1,30 +1,16 @@
 import json
 from glob import glob
 from os import path as OS_PATH
-from subprocess import check_output
 from typing import Any
 
-from .naming import PyNaming as Naming
+from . import vns_python_wrapper
 
 
 class Compiler:
     # 直接加载
     @staticmethod
     def load(path: str) -> dict[str, Any]:
-        return dict(
-            json.loads(
-                check_output(
-                    [
-                        OS_PATH.join(OS_PATH.dirname(__file__), "vns.exe"),
-                        "-i",
-                        path,
-                        "-n",
-                        Naming.get_database_as_json(),
-                        "-s",
-                    ]
-                ).decode()
-            )
-        )
+        return vns_python_wrapper.Compiler.load(path)
 
     # 编译
     @classmethod

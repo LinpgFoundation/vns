@@ -35,7 +35,7 @@ class Content:
         # 下一个
         self.next: _Next = _Next(_data.get("next"))
         # 注释
-        self.comments: list[str] = []
+        self.comments: list[str] = _data.get("comments", [])
 
     @property
     def id(self) -> str:

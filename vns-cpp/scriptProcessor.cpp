@@ -58,10 +58,13 @@ DialogueDataType ScriptProcessor::get_output() const
     DialogueDataType output;
     for (const auto &[section_name, section_contents]: output_)
     {
-        output[section_name] = {};
-        for (const auto &[dialogue_id, dialogue_content]: section_contents)
+        if (!section_contents.empty())
         {
-            output[section_name][dialogue_id] = dialogue_content.to_map();
+            output[section_name] = {};
+            for (const auto &[dialogue_id, dialogue_content]: section_contents)
+            {
+                output[section_name][dialogue_id] = dialogue_content.to_map();
+            }
         }
     }
     return output;

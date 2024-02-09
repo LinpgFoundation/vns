@@ -3,7 +3,6 @@
 
 #include <filesystem>
 #include <unordered_map>
-#include <any>
 #include "libs/nlohmann/json.hpp"
 #include "scriptProcessor.hpp"
 
