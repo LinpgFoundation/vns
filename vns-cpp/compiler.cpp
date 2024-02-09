@@ -3,7 +3,6 @@
 #include "compiler.hpp"
 #include <fstream>
 #include <iostream>
-#include "scriptProcessor.hpp"
 
 // get the info of compiler
 std::unordered_map<std::string, int> Compiler::get_compiler_info()
@@ -14,7 +13,8 @@ std::unordered_map<std::string, int> Compiler::get_compiler_info()
 }
 
 // load data from file directly
-std::unordered_map<std::string, std::any> Compiler::load(const std::filesystem::path &path)
+std::unordered_map<std::string, std::variant<DialogueDataType, std::unordered_map<std::string, int>, std::string>>
+Compiler::load(const std::filesystem::path &path)
 {
     ScriptProcessor processor;
     processor.process(path);

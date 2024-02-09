@@ -5,13 +5,15 @@
 #include <unordered_map>
 #include <any>
 #include "libs/nlohmann/json.hpp"
+#include "scriptProcessor.hpp"
 
 class Compiler
 {
 public:
     static std::unordered_map<std::string, int> get_compiler_info();
 
-    static std::unordered_map<std::string, std::any> load(const std::filesystem::path &);
+    static std::unordered_map<std::string, std::variant<DialogueDataType, std::unordered_map<std::string, int>, std::string>>
+    load(const std::filesystem::path &);
 
     static void compile(const std::filesystem::path &, const std::filesystem::path & = "");
 
