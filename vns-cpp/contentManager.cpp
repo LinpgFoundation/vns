@@ -90,37 +90,57 @@ std::string ContentManager::get_section() const
 // Set current section name
 void ContentManager::set_section(const std::string &section)
 {
-    section_ = section.empty() ? "head" : section;
+    section_ = section;
     current_ = nullptr;
     last_ = nullptr;
 }
 
 // Remove section
-void ContentManager::remove_section(const std::string &id)
+void ContentManager::remove_section(const std::string &section)
 {
-    dialog_data_[section_].erase(id.empty() ? id_ : id);
+    dialog_data_.erase(section);
 }
 
 // Get section content
+SectionDataType &ContentManager::get_section_contents()
+{
+    return get_section_contents(section_);
+}
+
 SectionDataType &ContentManager::get_section_contents(const std::string &section)
 {
-    return dialog_data_.at(section.empty() ? section_ : section);
+    return dialog_data_.at(section);
 }
 
 // Set section content
-void ContentManager::set_section_contents(const SectionDataType &data, const std::string &section)
+void ContentManager::set_section_contents(const SectionDataType &data)
 {
-    dialog_data_[section.empty() ? section_ : section] = data;
+    set_section_contents(section_, data);
+}
+
+void ContentManager::set_section_contents(const std::string &section, const SectionDataType &data)
+{
+    dialog_data_[section] = data;
 }
 
 // Get dialog data
+ContentDataType &ContentManager::get_content()
+{
+    return get_content(section_, id_);
+}
+
 ContentDataType &ContentManager::get_content(const std::string &section, const std::string &id)
 {
-    return get_section_contents(section)[id.empty() ? id_ : id];
+    return get_section_contents(section)[id];
 }
 
 // Remove dialog data
+void ContentManager::remove_content()
+{
+    remove_content(section_, id_);
+}
+
 void ContentManager::remove_content(const std::string &section, const std::string &id)
 {
-    get_section_contents(section).erase(id.empty() ? id_ : id);
+    get_section_contents(section).erase(id);
 }

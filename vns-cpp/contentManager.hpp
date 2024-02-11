@@ -40,22 +40,30 @@ public:
     [[nodiscard]] std::string get_section() const;
 
     // Set current section name
-    void set_section(const std::string & = "");
+    void set_section(const std::string &);
 
     // Remove section
-    void remove_section(const std::string & = "");
+    void remove_section(const std::string &);
 
     // Get section content
-    [[nodiscard]] SectionDataType &get_section_contents(const std::string & = "");
+    [[nodiscard]] SectionDataType &get_section_contents();
+
+    [[nodiscard]] SectionDataType &get_section_contents(const std::string &);
 
     // Set section content
-    void set_section_contents(const SectionDataType &, const std::string & = "");
+    void set_section_contents(const SectionDataType &);
+
+    void set_section_contents(const std::string &, const SectionDataType &);
 
     // Get dialog data
-    [[nodiscard]] ContentDataType &get_content(const std::string & = "", const std::string & = "");
+    [[nodiscard]] ContentDataType &get_content();
+
+    [[nodiscard]] ContentDataType &get_content(const std::string &, const std::string &);
 
     // Remove dialog data
-    void remove_content(const std::string & = "", const std::string & = "");
+    void remove_content();
+
+    void remove_content(const std::string &, const std::string &);
 
 private:
     DialogueDataType dialog_data_;

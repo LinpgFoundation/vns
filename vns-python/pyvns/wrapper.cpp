@@ -16,7 +16,11 @@ PYBIND11_MODULE(vns_python_wrapper, m) {
             .def("contains_tag", &Naming::contains_tag)
             .def("insert_tag", &Naming::insert_tag)
             .def("erase_tag", &Naming::erase_tag)
-            .def_static("get_database", &Naming::get_database)
+            .def("equal", (bool (Naming::*)(const std::string &) const) &Naming::equal)
+            .def("equal", (bool (Naming::*)(const std::string &, bool) const) &Naming::equal)
+            .def("equal", (bool (Naming::*)(const Naming &) const) &Naming::equal)
+            .def("equal", (bool (Naming::*)(const Naming &, bool) const) &Naming::equal)
+            .def_static("get_database", &Naming::get_database, py::return_value_policy::reference)
             .def_static("clear_database", &Naming::clear_database)
             .def_static("update_database", (void (*)(std::string &)) &Naming::update_database)
             .def_static("update_database", (void (*)(
@@ -53,7 +57,8 @@ PYBIND11_MODULE(vns_python_wrapper, m) {
             .def("has_next", &Content::has_next)
             .def("to_map", &Content::to_map);
 
-    py::class_<ContentManager>(m, "ContentManager").def(py::init<>()) // Default constructor
+    py::class_<ContentManager>(m, "ContentManager")
+            .def(py::init<>())
             .def("get_previous", &ContentManager::get_previous, py::return_value_policy::reference)
             .def("get_current", &ContentManager::get_current, py::return_value_policy::reference)
             .def("get_last", &ContentManager::get_last, py::return_value_policy::reference)
@@ -67,8 +72,21 @@ PYBIND11_MODULE(vns_python_wrapper, m) {
             .def("get_section", &ContentManager::get_section)
             .def("set_section", &ContentManager::set_section)
             .def("remove_section", &ContentManager::remove_section)
-            .def("get_section_contents", &ContentManager::get_section_contents, py::return_value_policy::reference)
-            .def("set_section_contents", &ContentManager::set_section_contents)
-            .def("get_content", &ContentManager::get_content, py::return_value_policy::reference)
-            .def("remove_content", &ContentManager::remove_content);
+            .def("get_section_contents", (SectionDataType &(ContentManager::*)()) &ContentManager::get_section_contents,
+                 py::return_value_policy::reference)
+            .def("get_section_contents",
+                 (SectionDataType &(ContentManager::*)(const std::string &)) &ContentManager::get_section_contents,
+                 py::return_value_policy::reference)
+            .def("set_section_contents",
+                 (void (ContentManager::*)(const SectionDataType &)) &ContentManager::set_section_contents)
+            .def("set_section_contents", (void (ContentManager::*)(const std::string &,
+                                                                   const SectionDataType &)) &ContentManager::set_section_contents)
+            .def("get_content", (ContentDataType &(ContentManager::*)()) &ContentManager::get_content,
+                 py::return_value_policy::reference)
+            .def("get_content", (ContentDataType &(ContentManager::*)(const std::string &,
+                                                                      const std::string &)) &ContentManager::get_content,
+                 py::return_value_policy::reference)
+            .def("remove_content", (void (ContentManager::*)()) &ContentManager::remove_content)
+            .def("remove_content",
+                 (void (ContentManager::*)(const std::string &, const std::string &)) &ContentManager::remove_content);
 }
