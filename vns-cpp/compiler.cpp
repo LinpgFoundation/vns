@@ -13,8 +13,7 @@ std::unordered_map<std::string, int> Compiler::get_compiler_info()
 }
 
 // load data from file directly
-std::unordered_map<std::string, std::variant<DialogueDataType, std::unordered_map<std::string, int>, std::string>>
-Compiler::load(const std::filesystem::path &path)
+DialogueFileDataType Compiler::load(const std::filesystem::path &path)
 {
     ScriptProcessor processor;
     processor.process(path);
@@ -44,11 +43,16 @@ nlohmann::json Compiler::load_as_json(const std::filesystem::path &path)
 }
 
 // compile the file
+void Compiler::compile(const std::filesystem::path &path)
+{
+    compile(path, path.root_directory());
+}
+
 void Compiler::compile(const std::filesystem::path &path, const std::filesystem::path &out_dir)
 {
     if (!is_directory(path))
     {
-        save(load_as_json(path), out_dir.empty() ? path.root_directory() : out_dir);
+        save(load_as_json(path), out_dir);
     } else
     {
         for (const auto &entry: std::filesystem::directory_iterator(path))

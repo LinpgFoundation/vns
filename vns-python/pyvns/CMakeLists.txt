@@ -9,7 +9,7 @@ project(vns_python_wrapper)
 find_package(Python COMPONENTS Interpreter Development)
 
 # specify needed source files
-file(GLOB SOURCES "extern/vns-cpp/libs/*/*.h" "extern/vns-cpp/libs/*/*.cpp" "extern/vns-cpp/libs/*/*.hpp", "extern/vns-cpp/*.h" "extern/vns-cpp/*.cpp")
+file(GLOB SOURCES "extern/vns-cpp/libs/*/*.h" "extern/vns-cpp/libs/*/*.cpp" "extern/vns-cpp/libs/*/*.hpp" "extern/vns-cpp/*.h" "extern/vns-cpp/*.cpp")
 
 # add pybind11
 add_subdirectory(extern/pybind11)

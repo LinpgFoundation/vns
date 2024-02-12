@@ -29,7 +29,10 @@ PYBIND11_MODULE(vns_python_wrapper, m) {
                     const std::unordered_map<std::string, std::vector<std::string>> &)) &Naming::update_database);
 
     py::class_<Compiler>(m, "Compiler")
-            .def_static("load", &Compiler::load);
+            .def_static("load", &Compiler::load)
+            .def_static("compile", (void (*)(const std::filesystem::path &)) &Compiler::compile)
+            .def_static("compile",
+                        (void (*)(const std::filesystem::path &, const std::filesystem::path &)) &Compiler::compile);
 
     py::class_<ContentNext>(m, "ContentNext")
             .def(py::init<std::string, ContentNextValueType>())
