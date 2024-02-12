@@ -95,6 +95,12 @@ void ContentManager::set_section(const std::string &section)
     last_ = nullptr;
 }
 
+// Does dialogue have given section name
+bool ContentManager::contains_section(const std::string &section)
+{
+    return dialog_data_.contains(section);
+}
+
 // Remove section
 void ContentManager::remove_section(const std::string &section)
 {
@@ -123,7 +129,7 @@ void ContentManager::set_section_contents(const std::string &section, const Sect
     dialog_data_[section] = data;
 }
 
-// Get dialog data
+// Get content data
 ContentDataType &ContentManager::get_content()
 {
     return get_content(section_, id_);
@@ -132,6 +138,23 @@ ContentDataType &ContentManager::get_content()
 ContentDataType &ContentManager::get_content(const std::string &section, const std::string &id)
 {
     return get_section_contents(section)[id];
+}
+
+// Set content data
+void ContentManager::set_content(ContentDataType &data)
+{
+    set_content(section_, id_, data);
+}
+
+void ContentManager::set_content(const std::string &section, const std::string &id, ContentDataType &data)
+{
+    get_section_contents(section)[id] = data;
+}
+
+// Does dialogue with given section contain given id
+bool ContentManager::contains_content(const std::string &section, const std::string &id)
+{
+    return get_section_contents(section).contains(id);
 }
 
 // Remove dialog data

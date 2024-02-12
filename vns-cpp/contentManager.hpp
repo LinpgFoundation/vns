@@ -42,6 +42,9 @@ public:
     // Set current section name
     void set_section(const std::string &);
 
+    // Does dialogue have given section name
+    bool contains_section(const std::string &);
+
     // Remove section
     void remove_section(const std::string &);
 
@@ -55,10 +58,18 @@ public:
 
     void set_section_contents(const std::string &, const SectionDataType &);
 
-    // Get dialog data
+    // Get content data
     [[nodiscard]] ContentDataType &get_content();
 
     [[nodiscard]] ContentDataType &get_content(const std::string &, const std::string &);
+
+    // Set content data
+    void set_content(ContentDataType &);
+
+    void set_content(const std::string &, const std::string &, ContentDataType &);
+
+    // Does dialogue with given section contain given id
+    bool contains_content(const std::string &, const std::string &);
 
     // Remove dialog data
     void remove_content();
