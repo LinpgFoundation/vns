@@ -45,7 +45,7 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
 
         while (true)
         {
-            const ContentDataType &current_dialog = content_manager.get_content();
+            const ContentDataType &current_dialog = content_manager.get_current_content();
             // Process comments
             if (const auto &comments = std::get<std::vector<std::string>>(
                         current_dialog.at("comments")); !comments.empty())

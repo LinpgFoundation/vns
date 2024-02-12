@@ -108,7 +108,7 @@ void ContentManager::remove_section(const std::string &section)
 }
 
 // Get section content
-SectionDataType &ContentManager::get_section_contents()
+SectionDataType &ContentManager::get_current_section_contents()
 {
     return get_section_contents(section_);
 }
@@ -119,7 +119,7 @@ SectionDataType &ContentManager::get_section_contents(const std::string &section
 }
 
 // Set section content
-void ContentManager::set_section_contents(const SectionDataType &data)
+void ContentManager::set_current_section_contents(const SectionDataType &data)
 {
     set_section_contents(section_, data);
 }
@@ -130,7 +130,7 @@ void ContentManager::set_section_contents(const std::string &section, const Sect
 }
 
 // Get content data
-ContentDataType &ContentManager::get_content()
+ContentDataType &ContentManager::get_current_content()
 {
     return get_content(section_, id_);
 }
@@ -141,7 +141,7 @@ ContentDataType &ContentManager::get_content(const std::string &section, const s
 }
 
 // Set content data
-void ContentManager::set_content(ContentDataType &data)
+void ContentManager::set_current_content(ContentDataType &data)
 {
     set_content(section_, id_, data);
 }
@@ -158,7 +158,7 @@ bool ContentManager::contains_content(const std::string &section, const std::str
 }
 
 // Remove dialog data
-void ContentManager::remove_content()
+void ContentManager::remove_current_content()
 {
     remove_content(section_, id_);
 }

@@ -74,22 +74,17 @@ PYBIND11_MODULE(vns_python_wrapper, m) {
             .def("set_id", &ContentManager::set_id)
             .def("get_section", &ContentManager::get_section)
             .def("set_section", &ContentManager::set_section)
+            .def("contains_section", &ContentManager::contains_section)
             .def("remove_section", &ContentManager::remove_section)
-            .def("get_section_contents", (SectionDataType &(ContentManager::*)()) &ContentManager::get_section_contents,
-                 py::return_value_policy::reference)
-            .def("get_section_contents",
-                 (SectionDataType &(ContentManager::*)(const std::string &)) &ContentManager::get_section_contents,
-                 py::return_value_policy::reference)
-            .def("set_section_contents",
-                 (void (ContentManager::*)(const SectionDataType &)) &ContentManager::set_section_contents)
-            .def("set_section_contents", (void (ContentManager::*)(const std::string &,
-                                                                   const SectionDataType &)) &ContentManager::set_section_contents)
-            .def("get_content", (ContentDataType &(ContentManager::*)()) &ContentManager::get_content,
-                 py::return_value_policy::reference)
-            .def("get_content", (ContentDataType &(ContentManager::*)(const std::string &,
-                                                                      const std::string &)) &ContentManager::get_content,
-                 py::return_value_policy::reference)
-            .def("remove_content", (void (ContentManager::*)()) &ContentManager::remove_content)
-            .def("remove_content",
-                 (void (ContentManager::*)(const std::string &, const std::string &)) &ContentManager::remove_content);
+            .def("get_current_section_contents", &ContentManager::get_current_section_contents)
+            .def("get_section_contents", &ContentManager::get_section_contents)
+            .def("set_current_section_contents", &ContentManager::set_current_section_contents)
+            .def("set_section_contents", &ContentManager::set_section_contents)
+            .def("get_current_content", &ContentManager::get_current_content)
+            .def("get_content", &ContentManager::get_content)
+            .def("set_current_content", &ContentManager::set_current_content)
+            .def("set_content", &ContentManager::set_content)
+            .def("contains_content", &ContentManager::contains_content)
+            .def("remove_current_content", &ContentManager::remove_current_content)
+            .def("remove_content", &ContentManager::remove_content);
 }
