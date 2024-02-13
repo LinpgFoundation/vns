@@ -4,30 +4,30 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "contentNext.hpp"
+#include "dialogueNext.hpp"
 
-using ContentDataType = std::unordered_map<std::string, std::variant<std::string, std::vector<std::string>, std::unordered_map<std::string, ContentNextValueType>>>;
+using DialogueDataType = std::unordered_map<std::string, std::variant<std::string, std::vector<std::string>, std::unordered_map<std::string, DialogueNextValueType>>>;
 
-using SectionDataType = std::unordered_map<std::string, ContentDataType>;
+using DialogueSectionDataType = std::unordered_map<std::string, DialogueDataType>;
 
-using DialogueDataType = std::unordered_map<std::string, SectionDataType>;
+using DialogueSectionsDataType = std::unordered_map<std::string, DialogueSectionDataType>;
 
-struct Content
+struct Dialogue
 {
-    Content(const ContentDataType &, const std::string &);
+    Dialogue(const DialogueDataType &, const std::string &);
 
-    Content() : Content({}, "head")
+    Dialogue() : Dialogue({}, "head")
     {
     }
 
     [[nodiscard]] bool has_next() const;
 
-    [[nodiscard]] ContentDataType to_map() const;
+    [[nodiscard]] DialogueDataType to_map() const;
 
     [[nodiscard]] nlohmann::json to_json() const;
 
     std::string previous;
-    ContentNext next;
+    DialogueNext next;
     std::string background_image;
     std::string background_music;
     std::vector<std::string> character_images;
@@ -36,7 +36,7 @@ struct Content
     std::vector<std::string> comments;
     std::string id;
 
-    template<typename T> static T cast(const ContentDataType &data, const std::string &k, T default_v)
+    template<typename T> static T cast(const DialogueDataType &data, const std::string &k, T default_v)
     {
         const auto it = data.find(k);
         if (it != data.end())

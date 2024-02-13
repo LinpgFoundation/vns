@@ -6,7 +6,7 @@
 #include "libs/nlohmann/json.hpp"
 #include "scriptProcessor.hpp"
 
-using DialogueFileDataType = std::unordered_map<std::string, std::variant<DialogueDataType, std::unordered_map<std::string, int>, std::string>>;
+using DialogueFileDataType = std::unordered_map<std::string, std::variant<DialogueSectionsDataType, std::unordered_map<std::string, int>, std::string>>;
 
 class Compiler
 {

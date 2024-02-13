@@ -1,6 +1,6 @@
-#include "content.hpp"
+#include "dialogue.hpp"
 
-Content::Content(const ContentDataType &data, const std::string &content_id)
+Dialogue::Dialogue(const DialogueDataType &data, const std::string &content_id)
 {
     id = content_id;
     background_image = cast<std::string>(data, "background_image", "");
@@ -9,17 +9,17 @@ Content::Content(const ContentDataType &data, const std::string &content_id)
     contents = cast<std::vector<std::string>>(data, "contents", {});
     narrator = cast<std::string>(data, "narrator", "");
     previous = cast<std::string>(data, "previous", "");
-    next = ContentNext(cast<std::unordered_map<std::string, ContentNextValueType>>(data, "next", {{"type",   "default"},
-                                                                                                  {"target", ""}}));
+    next = DialogueNext(cast<std::unordered_map<std::string, DialogueNextValueType>>(data, "next", {{"type",   "default"},
+                                                                                                    {"target", ""}}));
     comments = cast<std::vector<std::string>>(data, "comments", {});
 }
 
-bool Content::has_next() const
+bool Dialogue::has_next() const
 {
     return !next.is_null();
 }
 
-ContentDataType Content::to_map() const
+DialogueDataType Dialogue::to_map() const
 {
     return {{"background_image", background_image},
             {"background_music", background_music},
@@ -31,7 +31,7 @@ ContentDataType Content::to_map() const
             {"comments",         comments}};
 }
 
-nlohmann::json Content::to_json() const
+nlohmann::json Dialogue::to_json() const
 {
     nlohmann::json json_data;
     if (!background_image.empty())
