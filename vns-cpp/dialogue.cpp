@@ -19,6 +19,16 @@ bool Dialogue::has_next() const
     return !next.is_null();
 }
 
+void Dialogue::set_next(std::string type, DialogueNextValueType target)
+{
+    next = DialogueNext(std::move(type), std::move(target));
+}
+
+void Dialogue::set_next(const std::unordered_map<std::string, DialogueNextValueType> &data)
+{
+    next = data.empty() ? kNullDialogueNext : DialogueNext(data);
+}
+
 DialogueDataType Dialogue::to_map() const
 {
     return {{"background_image", background_image},

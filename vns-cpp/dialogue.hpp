@@ -22,6 +22,10 @@ struct Dialogue
 
     [[nodiscard]] bool has_next() const;
 
+    void set_next(std::string, DialogueNextValueType);
+
+    void set_next(const std::unordered_map<std::string, DialogueNextValueType> &);
+
     [[nodiscard]] DialogueDataType to_map() const;
 
     [[nodiscard]] nlohmann::json to_json() const;

@@ -67,6 +67,11 @@ PYBIND11_MODULE(vns_python_wrapper, m) {
             .def_readwrite("comments", &Dialogue::comments)
             .def_readwrite("id", &Dialogue::id)
             .def("has_next", &Dialogue::has_next, "Check if the dialogue has next")
+            .def("set_next", py::overload_cast<std::string, DialogueNextValueType>(&Dialogue::set_next),
+                 "Set dialogue next")
+            .def("set_next",
+                 py::overload_cast<const std::unordered_map<std::string, DialogueNextValueType> &>(&Dialogue::set_next),
+                 "Set dialogue next")
             .def("to_map", &Dialogue::to_map, "Convert the dialogue object to a map");
 
     py::class_<DialoguesManager>(m, "DialoguesManager", "Class for managing dialogue contents")

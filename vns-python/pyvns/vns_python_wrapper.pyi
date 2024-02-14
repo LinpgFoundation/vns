@@ -55,6 +55,18 @@ class Dialogue:
         Check if the dialogue has next
         """
 
+    @typing.overload
+    def set_next(self, arg0: str, arg1: str | list[dict[str, str]]) -> None:
+        """
+        Set dialogue next
+        """
+
+    @typing.overload
+    def set_next(self, arg0: dict[str, str | list[dict[str, str]]]) -> None:
+        """
+        Set dialogue next
+        """
+
     def to_map(
         self,
     ) -> dict[str, str | list[str] | dict[str, str | list[dict[str, str]]]]:

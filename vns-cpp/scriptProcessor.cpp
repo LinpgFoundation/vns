@@ -245,7 +245,7 @@ void ScriptProcessor::convert(const int starting_index)
             {
                 if (!previous_.empty())
                 {
-                    output_[section_][previous_].next = kNullContentNext;
+                    output_[section_][previous_].set_next({});
                 }
                 // if section has no content, then remove head
                 if (output_[section_].size() == 1 && output_[section_]["head"].to_json().empty())
@@ -260,22 +260,24 @@ void ScriptProcessor::convert(const int starting_index)
             } else if (tag == "end")
             {
                 assert(!previous_.empty());
-                output_[section_][previous_].next = kNullContentNext;
+                output_[section_][previous_].set_next({});
             } else if (tag == "scene")
             {
                 assert(!previous_.empty());
-                output_[section_][previous_].next = output_[section_][previous_].next.has_multi_targets()
-                                                    ? DialogueNext("scene",
-                                                                   output_[section_][previous_].next.get_targets())
-                                                    : DialogueNext("scene",
-                                                                   output_[section_][previous_].next.get_target());
+                if (output_[section_][previous_].next.has_multi_targets())
+                {
+                    output_[section_][previous_].set_next("scene", output_[section_][previous_].next.get_targets());
+                } else
+                {
+                    output_[section_][previous_].set_next("scene", output_[section_][previous_].next.get_target());
+                }
                 current_data_.background_image = extract_parameter(current_line);
                 blocked_ = true;
             } else if (tag == "block")
             {
                 if (!previous_.empty())
                 {
-                    output_[section_][previous_].next = kNullContentNext;
+                    output_[section_][previous_].set_next({});
                 }
                 current_data_ = Dialogue({}, "id_needed");
                 previous_ = "";
@@ -298,7 +300,7 @@ void ScriptProcessor::convert(const int starting_index)
                                            {"id",   ensure_not_null(
                                                    trim(src_to_target.substr(src_to_target.find("->") + 2)))}});
                 // update next
-                output_[section_][previous_].next = DialogueNext("options", current_targets);
+                output_[section_][previous_].set_next("options", current_targets);
             }
                 // Placeholder, no action needed for "label" tag
             else if (tag == "label")
@@ -371,13 +373,13 @@ void ScriptProcessor::convert(const int starting_index)
                     {
                         if (output_[section_][previous_].next.get_type() != "options")
                         {
-                            output_[section_][previous_].next = DialogueNext(
-                                    output_[section_][previous_].next.get_type(), dialog_associate_key_[line_index_]);
+                            output_[section_][previous_].set_next(output_[section_][previous_].next.get_type(),
+                                                                  dialog_associate_key_[line_index_]);
                         }
                     } else
                     {
-                        output_[section_][previous_].next = DialogueNext(output_[section_][previous_].next.get_type(),
-                                                                         dialog_associate_key_[line_index_]);
+                        output_[section_][previous_].set_next(output_[section_][previous_].next.get_type(),
+                                                              dialog_associate_key_[line_index_]);
                     }
                 } else
                 {
