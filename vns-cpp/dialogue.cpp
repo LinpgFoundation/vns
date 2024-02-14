@@ -31,14 +31,24 @@ void Dialogue::set_next(const std::unordered_map<std::string, DialogueNextValueT
 
 DialogueDataType Dialogue::to_map() const
 {
-    return {{"background_image", background_image},
-            {"background_music", background_music},
-            {"character_images", character_images},
-            {"contents",         contents},
-            {"previous",         previous},
-            {"narrator",         narrator},
-            {"next",             next.to_map()},
-            {"comments",         comments}};
+    DialogueDataType map_data;
+    if (!background_image.empty())
+        map_data["background_image"] = background_image;
+    if (!background_music.empty())
+        map_data["background_music"] = background_music;
+    if (!character_images.empty())
+        map_data["character_images"] = character_images;
+    if (!contents.empty())
+        map_data["contents"] = contents;
+    if (!previous.empty())
+        map_data["previous"] = previous;
+    if (!narrator.empty())
+        map_data["narrator"] = narrator;
+    if (has_next())
+        map_data["next"] = next.to_map();
+    if (!comments.empty())
+        map_data["comments"] = comments;
+    return map_data;
 }
 
 nlohmann::json Dialogue::to_json() const
@@ -56,8 +66,8 @@ nlohmann::json Dialogue::to_json() const
         json_data["previous"] = previous;
     if (!narrator.empty())
         json_data["narrator"] = narrator;
-    if (nlohmann::json next_in_json = next.to_json(); !next_in_json.empty())
-        json_data["next"] = next_in_json;
+    if (has_next())
+        json_data["next"] = next.to_json();
     if (!comments.empty())
         json_data["comments"] = comments;
     return json_data;

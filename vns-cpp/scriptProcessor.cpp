@@ -75,13 +75,13 @@ nlohmann::json ScriptProcessor::get_output_as_json() const
     nlohmann::json output;
     for (const auto &[section_name, section_contents]: output_)
     {
-        nlohmann::json section;
-        for (const auto &[dialogue_id, dialogue_content]: section_contents)
+        if (!section_contents.empty())
         {
-            section[dialogue_id] = dialogue_content.to_json();
-        }
-        if (!section.empty())
-        {
+            nlohmann::json section;
+            for (const auto &[dialogue_id, dialogue_content]: section_contents)
+            {
+                section[dialogue_id] = dialogue_content.to_json();
+            }
             output[section_name] = section;
         }
     }
