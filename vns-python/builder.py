@@ -8,17 +8,18 @@ additional_files: tuple[str, ...] = (
     OS_PATH.join(OS_PATH.dirname(__file__), r"../LICENSE"),
 )
 
+Builder.CACHE_NEED_REMOVE.append("cmake-build-debug")
+Builder.CACHE_NEED_REMOVE.append("extern")
+Builder.CACHE_NEED_REMOVE.append("wrapper.cpp")
+
 # 编译源代码
 Builder.compile(
     "pyvns",
     additional_files=additional_files,
     update_the_one_in_sitepackages=True,
     include_pyinstaller_program=True,
-    options={
-        "enable_multiprocessing": True,
-        "includes": (OS_PATH.join(OS_PATH.dirname(__file__), "..", "vns-cpp"),),
-        "extra_compile_args": {"naming.pyx": ["/std:c++20"]},
-    },
+    ignore_key_words=("extern",),
+    options={"enable_multiprocessing": True, "auto_cmake": True},
 )
 
 # 提示编译完成

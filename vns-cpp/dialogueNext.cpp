@@ -1,12 +1,12 @@
-#include "contentNext.hpp"
+#include "dialogueNext.hpp"
 
-std::unordered_map<std::string, ContentNextValueType> ContentNext::to_map() const
+std::unordered_map<std::string, DialogueNextValueType> DialogueNext::to_map() const
 {
     return {{"type",   type_},
             {"target", target_}};
 }
 
-nlohmann::json ContentNext::to_json() const
+nlohmann::json DialogueNext::to_json() const
 {
     nlohmann::json json_data;
     if (!is_null())
@@ -23,32 +23,32 @@ nlohmann::json ContentNext::to_json() const
     return json_data;
 }
 
-bool ContentNext::has_single_target() const
+bool DialogueNext::has_single_target() const
 {
     return std::holds_alternative<std::string>(target_);
 }
 
-bool ContentNext::has_multi_targets() const
+bool DialogueNext::has_multi_targets() const
 {
     return !has_single_target();
 }
 
-std::string ContentNext::get_type() const
+std::string DialogueNext::get_type() const
 {
     return type_;
 }
 
-std::string ContentNext::get_target() const
+std::string DialogueNext::get_target() const
 {
     return std::get<std::string>(target_);
 }
 
-MultiTargetsType ContentNext::get_targets() const
+MultiTargetsType DialogueNext::get_targets() const
 {
     return std::get<MultiTargetsType>(target_);
 }
 
-bool ContentNext::is_null() const
+bool DialogueNext::is_null() const
 {
     return has_single_target() ? get_target().empty() : get_targets().empty();
 }

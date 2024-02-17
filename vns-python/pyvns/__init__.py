@@ -1,2 +1,1 @@
-from .compiler import Compiler, Naming
-from .content import Content, ContentManager
+from .vns_python_wrapper import Compiler, Dialogue, DialoguesManager, Naming

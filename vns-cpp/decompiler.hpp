@@ -1,7 +1,7 @@
 #ifndef DECOMPILER_HPP
 #define DECOMPILER_HPP
 
-#include "contentManager.hpp" // Assuming you have a header file for ContentManager
+#include "dialoguesManager.hpp" // Assuming you have a header file for ContentManager
 
 class Decompiler
 {

@@ -1,6 +1,6 @@
 #include "tests.hpp"
 #include <cassert>
-#include "contentNext.hpp"
+#include "dialogueNext.hpp"
 #include "naming.hpp"
 #include <iostream>
 #include "scriptProcessor.hpp"
@@ -34,7 +34,7 @@ void TestNameWithTags()
 
 void TestNullNext()
 {
-    const ContentNext test_null_next;
+    const DialogueNext test_null_next;
     assert(test_null_next.is_null());
     assert(!test_null_next.has_multi_targets());
     assert(test_null_next.get_type() == "default");
@@ -43,8 +43,8 @@ void TestNullNext()
 
 void TestSingleTargetNext()
 {
-    const ContentNext single_target_next({{"type",   "default"},
-                                          {"target", "~1"}});
+    const DialogueNext single_target_next({{"type",   "default"},
+                                           {"target", "~1"}});
     assert(!single_target_next.is_null());
     assert(!single_target_next.has_multi_targets());
     assert(single_target_next.get_type() == "default");
@@ -56,8 +56,8 @@ void TestMultiTargetsNext()
     const std::unordered_map<std::string, std::string> t1 = {{"hello1", "world1"}};
     const std::unordered_map<std::string, std::string> t2 = {{"hello2", "world2"}};
     const MultiTargetsType target_v = {t1, t2};
-    const ContentNext multi_targets_next({{"type",   "default"},
-                                          {"target", target_v}});
+    const DialogueNext multi_targets_next({{"type",   "default"},
+                                           {"target", target_v}});
     assert(!multi_targets_next.is_null());
     assert(multi_targets_next.has_multi_targets());
     assert(multi_targets_next.get_type() == "default");

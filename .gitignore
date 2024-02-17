@@ -160,5 +160,7 @@ vns-vscode/LICENSE
 vns-cpp/libs/
 vns-cpp/CMakeUserPresets.json
 vns-python/pyvns/vns.exe
+vns-python/pyvns/extern/
+vns-python/pyvns/cmake-build-debug/
 */.idea/
 vns-cpp/cmake-build-debug/

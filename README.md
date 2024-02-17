@@ -190,3 +190,9 @@ Dipper:
 ```
 
 This script would display the background image `bg1.png` and the character images `character1.png` and `character2.png`. Mabel would then say "Hello my name is Mabel!" and "How are you doing today!". Next, `character1.png` would be hidden and Dipper would say "Hi Mabel! I'm doing well, thanks for asking." Finally, the script would end.
+
+# License:
+
+VNS is licensed under **LGPL(GNU Lesser General Public License)-2.1-or-later**.
+
+See **[LICENSE](https://github.com/LinpgFoundation/vns/blob/main/LICENSE)**.

@@ -10,24 +10,24 @@
 #include <vector>
 #include "libs/nlohmann/json.hpp"
 
-using MultiTargetsType = std::vector<std::unordered_map<std::string, std::string> >;
+using MultiTargetsType = std::vector<std::unordered_map<std::string, std::string>>;
 
-using ContentNextValueType = std::variant<std::string, MultiTargetsType>;
+using DialogueNextValueType = std::variant<std::string, MultiTargetsType>;
 
-class ContentNext
+class DialogueNext
 {
 public:
-    ContentNext(std::string type, ContentNextValueType target) : type_(std::move(type)), target_(std::move(target))
+    DialogueNext(std::string type, DialogueNextValueType target) : type_(std::move(type)), target_(std::move(target))
     {
     }
 
-    explicit ContentNext(const std::unordered_map<std::string, ContentNextValueType> &data) : ContentNext(
+    explicit DialogueNext(const std::unordered_map<std::string, DialogueNextValueType> &data) : DialogueNext(
             data.contains("type") ? std::get<std::string>(data.at("type")) : "default",
             data.contains("target") ? data.at("target") : "")
     {
     }
 
-    ContentNext() : ContentNext("default", "")
+    DialogueNext() : DialogueNext("default", "")
     {
     }
 
@@ -43,14 +43,14 @@ public:
 
     [[nodiscard]] bool is_null() const;
 
-    [[nodiscard]] std::unordered_map<std::string, ContentNextValueType> to_map() const;
+    [[nodiscard]] std::unordered_map<std::string, DialogueNextValueType> to_map() const;
 
     [[nodiscard]] nlohmann::json to_json() const;
 
 private:
     std::string type_;
-    ContentNextValueType target_;
+    DialogueNextValueType target_;
 };
 
-const ContentNext kNullContentNext;
+const DialogueNext kNullDialogueNext;
 #endif

@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <filesystem>
-#include "content.hpp"
+#include "dialogue.hpp"
 
 class ScriptProcessor
 {
@@ -29,15 +29,15 @@ public:
 
     void process(const std::filesystem::path &);
 
-    [[nodiscard]] DialogueDataType get_output() const;
+    [[nodiscard]] DialogueSectionsDataType get_output() const;
 
     [[nodiscard]] nlohmann::json get_output_as_json() const;
 
 private:
     std::filesystem::path path_;
     size_t line_index_;
-    std::unordered_map<std::string, std::unordered_map<std::string, Content> > output_;
-    Content current_data_;
+    std::unordered_map<std::string, std::unordered_map<std::string, Dialogue>> output_;
+    Dialogue current_data_;
     std::string id_;
     std::string lang_;
     std::string section_;

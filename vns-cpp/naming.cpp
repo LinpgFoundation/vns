@@ -63,9 +63,19 @@ void Naming::erase_tag(const std::string &tag)
 }
 
 // Check if two Naming objects or a Naming object and a string refer to the same character
+bool Naming::equal(const std::string &other) const
+{
+    return equal(Naming(other), false);
+}
+
 bool Naming::equal(const std::string &other, const bool must_be_the_same) const
 {
     return equal(Naming(other), must_be_the_same);
+}
+
+bool Naming::equal(const Naming &other) const
+{
+    return equal(other, false);
 }
 
 bool Naming::equal(const Naming &other, const bool must_be_the_same) const

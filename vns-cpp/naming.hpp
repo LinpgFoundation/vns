@@ -28,9 +28,13 @@ public:
 
     void erase_tag(const std::string &);
 
-    [[nodiscard]] bool equal(const std::string &, bool must_be_the_same = false) const;
+    [[nodiscard]] bool equal(const std::string &) const;
 
-    [[nodiscard]] bool equal(const Naming &, bool must_be_the_same = false) const;
+    [[nodiscard]] bool equal(const std::string &, bool must_be_the_same) const;
+
+    [[nodiscard]] bool equal(const Naming &) const;
+
+    [[nodiscard]] bool equal(const Naming &, bool must_be_the_same) const;
 
     static std::unordered_map<std::string, std::unordered_set<std::string>> &get_database();
 
