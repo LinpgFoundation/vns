@@ -81,6 +81,7 @@ PYBIND11_MODULE(vns_python_wrapper, m) {
             .def("get_current", &DialoguesManager::get_current, py::return_value_policy::reference,
                  "Get current dialogue")
             .def("get_last", &DialoguesManager::get_last, py::return_value_policy::reference, "Get last dialogue")
+            .def("load", &DialoguesManager::load, "load dialogue data from vns file")
             .def("save", &DialoguesManager::save, "Save modifications to the current dialogue interface")
             .def("empty", &DialoguesManager::empty, "Check if data is empty")
             .def("clear", &DialoguesManager::clear, "Clear data")

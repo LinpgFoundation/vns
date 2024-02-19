@@ -216,6 +216,11 @@ class DialoguesManager:
         Get the names of all sections
         """
 
+    def load(self, arg0: str) -> None:
+        """
+        load dialogue data from vns file
+        """
+
     def remove_current_dialogue(self) -> None:
         """
         Remove current dialogue

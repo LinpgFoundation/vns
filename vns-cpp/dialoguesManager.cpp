@@ -1,4 +1,5 @@
 #include "dialoguesManager.hpp"
+#include "scriptProcessor.hpp"
 
 // If the pointer to the current dialogue data does not exist, set_data the pointer
 void DialoguesManager::refresh_current()
@@ -33,6 +34,14 @@ Dialogue *DialoguesManager::get_last()
         last_ = new Dialogue(dialog_data_[section_][get_current()->previous], get_current()->previous);
     }
     return last_;
+}
+
+// load dialogue data from vns file
+void DialoguesManager::load(const std::filesystem::path &path)
+{
+    ScriptProcessor processor;
+    processor.process(path);
+    set_data(processor.get_output());
 }
 
 // Save modifications to the current dialogue interface

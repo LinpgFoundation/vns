@@ -16,6 +16,9 @@ public:
     // Getters for last dialogue
     Dialogue *get_last();
 
+    // load dialogue data from vns file
+    void load(const std::filesystem::path &);
+
     // Save modifications to the current dialogue interface
     void save();
 
