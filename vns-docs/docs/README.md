@@ -14,7 +14,7 @@ Unlike Ren'py, writing visual novel script is more like writing a story instead 
 
 The development of the VNS can be traced all the way back to the initial stages of Linpg's development. During this period, the team faced the challenge of finding an efficient method to store the dialogue. Each conversation required the storage of multiple variables, including the narrator, the actual dialogue content, associated character images, ambient background music, and various other components:
 
-![](vns-docs/docs/readme_conv_ex.png)
+![](readme_conv_ex.png)
 
 Ultimately, the team opted for a design inspired by doubly linked list, but implemented using dictionary (HashMap for Java forks). This approach not only facilitated easier access to the data but also  streamlined the saving process, enabling compatibility with formats like JSON or YAML. This method preserved readability while efficiently  managing the dialogue. Today, the current system closely resembles our initial design, with only a few subtle refinements:
 
