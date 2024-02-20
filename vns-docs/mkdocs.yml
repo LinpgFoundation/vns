@@ -1,21 +1,23 @@
-site_name: VNS (Visual Novel Script), a universal scripting language for creating in-game dialogues
-theme: readthedocs
 nav:
-  - Home: README.md
-  - Tutorials:
-    - 'Basic Tutorial': tutorials/basic_tutorial.md
-    - Tags:
-      - "[id]": tutorials/tags/id.md
-      - "[language]/[lang]": tutorials/tags/language.md
-      - "[section]": tutorials/tags/section.md
-      - "[bgi]": tutorials/tags/bgi.md
-      - "[bgm]": tutorials/tags/bgm.md
-      - "[display]/[disp]": tutorials/tags/display.md
-      - "[hide]": tutorials/tags/display.md
-      - "[scene]": tutorials/tags/scene.md
-      - "[option]": tutorials/tags/option.md
-      - "[label]": tutorials/tags/label.md
-      - "[end]": tutorials/tags/end.md
-      - "[block]": tutorials/tags/block.md
-    - 'Comments and Notes': tutorials/comments_and_notes.md
-    - 'Dialogues': tutorials/dialogues.md
+- Home: README.md
+- Basic Tutorial: tutorials/basic_tutorial.md
+- Tags:
+  - '[id]': tutorials/tags/id.md
+  - '[language]/[lang]': tutorials/tags/language.md
+  - '[section]': tutorials/tags/section.md
+  - '[bgi]': tutorials/tags/bgi.md
+  - '[bgm]': tutorials/tags/bgm.md
+  - '[show]': tutorials/tags/show.md
+  - '[display]/[disp]': tutorials/tags/display.md
+  - '[hide]': tutorials/tags/hide.md
+  - '[scene]': tutorials/tags/scene.md
+  - '[option]/[opt]': tutorials/tags/option.md
+  - '[label]': tutorials/tags/label.md
+  - '[end]': tutorials/tags/end.md
+  - '[block]': tutorials/tags/block.md
+- Comments and Notes: tutorials/comments_and_notes.md
+- Dialogues: tutorials/dialogues.md
+site_name: VNS (Visual Novel Script), a universal scripting language for creating
+  in-game dialogues
+theme:
+  name: material

@@ -1,5 +1,5 @@
 # Section:
 
-`[section]str`, ex: `[section]dialog_example`
+`[section]string`, ex: `[section]dialog_example`
 
 Specifies the section of all the following dialogues.

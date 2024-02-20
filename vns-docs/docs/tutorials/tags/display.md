@@ -1,5 +1,5 @@
-# Display character(s)
+# Display character(s):
 
-`[display]*str`, ex: `[display]character1.png character2.png`
+`[display]*strings`, ex: `[display]character1.png character2.png`
 
-Displays the character(s) for the current and following dialogues.
+Displays character images corresponding to the ongoing and forthcoming dialogues. Unlike the [show] tag, which introduces new character images in addition to existing character images, this tag will first clear any existing character images before introducing the designated character image(s).

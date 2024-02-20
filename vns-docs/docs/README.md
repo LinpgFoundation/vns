@@ -66,6 +66,7 @@ Here is a simple example of a VNS script:
 ```vns
 [id]1
 [language]English
+
 [section]dialog_example
 
 [bgi]bg1.png
