@@ -19,9 +19,6 @@ public:
     // load dialogue data from vns file
     void load(const std::filesystem::path &);
 
-    // Save modifications to the current dialogue interface
-    void save();
-
     // Check if data is empty
     [[nodiscard]] bool empty() const;
 
@@ -29,16 +26,16 @@ public:
     void clear();
 
     // Update data
-    void set_data(const DialogueSectionsDataType &);
+    void update(const DialogueSectionsDataType &);
 
     // Get data
-    [[nodiscard]] DialogueSectionsDataType get_data() const;
+    [[nodiscard]] DialogueSectionsDataType to_map() const;
 
     // Get current dialogue id
-    [[nodiscard]] std::string get_id() const;
+    [[nodiscard]] std::string get_current_dialogue_id() const;
 
     // Set current dialogue id
-    void set_id(const std::string &);
+    void set_current_dialogue_id(const std::string &id);
 
     // Get current section name
     [[nodiscard]] std::string get_section() const;
@@ -56,10 +53,10 @@ public:
     void remove_section(const std::string &);
 
     // Get current section dialogue contents
-    [[nodiscard]] DialogueSectionDataType &get_current_section_dialogues();
+    [[nodiscard]] std::unordered_map<std::string, Dialogue> &get_current_section_dialogues();
 
     // Get section dialogue contents by section name
-    [[nodiscard]] DialogueSectionDataType &get_section_dialogues(const std::string &);
+    [[nodiscard]] std::unordered_map<std::string, Dialogue> &get_section_dialogues(const std::string &);
 
     // Set current section dialogue contents
     void set_current_section_dialogues(const DialogueSectionDataType &);
@@ -68,10 +65,10 @@ public:
     void set_section_dialogues(const std::string &, const DialogueSectionDataType &);
 
     // Get current dialogue data
-    [[nodiscard]] DialogueDataType &get_current_dialogue();
+    [[nodiscard]] Dialogue &get_current_dialogue();
 
     // Get dialogue data
-    [[nodiscard]] DialogueDataType &get_dialogue(const std::string &, const std::string &);
+    [[nodiscard]] Dialogue &get_dialogue(const std::string &, const std::string &);
 
     // Set current dialogue data
     void set_current_dialogue(DialogueDataType &);
@@ -89,9 +86,9 @@ public:
     void remove_dialogue(const std::string &, const std::string &);
 
 private:
-    DialogueSectionsDataType dialog_data_;
+    std::unordered_map<std::string, std::unordered_map<std::string, Dialogue>> dialog_data_;
     std::string section_;
-    std::string id_ = "head";
+    std::string current_dialog_id_ = "head";
     Dialogue *current_ = nullptr;
     Dialogue *last_ = nullptr;
     Dialogue *previous_ = nullptr;

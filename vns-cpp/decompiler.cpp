@@ -1,5 +1,4 @@
 #include <fstream>
-#include <vector>
 #include "naming.hpp"
 #include "decompiler.hpp"
 
@@ -19,7 +18,7 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
     // Initialize visual novel data management module
     DialoguesManager content_manager;
     // Update data to the management module
-    content_manager.set_data(std::any_cast<DialogueSectionsDataType>(data.at("dialogs")));
+    content_manager.update(std::any_cast<DialogueSectionsDataType>(data.at("dialogs")));
 
     // string stream to store results
     std::stringstream result_ss;
@@ -37,7 +36,7 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
     for (const std::string &k: data | std::views::keys)
     {
         // Update the current position of the visual novel data management module
-        content_manager.set_id("head");
+        content_manager.set_current_dialogue_id("head");
         content_manager.set_section(k);
 
         // create section line
@@ -45,13 +44,12 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
 
         while (true)
         {
-            const DialogueDataType &current_dialog = content_manager.get_current_dialogue();
+            const Dialogue &current_dialog = content_manager.get_current_dialogue();
             // Process comments
-            if (const auto &comments = std::get<std::vector<std::string>>(
-                        current_dialog.at("comments")); !comments.empty())
+            if (!current_dialog.notes.empty())
             {
                 result_ss << "\n";
-                for (const std::string &note: comments)
+                for (const std::string &note: current_dialog.notes)
                     result_ss << "// " << note << "\n";
             }
             // Write speaker's name
@@ -59,7 +57,7 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
                                                                           : content_manager.get_current()->narrator)
                       << ":\n";
             // Write dialogue
-            for (const auto &sentence: std::get<std::vector<std::string>>(current_dialog.at("contents")))
+            for (const auto &sentence: current_dialog.contents)
                 result_ss << "- " << sentence << "\n";
 
             // If the following content has changed, write it
@@ -102,7 +100,7 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
             {
                 if (content_manager.get_current()->next.has_single_target())
                 {
-                    content_manager.set_id(content_manager.get_current()->next.get_target());
+                    content_manager.set_current_dialogue_id(content_manager.get_current()->next.get_target());
                 } else
                 {
                     // branch is currently not supported
