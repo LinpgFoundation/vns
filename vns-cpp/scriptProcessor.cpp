@@ -189,7 +189,7 @@ void ScriptProcessor::convert(const int starting_index)
         } else if (current_line.find(COMMENT_PREFIX) == 0)
         {
             // Accumulate comments
-            current_data_.comments.push_back(current_line.substr(COMMENT_PREFIX.length() + 1));
+            current_data_.notes.push_back(current_line.substr(COMMENT_PREFIX.length() + 1));
         } else if (current_line.find(TAG_STARTS) == 0)
         {
             std::string tag = extract_tag(current_line);
@@ -393,7 +393,7 @@ void ScriptProcessor::convert(const int starting_index)
             previous_ = dialog_associate_key_[line_index_];
             line_index_ += current_data_.contents.size();
             output_[section_][previous_] = Dialogue(current_data_.to_map(), previous_);
-            current_data_.comments.clear();
+            current_data_.notes.clear();
         } else
         {
             terminated("Invalid code or content!");

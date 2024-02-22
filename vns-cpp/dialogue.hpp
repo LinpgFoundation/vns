@@ -37,7 +37,7 @@ struct Dialogue
     std::vector<std::string> character_images;
     std::vector<std::string> contents;
     std::string narrator;
-    std::vector<std::string> comments;
+    std::vector<std::string> notes;
     std::string id;
 
     template<typename T> static T cast(const DialogueDataType &data, const std::string &k, T default_v)

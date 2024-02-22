@@ -11,7 +11,7 @@ Dialogue::Dialogue(const DialogueDataType &data, const std::string &content_id)
     previous = cast<std::string>(data, "previous", "");
     next = DialogueNext(cast<std::unordered_map<std::string, DialogueNextValueType>>(data, "next", {{"type",   "default"},
                                                                                                     {"target", ""}}));
-    comments = cast<std::vector<std::string>>(data, "comments", {});
+    notes = cast<std::vector<std::string>>(data, "notes", {});
 }
 
 bool Dialogue::has_next() const
@@ -46,8 +46,8 @@ DialogueDataType Dialogue::to_map() const
         map_data["narrator"] = narrator;
     if (has_next())
         map_data["next"] = next.to_map();
-    if (!comments.empty())
-        map_data["comments"] = comments;
+    if (!notes.empty())
+        map_data["notes"] = notes;
     return map_data;
 }
 
@@ -68,7 +68,7 @@ nlohmann::json Dialogue::to_json() const
         json_data["narrator"] = narrator;
     if (has_next())
         json_data["next"] = next.to_json();
-    if (!comments.empty())
-        json_data["comments"] = comments;
+    if (!notes.empty())
+        json_data["notes"] = notes;
     return json_data;
 }
