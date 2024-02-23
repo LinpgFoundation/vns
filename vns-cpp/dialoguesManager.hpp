@@ -59,13 +59,13 @@ public:
     [[nodiscard]] std::unordered_map<std::string, Dialogue> &get_current_section_dialogues();
 
     // Get section dialogue contents by section name
-    [[nodiscard]] std::unordered_map<std::string, Dialogue> &get_section_dialogues(const std::string &);
+    [[nodiscard]] std::unordered_map<std::string, Dialogue> &get_dialogues(const std::string &section);
 
     // Set current section dialogue contents
     void set_current_section_dialogues(const DialogueSectionDataType &);
 
     // Set section dialogue contents by section name
-    void set_section_dialogues(const std::string &, const DialogueSectionDataType &);
+    void set_dialogues(const std::string &section, const DialogueSectionDataType &data);
 
     // Get current dialogue data
     [[nodiscard]] Dialogue &get_current_dialogue();

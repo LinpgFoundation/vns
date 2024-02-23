@@ -61,7 +61,7 @@ void DialoguesManager::update(const DialogueSectionsDataType &data)
 {
     for (const auto &[section_name, section_dialogues]: data)
     {
-        set_section_dialogues(section_name, section_dialogues);
+        set_dialogues(section_name, section_dialogues);
     }
     set_current_dialogue_id("head");
 }
@@ -153,11 +153,11 @@ void DialoguesManager::remove_section(const std::string &section)
 // Get current section dialogue contents
 std::unordered_map<std::string, Dialogue> &DialoguesManager::get_current_section_dialogues()
 {
-    return get_section_dialogues(section_);
+    return get_dialogues(section_);
 }
 
 // Get section dialogue contents by section name
-std::unordered_map<std::string, Dialogue> &DialoguesManager::get_section_dialogues(const std::string &section)
+std::unordered_map<std::string, Dialogue> &DialoguesManager::get_dialogues(const std::string &section)
 {
     return dialog_data_.at(section);
 }
@@ -165,11 +165,11 @@ std::unordered_map<std::string, Dialogue> &DialoguesManager::get_section_dialogu
 // Set current section dialogue contents
 void DialoguesManager::set_current_section_dialogues(const DialogueSectionDataType &data)
 {
-    set_section_dialogues(section_, data);
+    set_dialogues(section_, data);
 }
 
 // Set section dialogue contents by section name
-void DialoguesManager::set_section_dialogues(const std::string &section, const DialogueSectionDataType &data)
+void DialoguesManager::set_dialogues(const std::string &section, const DialogueSectionDataType &data)
 {
     // make sure dialog_data will have given section as a key
     if (!dialog_data_.contains(section))
@@ -192,7 +192,7 @@ Dialogue &DialoguesManager::get_current_dialogue()
 // Get dialogue data
 Dialogue &DialoguesManager::get_dialogue(const std::string &section, const std::string &id)
 {
-    return get_section_dialogues(section)[id];
+    return get_dialogues(section)[id];
 }
 
 // Set current dialogue data
@@ -204,13 +204,13 @@ void DialoguesManager::set_current_dialogue(DialogueDataType &data)
 // Set dialogue data
 void DialoguesManager::set_dialogue(const std::string &section, const std::string &id, DialogueDataType &data)
 {
-    get_section_dialogues(section)[id] = Dialogue(data, id);
+    get_dialogues(section)[id] = Dialogue(data, id);
 }
 
 // Does section contain given dialogue id
 bool DialoguesManager::contains_dialogue(const std::string &section, const std::string &id)
 {
-    return get_section_dialogues(section).contains(id);
+    return get_dialogues(section).contains(id);
 }
 
 // Remove current dialogue
@@ -223,5 +223,5 @@ void DialoguesManager::remove_current_dialogue()
 // Remove dialogue
 void DialoguesManager::remove_dialogue(const std::string &section, const std::string &id)
 {
-    get_section_dialogues(section).erase(id);
+    get_dialogues(section).erase(id);
 }
