@@ -37,7 +37,7 @@ void TestNullNext()
     const DialogueNext test_null_next;
     assert(test_null_next.is_null());
     assert(!test_null_next.has_multi_targets());
-    assert(test_null_next.get_type() == "default");
+    assert(test_null_next.has_type("default"));
     assert(test_null_next.get_target().empty());
 }
 
@@ -47,7 +47,7 @@ void TestSingleTargetNext()
                                            {"target", "~1"}});
     assert(!single_target_next.is_null());
     assert(!single_target_next.has_multi_targets());
-    assert(single_target_next.get_type() == "default");
+    assert(single_target_next.has_type("default"));
     assert(single_target_next.get_target() == "~1");
 }
 
@@ -60,7 +60,7 @@ void TestMultiTargetsNext()
                                            {"target", target_v}});
     assert(!multi_targets_next.is_null());
     assert(multi_targets_next.has_multi_targets());
-    assert(multi_targets_next.get_type() == "default");
+    assert(multi_targets_next.has_type("default"));
     assert(multi_targets_next.get_targets().size() == 2);
 }
 

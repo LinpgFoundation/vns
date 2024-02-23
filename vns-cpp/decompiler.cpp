@@ -66,7 +66,7 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
                 content_manager.get_current()->background_image != content_manager.get_previous()->background_image)
             {
                 if (content_manager.get_previous() == nullptr ||
-                    content_manager.get_previous()->next.get_type() != "scene")
+                    !content_manager.get_previous()->next.has_type("scene"))
                     result_ss << TAG_STARTS << "bgi" << TAG_ENDS
                               << to_str_in_case_null(content_manager.get_current()->background_image) << "\n";
                 else

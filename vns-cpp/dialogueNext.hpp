@@ -33,6 +33,8 @@ public:
 
     [[nodiscard]] std::string get_type() const;
 
+    [[nodiscard]] bool has_type(const std::string &) const;
+
     [[nodiscard]] std::string get_target() const;
 
     [[nodiscard]] MultiTargetsType get_targets() const;

@@ -29,6 +29,11 @@ void Dialogue::set_next(const std::unordered_map<std::string, DialogueNextValueT
     next = data.empty() ? kNullDialogueNext : DialogueNext(data);
 }
 
+void Dialogue::set_next()
+{
+    set_next({});
+}
+
 DialogueDataType Dialogue::to_map() const
 {
     DialogueDataType map_data;

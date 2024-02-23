@@ -38,6 +38,11 @@ std::string DialogueNext::get_type() const
     return type_;
 }
 
+bool DialogueNext::has_type(const std::string &type) const
+{
+    return type_ == type;
+}
+
 std::string DialogueNext::get_target() const
 {
     return std::get<std::string>(target_);

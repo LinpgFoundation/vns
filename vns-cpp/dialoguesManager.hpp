@@ -31,6 +31,9 @@ public:
     // Get data
     [[nodiscard]] DialogueSectionsDataType to_map() const;
 
+    // Get data as json
+    [[nodiscard]] nlohmann::json to_json() const;
+
     // Get current dialogue id
     [[nodiscard]] std::string get_current_dialogue_id() const;
 

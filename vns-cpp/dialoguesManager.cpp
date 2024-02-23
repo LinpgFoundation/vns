@@ -72,10 +72,31 @@ DialogueSectionsDataType DialoguesManager::to_map() const
     DialogueSectionsDataType data_map;
     for (const auto &[section_name, section_dialogues]: dialog_data_)
     {
-        data_map[section_name] = {};
-        for (const auto &[dialogue_id, the_dialogue]: section_dialogues)
+        if (!section_dialogues.empty())
         {
-            data_map[section_name][dialogue_id] = the_dialogue.to_map();
+            data_map[section_name] = {};
+            for (const auto &[dialogue_id, the_dialogue]: section_dialogues)
+            {
+                data_map[section_name][dialogue_id] = the_dialogue.to_map();
+            }
+        }
+    }
+    return data_map;
+}
+
+// Get data as json
+nlohmann::json DialoguesManager::to_json() const
+{
+    nlohmann::json data_map;
+    for (const auto &[section_name, section_dialogues]: dialog_data_)
+    {
+        if (!section_dialogues.empty())
+        {
+            data_map[section_name] = {};
+            for (const auto &[dialogue_id, the_dialogue]: section_dialogues)
+            {
+                data_map[section_name][dialogue_id] = the_dialogue.to_json();
+            }
         }
     }
     return data_map;
@@ -151,7 +172,8 @@ void DialoguesManager::set_current_section_dialogues(const DialogueSectionDataTy
 void DialoguesManager::set_section_dialogues(const std::string &section, const DialogueSectionDataType &data)
 {
     // make sure dialog_data will have given section as a key
-    if (!dialog_data_.contains(section)){
+    if (!dialog_data_.contains(section))
+    {
         dialog_data_[section] = {};
     }
     // loop through the data and init data as dialogue object(s)

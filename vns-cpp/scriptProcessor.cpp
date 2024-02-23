@@ -55,37 +55,12 @@ std::string ScriptProcessor::get_current_line() const
 
 DialogueSectionsDataType ScriptProcessor::get_output() const
 {
-    DialogueSectionsDataType output;
-    for (const auto &[section_name, section_contents]: output_)
-    {
-        if (!section_contents.empty())
-        {
-            output[section_name] = {};
-            for (const auto &[dialogue_id, dialogue_content]: section_contents)
-            {
-                output[section_name][dialogue_id] = dialogue_content.to_map();
-            }
-        }
-    }
-    return output;
+    return output_.to_map();
 }
 
 nlohmann::json ScriptProcessor::get_output_as_json() const
 {
-    nlohmann::json output;
-    for (const auto &[section_name, section_contents]: output_)
-    {
-        if (!section_contents.empty())
-        {
-            nlohmann::json section;
-            for (const auto &[dialogue_id, dialogue_content]: section_contents)
-            {
-                section[dialogue_id] = dialogue_content.to_json();
-            }
-            output[section_name] = section;
-        }
-    }
-    return output;
+    return output_.to_json();
 }
 
 
@@ -245,31 +220,35 @@ void ScriptProcessor::convert(const int starting_index)
             {
                 if (!previous_.empty())
                 {
-                    output_[section_][previous_].set_next({});
+                    output_.get_dialogue(section_, previous_).set_next();
                 }
                 // if section has no content, then remove head
-                if (output_[section_].size() == 1 && output_[section_]["head"].to_json().empty())
+                if (output_.contains_section(section_) && output_.get_section_dialogues(section_).size() == 1 &&
+                    output_.get_dialogue(section_, "head").to_json().empty())
                 {
-                    output_[section_].clear();
+                    output_.set_section_dialogues(section_, {});
                 }
                 section_ = extract_string(current_line);
-                output_[section_] = {};
-                output_[section_]["head"] = Dialogue({}, "head");
+                output_.set_section_dialogues(section_, {});
+                DialogueDataType dialogue_data;
+                output_.set_dialogue(section_, "head", dialogue_data);
                 current_data_ = Dialogue({}, "head");
                 previous_ = "";
             } else if (tag == "end")
             {
                 assert(!previous_.empty());
-                output_[section_][previous_].set_next({});
+                output_.get_dialogue(section_, previous_).set_next();
             } else if (tag == "scene")
             {
                 assert(!previous_.empty());
-                if (output_[section_][previous_].next.has_multi_targets())
+                if (output_.get_dialogue(section_, previous_).next.has_multi_targets())
                 {
-                    output_[section_][previous_].set_next("scene", output_[section_][previous_].next.get_targets());
+                    output_.get_dialogue(section_, previous_).set_next("scene", output_.get_dialogue(section_,
+                                                                                                     previous_).next.get_targets());
                 } else
                 {
-                    output_[section_][previous_].set_next("scene", output_[section_][previous_].next.get_target());
+                    output_.get_dialogue(section_, previous_).set_next("scene", output_.get_dialogue(section_,
+                                                                                                     previous_).next.get_target());
                 }
                 current_data_.background_image = extract_parameter(current_line);
                 blocked_ = true;
@@ -277,7 +256,7 @@ void ScriptProcessor::convert(const int starting_index)
             {
                 if (!previous_.empty())
                 {
-                    output_[section_][previous_].set_next({});
+                    output_.get_dialogue(section_, previous_).set_next();
                 }
                 current_data_ = Dialogue({}, "id_needed");
                 previous_ = "";
@@ -289,9 +268,9 @@ void ScriptProcessor::convert(const int starting_index)
                 }
                 // get current targets
                 MultiTargetsType current_targets;
-                if (output_[section_][previous_].next.get_type() == "options")
+                if (output_.get_dialogue(section_, previous_).next.has_type("options"))
                 {
-                    current_targets = output_[section_][previous_].next.get_targets();
+                    current_targets = output_.get_dialogue(section_, previous_).next.get_targets();
                 }
                 // get value string
                 auto src_to_target = extract_string(current_line);
@@ -300,7 +279,7 @@ void ScriptProcessor::convert(const int starting_index)
                                            {"id",   ensure_not_null(
                                                    trim(src_to_target.substr(src_to_target.find("->") + 2)))}});
                 // update next
-                output_[section_][previous_].set_next("options", current_targets);
+                output_.get_dialogue(section_, previous_).set_next("options", current_targets);
             }
                 // Placeholder, no action needed for "label" tag
             else if (tag == "label")
@@ -351,9 +330,9 @@ void ScriptProcessor::convert(const int starting_index)
             {
                 terminated("You have to specify section before script");
             }
-            if (!output_.contains(section_))
+            if (!output_.contains_section(section_))
             {
-                output_[section_] = {};
+                output_.set_current_section_dialogues({});
             }
 
             if (!previous_.empty())
@@ -367,19 +346,21 @@ void ScriptProcessor::convert(const int starting_index)
                     blocked_ = false;
                 }
 
-                if (output_[section_].contains(previous_))
+                if (output_.contains_dialogue(section_, previous_))
                 {
-                    if (output_[section_][previous_].has_next())
+                    if (output_.get_dialogue(section_, previous_).has_next())
                     {
-                        if (output_[section_][previous_].next.get_type() != "options")
+                        if (!output_.get_dialogue(section_, previous_).next.has_type("options"))
                         {
-                            output_[section_][previous_].set_next(output_[section_][previous_].next.get_type(),
-                                                                  dialog_associate_key_[line_index_]);
+                            output_.get_dialogue(section_, previous_).set_next(
+                                    output_.get_dialogue(section_, previous_).next.get_type(),
+                                    dialog_associate_key_[line_index_]);
                         }
                     } else
                     {
-                        output_[section_][previous_].set_next(output_[section_][previous_].next.get_type(),
-                                                              dialog_associate_key_[line_index_]);
+                        output_.get_dialogue(section_, previous_).set_next(
+                                output_.get_dialogue(section_, previous_).next.get_type(),
+                                dialog_associate_key_[line_index_]);
                     }
                 } else
                 {
@@ -392,7 +373,8 @@ void ScriptProcessor::convert(const int starting_index)
 
             previous_ = dialog_associate_key_[line_index_];
             line_index_ += current_data_.contents.size();
-            output_[section_][previous_] = Dialogue(current_data_.to_map(), previous_);
+            DialogueDataType current_data_map = current_data_.to_map();
+            output_.set_dialogue(section_, previous_, current_data_map);
             current_data_.notes.clear();
         } else
         {

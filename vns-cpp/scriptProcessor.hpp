@@ -1,10 +1,7 @@
 #ifndef PROCESSOR_HPP
 #define PROCESSOR_HPP
 
-#include <unordered_map>
-#include <unordered_set>
-#include <filesystem>
-#include "dialogue.hpp"
+#include "dialoguesManager.hpp"
 
 class ScriptProcessor
 {
@@ -36,7 +33,7 @@ public:
 private:
     std::filesystem::path path_;
     size_t line_index_;
-    std::unordered_map<std::string, std::unordered_map<std::string, Dialogue>> output_;
+    DialoguesManager output_;
     Dialogue current_data_;
     std::string id_;
     std::string lang_;
