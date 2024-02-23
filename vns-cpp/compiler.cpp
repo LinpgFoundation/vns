@@ -5,11 +5,11 @@
 #include <iostream>
 
 // get the info of compiler
-std::unordered_map<std::string, int> Compiler::get_compiler_info()
+std::unordered_map<std::string, size_t> Compiler::get_compiler_info()
 {
     return {{"version",    VERSION},
             {"reversion",  REVISION},
-            {"compiledAt", static_cast<int>(std::time(nullptr))}};
+            {"compiledAt", static_cast<size_t>(std::time(nullptr))}};
 }
 
 // load data from file directly

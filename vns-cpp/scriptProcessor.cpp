@@ -38,19 +38,14 @@ std::string ScriptProcessor::extract_string(const std::string &text)
 
 [[noreturn]] void ScriptProcessor::terminated(const std::string &reason) const
 {
+    throw std::runtime_error("File \"" + path_.string() + "\", failed to compile due to: " + reason);
+}
+
+[[noreturn]] void ScriptProcessor::terminated(const std::string &reason, const size_t &line_index) const
+{
     throw std::runtime_error(
-            "File \"" + path_.string() + "\", line " + std::to_string(line_index_ + 1) + "\n  " + get_current_line() +
+            "File \"" + path_.string() + "\", line " + std::to_string(line_index + 1) + "\n  " + lines_[line_index] +
             "\nFail to compile due to: " + reason);
-}
-
-[[noreturn]] void ScriptProcessor::preprocess_terminated(const std::string &reason) const
-{
-    throw std::runtime_error("File \"" + path_.string() + "\" failed to compile due to: " + reason);
-}
-
-std::string ScriptProcessor::get_current_line() const
-{
-    return lines_[line_index_];
 }
 
 DialogueSectionsDataType ScriptProcessor::get_output() const
@@ -67,12 +62,12 @@ nlohmann::json ScriptProcessor::get_output_as_json() const
 void ScriptProcessor::process(const std::filesystem::path &path)
 {
     path_ = path;
-    int current_index = 0;
+    size_t current_index = 0;
 
     //make sure file exists
     if (!exists(path_))
     {
-        preprocess_terminated("File does not exist!");
+        terminated("File does not exist!");
     }
 
     // read file
@@ -88,35 +83,35 @@ void ScriptProcessor::process(const std::filesystem::path &path)
             f.close();
         } else
         {
-            preprocess_terminated("File is occupied!");
+            terminated("File is occupied!");
         }
     }
 
     // make sure file is not empty
     if (lines_.empty())
     {
-        preprocess_terminated("Cannot convert an empty script file!");
+        terminated("Cannot convert an empty script file!");
     }
 
     std::string last_label;
 
     for (size_t index = 0; index < lines_.size(); ++index)
     {
-        lines_[index] = trim(lines_[index].substr(0, lines_[index].find(NOTE_PREFIX)));
+        lines_[index] = trim(lines_[index].substr(0, lines_[index].find(COMMENT_PREFIX)));
 
-        if (lines_[index].find(TAG_STARTS) == 0)
+        if (lines_[index].starts_with(TAG_STARTS))
         {
             if (auto tag = extract_tag(lines_[index]); tag == "label")
             {
                 if (!last_label.empty())
                 {
-                    terminated("This label is overwriting the previous one");
+                    terminated("This label is overwriting the previous one", index);
                 }
 
                 last_label = extract_parameter(lines_[index]);
                 if (RESERVED_WORDS.contains(last_label))
                 {
-                    terminated("You cannot use reserved word '" + last_label + "' as a label");
+                    terminated("You cannot use reserved word '" + last_label + "' as a label", index);
                 }
             } else if (tag == "section")
             {
@@ -150,25 +145,27 @@ void ScriptProcessor::process(const std::filesystem::path &path)
     }
 }
 
-void ScriptProcessor::convert(const int starting_index)
+void ScriptProcessor::convert(const size_t starting_index)
 {
-    line_index_ = starting_index;
+    size_t line_index = starting_index;
 
-    while (line_index_ < lines_.size())
+    while (line_index < lines_.size())
     {
-        if (std::string current_line = get_current_line(); current_line.empty() ||
-                                                           lines_[line_index_].find(NOTE_PREFIX) == 0)
+        // obtain current line as a pointer
+        const std::string &current_line = lines_[line_index];
+        // Skip empty lines or lines starting with #
+        if (current_line.empty() || lines_[line_index].starts_with(COMMENT_PREFIX))
         {
-            // Skip empty lines or lines starting with #
             // Do nothing
-        } else if (current_line.find(COMMENT_PREFIX) == 0)
+        } else if (current_line.starts_with(NOTE_PREFIX))
         {
-            // Accumulate comments
-            current_data_.notes.push_back(current_line.substr(COMMENT_PREFIX.length() + 1));
-        } else if (current_line.find(TAG_STARTS) == 0)
+            // Accumulate notes
+            current_data_.notes.push_back(current_line.substr(NOTE_PREFIX.length() + 1));
+        } else if (current_line.starts_with(TAG_STARTS))
         {
             std::string tag = extract_tag(current_line);
 
+            // check if the tag is an alternative of another tag
             if (ALTERNATIVES.contains(tag))
             {
                 tag = ALTERNATIVES.at(tag);
@@ -211,7 +208,7 @@ void ScriptProcessor::convert(const int starting_index)
                 id_ = extract_parameter(current_line);
                 if (id_.empty())
                 {
-                    terminated("Chapter id cannot be None!");
+                    terminated("Chapter id cannot be None!", line_index);
                 }
             } else if (tag == "language")
             {
@@ -223,13 +220,13 @@ void ScriptProcessor::convert(const int starting_index)
                     output_.get_dialogue(section_, previous_).set_next();
                 }
                 // if section has no content, then remove head
-                if (output_.contains_section(section_) && output_.get_section_dialogues(section_).size() == 1 &&
+                if (output_.contains_section(section_) && output_.get_dialogues(section_).size() == 1 &&
                     output_.get_dialogue(section_, "head").to_json().empty())
                 {
-                    output_.set_section_dialogues(section_, {});
+                    output_.set_dialogues(section_, {});
                 }
                 section_ = extract_string(current_line);
-                output_.set_section_dialogues(section_, {});
+                output_.set_dialogues(section_, {});
                 DialogueDataType dialogue_data;
                 output_.set_dialogue(section_, "head", dialogue_data);
                 current_data_ = Dialogue({}, "head");
@@ -264,7 +261,7 @@ void ScriptProcessor::convert(const int starting_index)
             {
                 if (current_data_.contents.empty())
                 {
-                    terminated("Invalid option syntax: '->' cannot be found!");
+                    terminated("Invalid option syntax: '->' cannot be found!", line_index);
                 }
                 // get current targets
                 MultiTargetsType current_targets;
@@ -286,7 +283,7 @@ void ScriptProcessor::convert(const int starting_index)
             {
             } else
             {
-                terminated("Invalid tag " + tag);
+                terminated("Invalid tag " + tag, line_index);
             }
         } else if (current_line.find(':') != std::string::npos)
         {
@@ -315,20 +312,18 @@ void ScriptProcessor::convert(const int starting_index)
 
             current_data_.contents.clear();
 
-            for (size_t sub_index = line_index_ + 1; sub_index < lines_.size(); ++sub_index)
+            for (size_t sub_index = line_index + 1; sub_index < lines_.size(); ++sub_index)
             {
-                if (lines_[sub_index].find("- ") == 0)
-                {
-                    current_data_.contents.push_back(trim(lines_[sub_index].substr(2)));
-                } else
+                if (!lines_[sub_index].starts_with('-'))
                 {
                     break;
                 }
+                current_data_.contents.push_back(trim(lines_[sub_index].substr(1)));
             }
 
             if (section_.empty())
             {
-                terminated("You have to specify section before script");
+                terminated("You have to specify section before script", line_index);
             }
             if (!output_.contains_section(section_))
             {
@@ -354,33 +349,33 @@ void ScriptProcessor::convert(const int starting_index)
                         {
                             output_.get_dialogue(section_, previous_).set_next(
                                     output_.get_dialogue(section_, previous_).next.get_type(),
-                                    dialog_associate_key_[line_index_]);
+                                    dialog_associate_key_[line_index]);
                         }
                     } else
                     {
                         output_.get_dialogue(section_, previous_).set_next(
                                 output_.get_dialogue(section_, previous_).next.get_type(),
-                                dialog_associate_key_[line_index_]);
+                                dialog_associate_key_[line_index]);
                     }
                 } else
                 {
-                    terminated("KeyError: " + previous_);
+                    terminated("KeyError: " + previous_, line_index);
                 }
             } else
             {
                 current_data_.previous = "";
             }
 
-            previous_ = dialog_associate_key_[line_index_];
-            line_index_ += current_data_.contents.size();
+            previous_ = dialog_associate_key_[line_index];
+            line_index += current_data_.contents.size();
             DialogueDataType current_data_map = current_data_.to_map();
             output_.set_dialogue(section_, previous_, current_data_map);
             current_data_.notes.clear();
         } else
         {
-            terminated("Invalid code or content!");
+            terminated("Invalid code or content!", line_index);
         }
         // Move to the next line
-        ++line_index_;
+        line_index++;
     }
 }

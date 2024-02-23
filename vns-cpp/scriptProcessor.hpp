@@ -13,10 +13,10 @@ public:
     static const std::unordered_set<std::string> inline RESERVED_WORDS = {"null", "none", "head"};
     static const std::string inline TAG_STARTS = "[";
     static const std::string inline TAG_ENDS = "]";
-    static const std::string inline NOTE_PREFIX = "#";
     static const std::string inline COMMENT_PREFIX = "//";
+    static const std::string inline NOTE_PREFIX = "#";
 
-    ScriptProcessor() : line_index_(0), current_data_({}, "head"), blocked_(false)
+    ScriptProcessor() : current_data_({}, "head"), blocked_(false)
     {
     }
 
@@ -32,7 +32,6 @@ public:
 
 private:
     std::filesystem::path path_;
-    size_t line_index_;
     DialoguesManager output_;
     Dialogue current_data_;
     std::string id_;
@@ -54,11 +53,9 @@ private:
 
     [[noreturn]] void terminated(const std::string &) const;
 
-    [[noreturn]] void preprocess_terminated(const std::string &) const;
+    [[noreturn]] void terminated(const std::string &, const size_t &) const;
 
-    [[nodiscard]] std::string get_current_line() const;
-
-    void convert(int);
+    void convert(size_t);
 };
 
 #endif

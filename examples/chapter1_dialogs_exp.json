@@ -1,7 +1,7 @@
 {
     "compiler": {
-        "compiledAt": 1707468310,
-        "reversion": 0,
+        "compiledAt": 1708751833,
+        "reversion": 1,
         "version": 2
     },
     "dialogs": {
@@ -9,16 +9,16 @@
             "head": {
                 "background_image": "bg1.png",
                 "background_music": "bgm1.ogg",
-                "comments": [
-                    "section 1"
-                ],
                 "contents": [
                     "This is a test message."
                 ],
                 "next": {
                     "target": "~01",
                     "type": "default"
-                }
+                },
+                "notes": [
+                    "this the first dialogue of section 1"
+                ]
             },
             "jumping_point1": {
                 "background_image": "bg2.png",
@@ -39,6 +39,9 @@
                 "contents": [
                     "I hope it works."
                 ],
+                "notes": [
+                    "this the second dialogue of section 1"
+                ],
                 "previous": "head"
             },
             "~02": {
@@ -57,9 +60,6 @@
                     "test_character1.png&silent",
                     "test_character2.png&silent"
                 ],
-                "comments": [
-                    "section 2"
-                ],
                 "contents": [
                     "Hello I am test character 1."
                 ],
@@ -67,7 +67,10 @@
                 "next": {
                     "target": "~04",
                     "type": "default"
-                }
+                },
+                "notes": [
+                    "this the first dialogue of section 2"
+                ]
             },
             "~04": {
                 "background_image": "bg2.png",
@@ -93,6 +96,9 @@
                     ],
                     "type": "options"
                 },
+                "notes": [
+                    "this the second dialogue of section 2"
+                ],
                 "previous": "~03"
             }
         }

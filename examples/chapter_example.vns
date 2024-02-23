@@ -7,8 +7,10 @@
 // section 1
 [bgi]bg1.png
 [bgm]bgm1.ogg
+# this the first dialogue of section 1
 null:
 - This is a test message.
+# this the second dialogue of section 1
 null:
 - I hope it works.
 
@@ -20,8 +22,10 @@ null:
 [scene]bg2.png
 [bgm]bgm2.ogg
 [display]test_character1.png test_character2.png
+# this the first dialogue of section 2
 Test Character 1:
 - Hello I am test character 1.
+# this the second dialogue of section 2
 Test Character 2:
 - Hello I am test character 2.
 [option]click here to go to jump point 1 -> jumping_point1
