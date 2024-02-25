@@ -117,7 +117,7 @@ void ScriptProcessor::process(const std::filesystem::path &path)
             {
                 current_index = 0;
             }
-        } else if (lines_[index].find(':') != std::string::npos)
+        } else if (lines_[index].ends_with(':'))
         {
             dialog_associate_key_[index] =
                     current_index == 0 ? "head" : last_label.empty() ? (current_index < 10 ? "~0" + std::to_string(
@@ -285,7 +285,7 @@ void ScriptProcessor::convert(const size_t starting_index)
             {
                 terminated("Invalid tag " + tag, line_index);
             }
-        } else if (current_line.find(':') != std::string::npos)
+        } else if (current_line.ends_with(':'))
         {
             const std::string narrator = ensure_not_null(current_line.substr(0, current_line.size() - 1));
             current_data_.narrator = narrator;
@@ -371,6 +371,11 @@ void ScriptProcessor::convert(const size_t starting_index)
             DialogueDataType current_data_map = current_data_.to_map();
             output_.set_dialogue(section_, previous_, current_data_map);
             current_data_.notes.clear();
+            current_data_.events.clear();
+        } else if (current_line.find('=') != std::string::npos)
+        {
+            const std::vector<std::string> cmds = split(current_line, '=');
+            current_data_.events.emplace_back("set", cmds[0], cmds[1]);
         } else
         {
             terminated("Invalid code or content!", line_index);

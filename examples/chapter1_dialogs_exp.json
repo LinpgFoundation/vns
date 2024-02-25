@@ -1,6 +1,6 @@
 {
     "compiler": {
-        "compiledAt": 1708751833,
+        "compiledAt": 1708838180,
         "reversion": 1,
         "version": 2
     },
@@ -62,6 +62,13 @@
                 ],
                 "contents": [
                     "Hello I am test character 1."
+                ],
+                "events": [
+                    {
+                        "target": "section1_end ",
+                        "type": "set",
+                        "value": " true"
+                    }
                 ],
                 "narrator": "Test Character 1",
                 "next": {

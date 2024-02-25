@@ -12,6 +12,10 @@ Dialogue::Dialogue(const DialogueDataType &data, const std::string &content_id)
     next = DialogueNext(cast<std::unordered_map<std::string, DialogueNextValueType>>(data, "next", {{"type",   "default"},
                                                                                                     {"target", ""}}));
     notes = cast<std::vector<std::string>>(data, "notes", {});
+    for (const EventDataType &e: cast<std::vector<EventDataType>>(data, "events", {}))
+    {
+        events.emplace_back(e);
+    }
 }
 
 bool Dialogue::has_next() const
@@ -53,6 +57,15 @@ DialogueDataType Dialogue::to_map() const
         map_data["next"] = next.to_map();
     if (!notes.empty())
         map_data["notes"] = notes;
+    if (!events.empty())
+    {
+        std::vector<EventDataType> events_in_maps;
+        for (const Event &e: events)
+        {
+            events_in_maps.push_back(e.to_map());
+        }
+        map_data["events"] = events_in_maps;
+    }
     return map_data;
 }
 
@@ -75,5 +88,14 @@ nlohmann::json Dialogue::to_json() const
         json_data["next"] = next.to_json();
     if (!notes.empty())
         json_data["notes"] = notes;
+    if (!events.empty())
+    {
+        std::vector<nlohmann::json> events_in_maps;
+        for (const Event &e: events)
+        {
+            events_in_maps.push_back(e.to_json());
+        }
+        json_data["events"] = events_in_maps;
+    }
     return json_data;
 }

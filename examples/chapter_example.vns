@@ -18,6 +18,8 @@ null:
 null:
 - you cannot go back
 
+section1_end = true
+
 // section 2
 [scene]bg2.png
 [bgm]bgm2.ogg
