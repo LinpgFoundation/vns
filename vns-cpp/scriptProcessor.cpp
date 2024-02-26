@@ -375,7 +375,45 @@ void ScriptProcessor::convert(const size_t starting_index)
         } else if (current_line.find('=') != std::string::npos)
         {
             const std::vector<std::string> cmds = split(current_line, '=');
-            current_data_.events.emplace_back("set", cmds[0], cmds[1]);
+            if (cmds.size() > 2)
+            {
+                terminated("Invalid variable assignment!", line_index);
+            }
+            const std::string v = trim(cmds[1]);
+            EventValueType event_value;
+            if (v == "true")
+            {
+                event_value = true;
+            } else if (v == "false")
+            {
+                event_value = false;
+            } else if (v.starts_with('"'))
+            {
+                if (!v.ends_with('"'))
+                {
+                    terminated("Possible missing close quotation mark for string", line_index);
+                }
+                event_value = v.substr(1, v.size() - 2);
+            } else if (v.find('.') != std::string::npos)
+            {
+                try
+                {
+                    event_value = std::stof(v);
+                } catch (std::invalid_argument &)
+                {
+                    terminated("Possible invalid float assignment", line_index);
+                }
+            } else
+            {
+                try
+                {
+                    event_value = std::stoi(v);
+                } catch (std::invalid_argument &)
+                {
+                    terminated("Possible invalid int assignment", line_index);
+                }
+            }
+            current_data_.events.emplace_back("set", trim(cmds[0]), event_value);
         } else
         {
             terminated("Invalid code or content!", line_index);

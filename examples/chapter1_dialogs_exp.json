@@ -1,6 +1,6 @@
 {
     "compiler": {
-        "compiledAt": 1708838180,
+        "compiledAt": 1708979853,
         "reversion": 1,
         "version": 2
     },
@@ -29,6 +29,13 @@
                 ],
                 "contents": [
                     "Welcome to jump point 1"
+                ],
+                "events": [
+                    {
+                        "target": "say",
+                        "type": "set",
+                        "value": "hi"
+                    }
                 ],
                 "narrator": "Test Character 3",
                 "previous": "~04"
@@ -65,9 +72,14 @@
                 ],
                 "events": [
                     {
-                        "target": "section1_end ",
+                        "target": "section1_end",
                         "type": "set",
-                        "value": " true"
+                        "value": true
+                    },
+                    {
+                        "target": "chapter_passed",
+                        "type": "set",
+                        "value": 1
                     }
                 ],
                 "narrator": "Test Character 1",
