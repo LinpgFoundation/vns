@@ -1,6 +1,6 @@
 {
     "compiler": {
-        "compiledAt": 1708979853,
+        "compiledAt": 1709095130,
         "reversion": 1,
         "version": 2
     },
@@ -46,12 +46,18 @@
                 "contents": [
                     "I hope it works."
                 ],
+                "next": {
+                    "target": "~02",
+                    "type": "default"
+                },
                 "notes": [
                     "this the second dialogue of section 1"
                 ],
                 "previous": "head"
             },
             "~02": {
+                "background_image": "bg1.png",
+                "background_music": "bgm1.ogg",
                 "contents": [
                     "you cannot go back"
                 ],

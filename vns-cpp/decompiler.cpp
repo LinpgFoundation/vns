@@ -44,12 +44,11 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
 
         while (true)
         {
-            const Dialogue &current_dialog = content_manager.get_current_dialogue();
             // Process comments
-            if (!current_dialog.notes.empty())
+            if (!content_manager.get_current()->notes.empty())
             {
                 result_ss << "\n";
-                for (const std::string &note: current_dialog.notes)
+                for (const std::string &note: content_manager.get_current()->notes)
                     result_ss << "// " << note << "\n";
             }
             // Write speaker's name
@@ -57,7 +56,7 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
                                                                           : content_manager.get_current()->narrator)
                       << ":\n";
             // Write dialogue
-            for (const auto &sentence: current_dialog.contents)
+            for (const auto &sentence: content_manager.get_current()->contents)
                 result_ss << "- " << sentence << "\n";
 
             // If the following content has changed, write it

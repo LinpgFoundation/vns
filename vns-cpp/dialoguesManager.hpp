@@ -7,13 +7,13 @@
 class DialoguesManager
 {
 public:
-    // Getters for previous dialogue
+    // Getter for previous dialogue of current dialogue
     Dialogue *get_previous();
 
-    // Getters for current dialogue
+    // Getter for current dialogue
     Dialogue *get_current();
 
-    // Getters for last dialogue
+    // Getter for last selected dialogue
     Dialogue *get_last();
 
     // load dialogue data from vns file
@@ -27,6 +27,24 @@ public:
 
     // Update data
     void update(const DialogueSectionsDataType &);
+
+    // Go to next dialogue
+    void next();
+
+    // Contains variable
+    bool contains_variable(const std::string &) const;
+
+    // Get variable
+    EventValueType get_variable(const std::string &) const;
+
+    // Get variable with Type
+    template<typename T> T get_variable(const std::string &name) const
+    {
+        return std::get<T>(get_variable(name));
+    }
+
+    // Set variable
+    void set_variable(const std::string &, const EventValueType &);
 
     // Get data
     [[nodiscard]] DialogueSectionsDataType to_map() const;
@@ -67,9 +85,6 @@ public:
     // Set section dialogue contents by section name
     void set_dialogues(const std::string &section, const DialogueSectionDataType &data);
 
-    // Get current dialogue data
-    [[nodiscard]] Dialogue &get_current_dialogue();
-
     // Get dialogue data
     [[nodiscard]] Dialogue &get_dialogue(const std::string &, const std::string &);
 
@@ -90,14 +105,12 @@ public:
 
 private:
     std::unordered_map<std::string, std::unordered_map<std::string, Dialogue>> dialog_data_;
+    std::unordered_map<std::string, std::unordered_map<std::string, EventValueType>> local_variables_;
+    std::unordered_map<std::string, EventValueType> global_variables_;
+    std::unordered_map<std::string, EventValueType> persistent_variables_;
     std::string section_;
     std::string current_dialog_id_ = "head";
-    Dialogue *current_ = nullptr;
-    Dialogue *last_ = nullptr;
-    Dialogue *previous_ = nullptr;
-
-    // If the pointer to the current dialogue data does not exist, set_data the pointer
-    void refresh_current();
+    std::string last_dialog_id_;
 };
 
 #endif

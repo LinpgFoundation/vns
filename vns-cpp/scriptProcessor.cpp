@@ -251,12 +251,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                 blocked_ = true;
             } else if (tag == "block")
             {
-                if (!previous_.empty())
-                {
-                    output_.get_dialogue(section_, previous_).set_next();
-                }
-                current_data_ = Dialogue({}, "id_needed");
-                previous_ = "";
+                blocked_ = true;
             } else if (tag == "option")
             {
                 if (current_data_.contents.empty())

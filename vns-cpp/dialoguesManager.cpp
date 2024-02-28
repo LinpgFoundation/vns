@@ -1,39 +1,23 @@
 #include "dialoguesManager.hpp"
 #include "scriptProcessor.hpp"
 
-// If the pointer to the current dialogue data does not exist, set_data the pointer
-void DialoguesManager::refresh_current()
-{
-    if (current_ == nullptr)
-    {
-        previous_ = current_;
-        current_ = &dialog_data_[section_][current_dialog_id_];
-    }
-}
-
-// Getters for previous dialogue
+// Getter for previous dialogue of current dialogue
 Dialogue *DialoguesManager::get_previous()
 {
-    refresh_current();
-    return previous_;
+    return dialog_data_[section_].contains(get_current()->previous) ? &dialog_data_[section_][get_current()->previous]
+                                                                    : nullptr;
 }
 
-// Getters for current dialogue
+// Getter for current dialogue
 Dialogue *DialoguesManager::get_current()
 {
-    refresh_current();
-    return current_;
+    return dialog_data_[section_].contains(current_dialog_id_) ? &dialog_data_[section_][current_dialog_id_] : nullptr;
 }
 
-// Getters for last dialogue
+// Getter for last selected dialogue
 Dialogue *DialoguesManager::get_last()
 {
-    // if pointer does not exist, then use previous as last
-    if (last_ == nullptr && !get_current()->previous.empty())
-    {
-        last_ = &dialog_data_[section_][get_current()->previous];
-    }
-    return last_;
+    return dialog_data_[section_].contains(last_dialog_id_) ? &dialog_data_[section_][last_dialog_id_] : nullptr;
 }
 
 // load dialogue data from vns file
@@ -64,6 +48,58 @@ void DialoguesManager::update(const DialogueSectionsDataType &data)
         set_dialogues(section_name, section_dialogues);
     }
     set_current_dialogue_id("head");
+}
+
+// Go to next dialogue
+void DialoguesManager::next()
+{
+    set_current_dialogue_id(get_current()->next.has_single_target() ? get_current()->next.get_target()
+                                                                    : get_current()->next.get_targets()[0]["id"]);
+};
+
+// Contains variable
+bool DialoguesManager::contains_variable(const std::string &name) const
+{
+    if (name.starts_with('@'))
+    {
+        return global_variables_.contains(name);
+    } else if (name.starts_with('%'))
+    {
+        return persistent_variables_.contains(name);
+    } else
+    {
+        return local_variables_.at(section_).contains(name);
+    }
+}
+
+// Get variable
+EventValueType DialoguesManager::get_variable(const std::string &name) const
+{
+    if (name.starts_with('@'))
+    {
+        return global_variables_.at(name);
+    } else if (name.starts_with('%'))
+    {
+        return persistent_variables_.at(name);
+    } else
+    {
+        return local_variables_.at(section_).at(name);
+    }
+}
+
+// Set variable
+void DialoguesManager::set_variable(const std::string &name, const EventValueType &value)
+{
+    if (name.starts_with('@'))
+    {
+        global_variables_[name] = value;
+    } else if (name.starts_with('%'))
+    {
+        persistent_variables_[name] = value;
+    } else
+    {
+        local_variables_[section_][name] = value;
+    }
 }
 
 // Get data
@@ -111,10 +147,16 @@ std::string DialoguesManager::get_current_dialogue_id() const
 // Set current dialogue id
 void DialoguesManager::set_current_dialogue_id(const std::string &id)
 {
+    last_dialog_id_ = current_dialog_id_;
     current_dialog_id_ = id;
-    current_ = nullptr;
-    last_ = nullptr;
-    previous_ = nullptr;
+    // process events
+    for (const Event &e: get_current()->events)
+    {
+        if (e.type == "set")
+        {
+            set_variable(e.target, e.value);
+        }
+    }
 }
 
 // Get current section name
@@ -134,8 +176,8 @@ std::unordered_set<std::string> DialoguesManager::get_sections() const
 void DialoguesManager::set_section(const std::string &section)
 {
     section_ = section;
-    current_ = nullptr;
-    last_ = nullptr;
+    current_dialog_id_ = "head";
+    last_dialog_id_ = "";
 }
 
 // Does dialogue have given section name
@@ -183,12 +225,6 @@ void DialoguesManager::set_dialogues(const std::string &section, const DialogueS
     }
 }
 
-// Get current dialogue data
-Dialogue &DialoguesManager::get_current_dialogue()
-{
-    return get_dialogue(section_, current_dialog_id_);
-}
-
 // Get dialogue data
 Dialogue &DialoguesManager::get_dialogue(const std::string &section, const std::string &id)
 {
@@ -216,7 +252,6 @@ bool DialoguesManager::contains_dialogue(const std::string &section, const std::
 // Remove current dialogue
 void DialoguesManager::remove_current_dialogue()
 {
-    current_ = nullptr;
     remove_dialogue(section_, current_dialog_id_);
 }
 
