@@ -66,16 +66,28 @@ void TestMultiTargetsNext()
 
 void TestScriptProcessor()
 {
-    auto test_processor = ScriptProcessor();
-    test_processor.process("C:/Users/yudon/Documents/GitHub/vns/examples/chapter_example.vns");
+    ScriptProcessor test_processor;
+    test_processor.process(EXAMPLE_VNS_TEST_FILE);
     assert(test_processor.get_id() == "1");
     assert(test_processor.get_language() == "English");
 }
 
 void TestCompiler()
 {
-    Compiler::compile("C:/Users/yudon/Documents/GitHub/vns/examples/chapter_example.vns",
-                      "C:/Users/yudon/Documents/GitHub/vns/examples");
+    Compiler::compile(EXAMPLE_VNS_TEST_FILE, EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR);
+}
+
+void TestDialoguesManager()
+{
+    DialoguesManager test_dialogues_manager;
+    test_dialogues_manager.load(EXAMPLE_VNS_TEST_FILE);
+    test_dialogues_manager.set_section("dialog_example");
+    test_dialogues_manager.next();
+    test_dialogues_manager.next();
+    test_dialogues_manager.next();
+    assert(test_dialogues_manager.get_current()->id == "~03");
+    assert(std::get<bool>(test_dialogues_manager.get_variable("section1_end")) == true);
+    assert(test_dialogues_manager.get_variable<int>("chapter_passed") == 1);
 }
 
 void TestAll()
@@ -93,5 +105,7 @@ void TestAll()
     TestScriptProcessor();
     std::cout << "- Test compiler\n";
     TestCompiler();
+    std::cout << "- Test Dialogues Manager\n";
+    TestDialoguesManager();
     std::cout << "> Done\n";
 }
