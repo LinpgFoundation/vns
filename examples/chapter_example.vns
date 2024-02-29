@@ -20,6 +20,10 @@ null:
 
 section1_end = true
 chapter_passed = 1
+chapter_passed++
+chapter_passed*=3
+chapter_passed/=3
+chapter_passed--
 
 // section 2
 [scene]bg2.png

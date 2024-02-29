@@ -4,20 +4,19 @@
 // Getter for previous dialogue of current dialogue
 Dialogue *DialoguesManager::get_previous()
 {
-    return dialog_data_[section_].contains(get_current()->previous) ? &dialog_data_[section_][get_current()->previous]
-                                                                    : nullptr;
+    return &dialog_data_[section_][get_current()->previous];
 }
 
 // Getter for current dialogue
 Dialogue *DialoguesManager::get_current()
 {
-    return dialog_data_[section_].contains(current_dialog_id_) ? &dialog_data_[section_][current_dialog_id_] : nullptr;
+    return &dialog_data_[section_][current_dialog_id_];
 }
 
 // Getter for last selected dialogue
 Dialogue *DialoguesManager::get_last()
 {
-    return dialog_data_[section_].contains(last_dialog_id_) ? &dialog_data_[section_][last_dialog_id_] : nullptr;
+    return &dialog_data_[section_][last_dialog_id_];
 }
 
 // load dialogue data from vns file
@@ -155,6 +154,130 @@ void DialoguesManager::set_current_dialogue_id(const std::string &id)
         if (e.type == "set")
         {
             set_variable(e.target, e.value);
+        } else
+        {
+            const EventValueType current_value = get_variable(e.target);
+            if (e.type == "add")
+            {
+                if (std::holds_alternative<float>(current_value))
+                {
+                    if (std::holds_alternative<float>(e.value))
+                    {
+                        set_variable(e.target, std::get<float>(current_value) + std::get<float>(e.value));
+                    } else if (std::holds_alternative<int>(e.value))
+                    {
+                        set_variable(e.target, std::get<float>(current_value) + std::get<int>(e.value));
+                    } else
+                    {
+                        throw std::runtime_error("Unable to add a non-number to" + e.target);
+                    }
+                } else if (std::holds_alternative<int>(current_value))
+                {
+                    if (std::holds_alternative<float>(e.value))
+                    {
+                        set_variable(e.target, std::get<int>(current_value) + std::get<float>(e.value));
+                    } else if (std::holds_alternative<int>(e.value))
+                    {
+                        set_variable(e.target, std::get<int>(current_value) + std::get<int>(e.value));
+                    } else
+                    {
+                        throw std::runtime_error("Unable to add a non-number to" + e.target);
+                    }
+                } else
+                {
+                    throw std::runtime_error("Unable to add to" + e.target + " because it is not a number");
+                }
+            } else if (e.type == "subtract")
+            {
+                if (std::holds_alternative<float>(current_value))
+                {
+                    if (std::holds_alternative<float>(e.value))
+                    {
+                        set_variable(e.target, std::get<float>(current_value) - std::get<float>(e.value));
+                    } else if (std::holds_alternative<int>(e.value))
+                    {
+                        set_variable(e.target, std::get<float>(current_value) - std::get<int>(e.value));
+                    } else
+                    {
+                        throw std::runtime_error("Unable to subtract a non-number to" + e.target);
+                    }
+                } else if (std::holds_alternative<int>(current_value))
+                {
+                    if (std::holds_alternative<float>(e.value))
+                    {
+                        set_variable(e.target, std::get<int>(current_value) - std::get<float>(e.value));
+                    } else if (std::holds_alternative<int>(e.value))
+                    {
+                        set_variable(e.target, std::get<int>(current_value) - std::get<int>(e.value));
+                    } else
+                    {
+                        throw std::runtime_error("Unable to subtract a non-number to" + e.target);
+                    }
+                } else
+                {
+                    throw std::runtime_error("Unable to subtract to" + e.target + " because it is not a number");
+                }
+            } else if (e.type == "multiply")
+            {
+                if (std::holds_alternative<float>(current_value))
+                {
+                    if (std::holds_alternative<float>(e.value))
+                    {
+                        set_variable(e.target, std::get<float>(current_value) * std::get<float>(e.value));
+                    } else if (std::holds_alternative<int>(e.value))
+                    {
+                        set_variable(e.target, std::get<float>(current_value) * std::get<int>(e.value));
+                    } else
+                    {
+                        throw std::runtime_error("Unable to multiply a non-number to" + e.target);
+                    }
+                } else if (std::holds_alternative<int>(current_value))
+                {
+                    if (std::holds_alternative<float>(e.value))
+                    {
+                        set_variable(e.target, std::get<int>(current_value) * std::get<float>(e.value));
+                    } else if (std::holds_alternative<int>(e.value))
+                    {
+                        set_variable(e.target, std::get<int>(current_value) * std::get<int>(e.value));
+                    } else
+                    {
+                        throw std::runtime_error("Unable to multiply a non-number to" + e.target);
+                    }
+                } else
+                {
+                    throw std::runtime_error("Unable to multiply to" + e.target + " because it is not a number");
+                }
+            } else if (e.type == "divide")
+            {
+                if (std::holds_alternative<float>(current_value))
+                {
+                    if (std::holds_alternative<float>(e.value))
+                    {
+                        set_variable(e.target, std::get<float>(current_value) / std::get<float>(e.value));
+                    } else if (std::holds_alternative<int>(e.value))
+                    {
+                        set_variable(e.target, std::get<float>(current_value) / std::get<int>(e.value));
+                    } else
+                    {
+                        throw std::runtime_error("Unable to divide a non-number to" + e.target);
+                    }
+                } else if (std::holds_alternative<int>(current_value))
+                {
+                    if (std::holds_alternative<float>(e.value))
+                    {
+                        set_variable(e.target, std::get<int>(current_value) / std::get<float>(e.value));
+                    } else if (std::holds_alternative<int>(e.value))
+                    {
+                        set_variable(e.target, std::get<int>(current_value) / std::get<int>(e.value));
+                    } else
+                    {
+                        throw std::runtime_error("Unable to divide a non-number to" + e.target);
+                    }
+                } else
+                {
+                    throw std::runtime_error("Unable to divide to" + e.target + " because it is not a number");
+                }
+            }
         }
     }
 }
@@ -177,7 +300,7 @@ void DialoguesManager::set_section(const std::string &section)
 {
     section_ = section;
     current_dialog_id_ = "head";
-    last_dialog_id_ = "";
+    last_dialog_id_.clear();
 }
 
 // Does dialogue have given section name
@@ -259,4 +382,8 @@ void DialoguesManager::remove_current_dialogue()
 void DialoguesManager::remove_dialogue(const std::string &section, const std::string &id)
 {
     get_dialogues(section).erase(id);
+    if (id == current_dialog_id_)
+    {
+        current_dialog_id_.clear();
+    }
 }

@@ -20,7 +20,7 @@ int main(const int argc, char **argv)
             arguments_map[current_arg] = argv[++i];
         } else if (arguments_without_input.contains(current_arg))
         {
-            arguments_map[current_arg] = "";
+            arguments_map[current_arg].clear();
         }
     }
     // update naming database

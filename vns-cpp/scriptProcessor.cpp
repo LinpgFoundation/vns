@@ -122,7 +122,7 @@ void ScriptProcessor::process(const std::filesystem::path &path)
             dialog_associate_key_[index] =
                     current_index == 0 ? "head" : last_label.empty() ? (current_index < 10 ? "~0" + std::to_string(
                             current_index) : "~" + std::to_string(current_index)) : last_label;
-            last_label = "";
+            last_label.clear();
             ++current_index;
         }
     }
@@ -230,7 +230,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                 DialogueDataType dialogue_data;
                 output_.set_dialogue(section_, "head", dialogue_data);
                 current_data_ = Dialogue({}, "head");
-                previous_ = "";
+                previous_.clear();
             } else if (tag == "end")
             {
                 assert(!previous_.empty());
@@ -332,7 +332,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                     current_data_.previous = previous_;
                 } else
                 {
-                    current_data_.previous = "";
+                    current_data_.previous.clear();
                     blocked_ = false;
                 }
 
@@ -358,7 +358,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                 }
             } else
             {
-                current_data_.previous = "";
+                current_data_.previous.clear();
             }
 
             previous_ = dialog_associate_key_[line_index];
@@ -367,48 +367,76 @@ void ScriptProcessor::convert(const size_t starting_index)
             output_.set_dialogue(section_, previous_, current_data_map);
             current_data_.notes.clear();
             current_data_.events.clear();
-        } else if (current_line.find('=') != std::string::npos)
+        } else if (const size_t eql_location = current_line.find('='); eql_location != std::string::npos)
         {
-            const std::vector<std::string> cmds = split(current_line, '=');
-            if (cmds.size() > 2)
-            {
-                terminated("Invalid variable assignment!", line_index);
-            }
-            const std::string v = trim(cmds[1]);
+            // get the operation, set (a=1), add (a+=1), and so on, which is why eql_location matters
+            const std::string variable_action = operations_.contains(current_line[eql_location - 1]) ? operations_.at(
+                    current_line[eql_location - 1]) : "set";
+            // get the name of the variable
+            const std::string variable_name = trim(
+                    current_line.substr(0, variable_action != "set" ? eql_location - 1 : eql_location));
+            // get the value of the variable
+            const std::string variable_value = trim(current_line.substr(eql_location + 1));
             EventValueType event_value;
-            if (v == "true")
+            // if variable value is true (boolean)
+            if (variable_value == "true")
             {
+                if (variable_action != "set")
+                {
+                    terminated("You can only set a boolean variable!");
+                }
                 event_value = true;
-            } else if (v == "false")
+            }
+                // if variable value is false (boolean)
+            else if (variable_value == "false")
             {
+                if (variable_action != "set")
+                {
+                    terminated("You can only set a boolean variable!");
+                }
                 event_value = false;
-            } else if (v.starts_with('"'))
+            }
+                // if variable value is string
+            else if (variable_value.starts_with('"'))
             {
-                if (!v.ends_with('"'))
+                if (!variable_value.ends_with('"'))
                 {
                     terminated("Possible missing close quotation mark for string", line_index);
+                } else if (variable_action != "set")
+                {
+                    terminated("You can only set a string variable!");
                 }
-                event_value = v.substr(1, v.size() - 2);
-            } else if (v.find('.') != std::string::npos)
+                event_value = variable_value.substr(1, variable_value.size() - 2);
+            }
+                // if variable value is float number
+            else if (variable_value.find('.') != std::string::npos)
             {
                 try
                 {
-                    event_value = std::stof(v);
+                    event_value = std::stof(variable_value);
                 } catch (std::invalid_argument &)
                 {
                     terminated("Possible invalid float assignment", line_index);
                 }
-            } else
+            }
+                // if variable value is int number?
+            else
             {
                 try
                 {
-                    event_value = std::stoi(v);
+                    event_value = std::stoi(variable_value);
                 } catch (std::invalid_argument &)
                 {
                     terminated("Possible invalid int assignment", line_index);
                 }
             }
-            current_data_.events.emplace_back("set", trim(cmds[0]), event_value);
+            current_data_.events.emplace_back(variable_action, variable_name, event_value);
+        } else if (current_line.ends_with("++"))
+        {
+            current_data_.events.emplace_back("add", trim(current_line.substr(0, current_line.size() - 2)), 1);
+        } else if (current_line.ends_with("--"))
+        {
+            current_data_.events.emplace_back("subtract", trim(current_line.substr(0, current_line.size() - 2)), 1);
         } else
         {
             terminated("Invalid code or content!", line_index);

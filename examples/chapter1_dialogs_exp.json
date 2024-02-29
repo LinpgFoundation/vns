@@ -1,6 +1,6 @@
 {
     "compiler": {
-        "compiledAt": 1709095130,
+        "compiledAt": 1709249430,
         "reversion": 1,
         "version": 2
     },
@@ -85,6 +85,26 @@
                     {
                         "target": "chapter_passed",
                         "type": "set",
+                        "value": 1
+                    },
+                    {
+                        "target": "chapter_passed",
+                        "type": "add",
+                        "value": 1
+                    },
+                    {
+                        "target": "chapter_passed",
+                        "type": "multiply",
+                        "value": 3
+                    },
+                    {
+                        "target": "chapter_passed",
+                        "type": "divide",
+                        "value": 3
+                    },
+                    {
+                        "target": "chapter_passed",
+                        "type": "subtract",
                         "value": 1
                     }
                 ],

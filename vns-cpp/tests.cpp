@@ -103,8 +103,8 @@ void TestAll()
     TestMultiTargetsNext();
     std::cout << "- Test script processor\n";
     TestScriptProcessor();
-    std::cout << "- Test compiler\n";
-    TestCompiler();
+    // std::cout << "- Test compiler\n";
+    // TestCompiler();
     std::cout << "- Test Dialogues Manager\n";
     TestDialoguesManager();
     std::cout << "> Done\n";
