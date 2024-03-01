@@ -406,7 +406,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                 {
                     terminated("You can only set a string variable!");
                 }
-                event_value = variable_value.substr(1, variable_value.size() - 2);
+                event_value = variable_value;
             }
                 // if variable value is float number
             else if (variable_value.find('.') != std::string::npos)
@@ -416,7 +416,8 @@ void ScriptProcessor::convert(const size_t starting_index)
                     event_value = std::stof(variable_value);
                 } catch (std::invalid_argument &)
                 {
-                    terminated("Possible invalid float assignment", line_index);
+                    // if variable value is number / math expression?
+                    event_value = variable_value;
                 }
             }
                 // if variable value is int number?
@@ -427,7 +428,8 @@ void ScriptProcessor::convert(const size_t starting_index)
                     event_value = std::stoi(variable_value);
                 } catch (std::invalid_argument &)
                 {
-                    terminated("Possible invalid int assignment", line_index);
+                    // if variable value is number / math expression?
+                    event_value = variable_value;
                 }
             }
             current_data_.events.emplace_back(variable_action, variable_name, event_value);

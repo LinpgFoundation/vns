@@ -111,6 +111,9 @@ private:
     std::string section_;
     std::string current_dialog_id_ = "head";
     std::string last_dialog_id_;
+
+    // Parse a string expression
+    float parse_expression(const std::string &) const;
 };
 
 #endif

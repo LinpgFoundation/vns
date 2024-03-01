@@ -24,6 +24,7 @@ chapter_passed++
 chapter_passed*=3
 chapter_passed/=3
 chapter_passed--
+test_multi = chapter_passed - 1
 
 // section 2
 [scene]bg2.png

@@ -1,5 +1,7 @@
 #include "dialoguesManager.hpp"
 #include "scriptProcessor.hpp"
+#include "expressionParser.hpp"
+#include "number.hpp"
 
 // Getter for previous dialogue of current dialogue
 Dialogue *DialoguesManager::get_previous()
@@ -54,7 +56,7 @@ void DialoguesManager::next()
 {
     set_current_dialogue_id(get_current()->next.has_single_target() ? get_current()->next.get_target()
                                                                     : get_current()->next.get_targets()[0]["id"]);
-};
+}
 
 // Contains variable
 bool DialoguesManager::contains_variable(const std::string &name) const
@@ -62,7 +64,7 @@ bool DialoguesManager::contains_variable(const std::string &name) const
     if (name.starts_with('@'))
     {
         return global_variables_.contains(name);
-    } else if (name.starts_with('%'))
+    } else if (name.starts_with('&'))
     {
         return persistent_variables_.contains(name);
     } else
@@ -77,7 +79,7 @@ EventValueType DialoguesManager::get_variable(const std::string &name) const
     if (name.starts_with('@'))
     {
         return global_variables_.at(name);
-    } else if (name.starts_with('%'))
+    } else if (name.starts_with('&'))
     {
         return persistent_variables_.at(name);
     } else
@@ -92,7 +94,7 @@ void DialoguesManager::set_variable(const std::string &name, const EventValueTyp
     if (name.starts_with('@'))
     {
         global_variables_[name] = value;
-    } else if (name.starts_with('%'))
+    } else if (name.starts_with('&'))
     {
         persistent_variables_[name] = value;
     } else
@@ -153,131 +155,61 @@ void DialoguesManager::set_current_dialogue_id(const std::string &id)
     {
         if (e.type == "set")
         {
-            set_variable(e.target, e.value);
+            if (std::holds_alternative<bool>(e.value))
+            {
+                set_variable(e.target, std::get<bool>(e.value));
+            } else if (std::holds_alternative<int>(e.value))
+            {
+                set_variable(e.target, std::get<int>(e.value));
+            } else if (std::holds_alternative<float>(e.value))
+            {
+                set_variable(e.target, std::get<float>(e.value));
+            } else
+            {
+                const std::string value_str = std::get<std::string>(e.value);
+                if (value_str.starts_with('"') && value_str.ends_with('"'))
+                {
+                    set_variable(e.target, value_str.substr(1, value_str.size() - 2));
+                } else
+                {
+                    set_variable(e.target, parse_expression(value_str));
+                }
+            }
         } else
         {
             const EventValueType current_value = get_variable(e.target);
-            if (e.type == "add")
+
+            // make sure source variable is a number
+            if (std::holds_alternative<bool>(current_value))
             {
-                if (std::holds_alternative<float>(current_value))
-                {
-                    if (std::holds_alternative<float>(e.value))
-                    {
-                        set_variable(e.target, std::get<float>(current_value) + std::get<float>(e.value));
-                    } else if (std::holds_alternative<int>(e.value))
-                    {
-                        set_variable(e.target, std::get<float>(current_value) + std::get<int>(e.value));
-                    } else
-                    {
-                        throw std::runtime_error("Unable to add a non-number to" + e.target);
-                    }
-                } else if (std::holds_alternative<int>(current_value))
-                {
-                    if (std::holds_alternative<float>(e.value))
-                    {
-                        set_variable(e.target, std::get<int>(current_value) + std::get<float>(e.value));
-                    } else if (std::holds_alternative<int>(e.value))
-                    {
-                        set_variable(e.target, std::get<int>(current_value) + std::get<int>(e.value));
-                    } else
-                    {
-                        throw std::runtime_error("Unable to add a non-number to" + e.target);
-                    }
-                } else
-                {
-                    throw std::runtime_error("Unable to add to" + e.target + " because it is not a number");
-                }
-            } else if (e.type == "subtract")
+                throw std::runtime_error("Unable to add to " + e.target + " because it is not a bool");
+            } else if (std::holds_alternative<std::string>(current_value))
             {
-                if (std::holds_alternative<float>(current_value))
-                {
-                    if (std::holds_alternative<float>(e.value))
-                    {
-                        set_variable(e.target, std::get<float>(current_value) - std::get<float>(e.value));
-                    } else if (std::holds_alternative<int>(e.value))
-                    {
-                        set_variable(e.target, std::get<float>(current_value) - std::get<int>(e.value));
-                    } else
-                    {
-                        throw std::runtime_error("Unable to subtract a non-number to" + e.target);
-                    }
-                } else if (std::holds_alternative<int>(current_value))
-                {
-                    if (std::holds_alternative<float>(e.value))
-                    {
-                        set_variable(e.target, std::get<int>(current_value) - std::get<float>(e.value));
-                    } else if (std::holds_alternative<int>(e.value))
-                    {
-                        set_variable(e.target, std::get<int>(current_value) - std::get<int>(e.value));
-                    } else
-                    {
-                        throw std::runtime_error("Unable to subtract a non-number to" + e.target);
-                    }
-                } else
-                {
-                    throw std::runtime_error("Unable to subtract to" + e.target + " because it is not a number");
-                }
-            } else if (e.type == "multiply")
+                throw std::runtime_error("Unable to add to " + e.target + " because it is not a string");
+            }
+            // cast source variable as number
+            const Number n1 = std::holds_alternative<int>(current_value) ? Number(std::get<int>(current_value))
+                                                                         : Number(std::get<float>(current_value));
+            // make sure destination variable is a number
+            if (std::holds_alternative<bool>(e.value))
             {
-                if (std::holds_alternative<float>(current_value))
-                {
-                    if (std::holds_alternative<float>(e.value))
-                    {
-                        set_variable(e.target, std::get<float>(current_value) * std::get<float>(e.value));
-                    } else if (std::holds_alternative<int>(e.value))
-                    {
-                        set_variable(e.target, std::get<float>(current_value) * std::get<int>(e.value));
-                    } else
-                    {
-                        throw std::runtime_error("Unable to multiply a non-number to" + e.target);
-                    }
-                } else if (std::holds_alternative<int>(current_value))
-                {
-                    if (std::holds_alternative<float>(e.value))
-                    {
-                        set_variable(e.target, std::get<int>(current_value) * std::get<float>(e.value));
-                    } else if (std::holds_alternative<int>(e.value))
-                    {
-                        set_variable(e.target, std::get<int>(current_value) * std::get<int>(e.value));
-                    } else
-                    {
-                        throw std::runtime_error("Unable to multiply a non-number to" + e.target);
-                    }
-                } else
-                {
-                    throw std::runtime_error("Unable to multiply to" + e.target + " because it is not a number");
-                }
-            } else if (e.type == "divide")
+                throw std::runtime_error("Unable to add a bool to " + e.target);
+            } else if (std::holds_alternative<std::string>(e.value))
             {
-                if (std::holds_alternative<float>(current_value))
+                if (const std::string value_str = std::get<std::string>(e.value); value_str.starts_with('"') ||
+                                                                                  value_str.ends_with('"'))
                 {
-                    if (std::holds_alternative<float>(e.value))
-                    {
-                        set_variable(e.target, std::get<float>(current_value) / std::get<float>(e.value));
-                    } else if (std::holds_alternative<int>(e.value))
-                    {
-                        set_variable(e.target, std::get<float>(current_value) / std::get<int>(e.value));
-                    } else
-                    {
-                        throw std::runtime_error("Unable to divide a non-number to" + e.target);
-                    }
-                } else if (std::holds_alternative<int>(current_value))
-                {
-                    if (std::holds_alternative<float>(e.value))
-                    {
-                        set_variable(e.target, std::get<int>(current_value) / std::get<float>(e.value));
-                    } else if (std::holds_alternative<int>(e.value))
-                    {
-                        set_variable(e.target, std::get<int>(current_value) / std::get<int>(e.value));
-                    } else
-                    {
-                        throw std::runtime_error("Unable to divide a non-number to" + e.target);
-                    }
-                } else
-                {
-                    throw std::runtime_error("Unable to divide to" + e.target + " because it is not a number");
+                    throw std::runtime_error("Unable to add a string to " + e.target);
                 }
             }
+            // cast destination variable as number
+            const Number n2 = std::holds_alternative<int>(e.value) ? Number(std::get<int>(e.value))
+                                                                   : (std::holds_alternative<float>(e.value) ? Number(
+                            std::get<float>(e.value)) : Number(parse_expression(std::get<std::string>(e.value))));
+            // get the result
+            const Number result = n1.operate(e.type, n2);
+            // set the variable accordingly
+            result.is_int() ? set_variable(e.target, result.get_int()) : set_variable(e.target, result.get_float());
         }
     }
 }
@@ -386,4 +318,15 @@ void DialoguesManager::remove_dialogue(const std::string &section, const std::st
     {
         current_dialog_id_.clear();
     }
+}
+
+// Parse a string expression
+float DialoguesManager::parse_expression(const std::string &expression) const
+{
+    ExpressionParser parser(expression, [this](const std::string &s) {
+        return this->contains_variable(s);
+    }, [this](const std::string &s) {
+        return this->get_variable(s);
+    });
+    return parser.parse();
 }
