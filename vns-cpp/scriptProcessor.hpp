@@ -44,7 +44,8 @@ private:
     const std::unordered_map<char, std::string> operations_ = {{'+', "add"},
                                                                {'-', "subtract"},
                                                                {'*', "multiply"},
-                                                               {'/', "divide"}};
+                                                               {'/', "divide"},
+                                                               {'%', "mod"}};
 
     bool blocked_;
 

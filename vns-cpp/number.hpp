@@ -13,15 +13,17 @@ struct Number
     {
     }
 
-    [[nodiscard]] Number add(const Number &) const;
+    void add(const Number &);
 
-    [[nodiscard]] Number subtract(const Number &) const;
+    void subtract(const Number &);
 
-    [[nodiscard]] Number multiply(const Number &) const;
+    void multiply(const Number &);
 
-    [[nodiscard]] Number divide(const Number &) const;
+    void divide(const Number &);
 
-    [[nodiscard]] Number operate(const std::string &, const Number &) const;
+    void mod(const Number &);
+
+    void operate(const std::string &, const Number &);
 
     [[nodiscard]] bool is_int() const;
 
@@ -29,7 +31,7 @@ struct Number
 
     [[nodiscard]] float get_float() const;
 
-    const std::variant<int, float> value;
+    std::variant<int, float> value;
 };
 
 

@@ -1,62 +1,55 @@
 #include <stdexcept>
 #include "number.hpp"
 
-Number Number::add(const Number &o) const
+void Number::add(const Number &o)
 {
     // If either of the values is a float, perform float addition.
     if (std::holds_alternative<float>(value) || std::holds_alternative<float>(o.value))
     {
-        float result = (std::holds_alternative<float>(value) ? std::get<float>(value) : std::get<int>(value)) +
-                       (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : std::get<int>(o.value));
-        return Number(result);
+        value = (std::holds_alternative<float>(value) ? std::get<float>(value) : std::get<int>(value)) +
+                (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : std::get<int>(o.value));
     } else
     {
         // If both values are ints, perform int addition.
-        int result = std::get<int>(value) + std::get<int>(o.value);
-        return Number(result);
+        value = std::get<int>(value) + std::get<int>(o.value);
     }
 }
 
-Number Number::subtract(const Number &o) const
+void Number::subtract(const Number &o)
 {
     // If either of the values is a float, perform float subtraction.
     if (std::holds_alternative<float>(value) || std::holds_alternative<float>(o.value))
     {
-        float result = (std::holds_alternative<float>(value) ? std::get<float>(value) : std::get<int>(value)) -
-                       (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : std::get<int>(o.value));
-        return Number(result);
+        value = (std::holds_alternative<float>(value) ? std::get<float>(value) : std::get<int>(value)) -
+                (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : std::get<int>(o.value));
     } else
     {
-        // If both values are ints, perform int addition.
-        int result = std::get<int>(value) - std::get<int>(o.value);
-        return Number(result);
+        // If both values are ints, perform int subtraction.
+        value = std::get<int>(value) - std::get<int>(o.value);
     }
 }
 
-Number Number::multiply(const Number &o) const
+void Number::multiply(const Number &o)
 {
     // If either of the values is a float, perform float multiplication.
     if (std::holds_alternative<float>(value) || std::holds_alternative<float>(o.value))
     {
-        float result = (std::holds_alternative<float>(value) ? std::get<float>(value) : std::get<int>(value)) *
-                       (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : std::get<int>(o.value));
-        return Number(result);
+        value = (std::holds_alternative<float>(value) ? std::get<float>(value) : std::get<int>(value)) *
+                (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : std::get<int>(o.value));
     } else
     {
-        // If both values are ints, perform int addition.
-        int result = std::get<int>(value) * std::get<int>(o.value);
-        return Number(result);
+        // If both values are ints, perform int multiplication.
+        value = std::get<int>(value) * std::get<int>(o.value);
     }
 }
 
-Number Number::divide(const Number &o) const
+void Number::divide(const Number &o)
 {
     // If either of the values is a float, perform float division.
     if (std::holds_alternative<float>(value) || std::holds_alternative<float>(o.value))
     {
-        float result = (std::holds_alternative<float>(value) ? std::get<float>(value) : std::get<int>(value)) /
-                       (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : std::get<int>(o.value));
-        return Number(result);
+        value = (std::holds_alternative<float>(value) ? std::get<float>(value) : std::get<int>(value)) /
+                (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : std::get<int>(o.value));
     } else
     {
         // Check if the division results in a non-integer value when both are ints
@@ -65,29 +58,43 @@ Number Number::divide(const Number &o) const
         if (dividend % divisor == 0)
         {
             // Division results in an integer value
-            return Number(dividend / divisor);
+            value = dividend / divisor;
         } else
         {
             // Division results in a non-integer value, perform the division as float
-            return Number(static_cast<float>(dividend) / static_cast<float>(divisor));
+            value = static_cast<float>(dividend) / static_cast<float>(divisor);
         }
     }
 }
 
-Number Number::operate(const std::string &operation_name, const Number &o) const
+void Number::mod(const Number &o)
+{
+    // If either of the values is a float, throw error
+    if (std::holds_alternative<float>(value) || std::holds_alternative<float>(o.value))
+    {
+        throw std::runtime_error("You can only perform modulus operation on two integers");
+    }
+    // If both values are ints, perform int mod.
+    value = std::get<int>(value) % std::get<int>(o.value);
+}
+
+void Number::operate(const std::string &operation_name, const Number &o)
 {
     if (operation_name == "add")
     {
-        return add(o);
+        add(o);
     } else if (operation_name == "subtract")
     {
-        return subtract(o);
+        subtract(o);
     } else if (operation_name == "multiply")
     {
-        return multiply(o);
+        multiply(o);
     } else if (operation_name == "divide")
     {
-        return divide(o);
+        divide(o);
+    } else if (operation_name == "mod")
+    {
+        mod(o);
     } else
     {
         throw std::runtime_error("Invalid operation " + operation_name);
