@@ -1,7 +1,7 @@
 #include "expressionParser.hpp"
 
 // Parse and evaluate the expression
-float ExpressionParser::parse()
+Number ExpressionParser::parse()
 {
     index = 0;
     return parseExpression();
@@ -9,19 +9,19 @@ float ExpressionParser::parse()
 
 
 // Parse an expression
-float ExpressionParser::parseExpression()
+Number ExpressionParser::parseExpression()
 {
-    float result = parseTerm();
+    Number result = parseTerm();
     while (index < buffer.size())
     {
         if (buffer[index] == '+')
         {
             ++index;
-            result += parseTerm();
+            result.add(parseTerm());
         } else if (buffer[index] == '-')
         {
             ++index;
-            result -= parseTerm();
+            result.subtract(parseTerm());
         } else
         {
             break;
@@ -31,23 +31,23 @@ float ExpressionParser::parseExpression()
 }
 
 // Parse a term
-float ExpressionParser::parseTerm()
+Number ExpressionParser::parseTerm()
 {
-    float result = parseFactor();
+    Number result = parseFactor();
     while (index < buffer.size())
     {
         if (buffer[index] == '*')
         {
             ++index;
-            result *= parseFactor();
+            result.multiply(parseFactor());
         } else if (buffer[index] == '/')
         {
             ++index;
-            float divisor = parseFactor();
-            if (divisor != 0.0)
-                result /= divisor;
-            else
-                throw std::runtime_error("Division by zero.");
+            result.divide(parseFactor());
+        } else if (buffer[index] == '%')
+        {
+            ++index;
+            result.mod(parseFactor());
         } else
         {
             break;
@@ -57,12 +57,12 @@ float ExpressionParser::parseTerm()
 }
 
 // Parse a factor
-float ExpressionParser::parseFactor()
+Number ExpressionParser::parseFactor()
 {
     if (buffer[index] == '(')
     {
         ++index; // Consume '('
-        float result = parseExpression();
+        Number result = parseExpression();
         if (buffer[index] != ')')
         {
             throw std::runtime_error("Expected ')'.");
@@ -76,7 +76,7 @@ float ExpressionParser::parseFactor()
 }
 
 // Parse a number
-float ExpressionParser::parseNumber()
+Number ExpressionParser::parseNumber()
 {
     size_t start = index;
     // check the tag for global or persistent variable
@@ -90,26 +90,32 @@ float ExpressionParser::parseNumber()
         ++index;
     }
     const std::string data_s = buffer.substr(start, index - start);
-    float number;
+    number number_t;
     // if the number extracted is the name of a variable
     if (contains_variable_(data_s))
     {
         EventValueType value = get_variable_(data_s);
         if (std::holds_alternative<int>(value))
         {
-            number = static_cast<float>(std::get<int>(value));
+            number_t = std::get<int>(value);
         } else if (std::holds_alternative<float>(value))
         {
-            number = std::get<float>(value);
+            number_t = std::get<float>(value);
         } else
         {
             throw std::runtime_error("Cannot add " + data_s + " because it is not a number");
         }
     }
-        // or if it is just a number
+        // it is a float?
+    else if (data_s.find('.') != std::string::npos)
+    {
+        number_t = std::stof(data_s);
+    }
+        // it is an integer?
     else
     {
-        number = std::stof(data_s);
+        number_t = std::stoi(data_s);
     }
-    return number;
+
+    return Number(number_t);
 }

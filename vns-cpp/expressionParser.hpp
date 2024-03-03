@@ -8,20 +8,23 @@
 #include <utility>
 #include <functional>
 #include "Event.hpp"
+#include "number.hpp"
+#include "functions.hpp"
 
 class ExpressionParser
 {
 public:
     ExpressionParser(
-            std::string buffer, const std::function<bool(std::string)> &contains_variable,
-            const std::function<EventValueType(std::string)> &get_variable) : index(0), buffer(std::move(buffer)),
+            const std::string &expression, const std::function<bool(std::string)> &contains_variable,
+            const std::function<EventValueType(std::string)> &get_variable) : index(0),
+                                                                              buffer(remove_whitespace(expression)),
                                                                               contains_variable_(contains_variable),
                                                                               get_variable_(get_variable)
     {
     }
 
     // Parse and evaluate the expression
-    float parse();
+    Number parse();
 
 private:
     size_t index;
@@ -30,16 +33,16 @@ private:
     const std::function<EventValueType(std::string)> &get_variable_;
 
     // Parse an expression
-    float parseExpression();
+    Number parseExpression();
 
     // Parse a term
-    float parseTerm();
+    Number parseTerm();
 
     // Parse a factor
-    float parseFactor();
+    Number parseFactor();
 
     // Parse a number
-    float parseNumber();
+    Number parseNumber();
 };
 
 #endif

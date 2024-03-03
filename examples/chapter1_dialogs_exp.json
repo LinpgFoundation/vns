@@ -1,6 +1,6 @@
 {
     "compiler": {
-        "compiledAt": 1709325406,
+        "compiledAt": 1709454700,
         "reversion": 1,
         "version": 2
     },
@@ -46,36 +46,6 @@
                 "contents": [
                     "I hope it works."
                 ],
-                "next": {
-                    "target": "~02",
-                    "type": "default"
-                },
-                "notes": [
-                    "this the second dialogue of section 1"
-                ],
-                "previous": "head"
-            },
-            "~02": {
-                "background_image": "bg1.png",
-                "background_music": "bgm1.ogg",
-                "contents": [
-                    "you cannot go back"
-                ],
-                "next": {
-                    "target": "~03",
-                    "type": "scene"
-                }
-            },
-            "~03": {
-                "background_image": "bg2.png",
-                "background_music": "bgm2.ogg",
-                "character_images": [
-                    "test_character1.png&silent",
-                    "test_character2.png&silent"
-                ],
-                "contents": [
-                    "Hello I am test character 1."
-                ],
                 "events": [
                     {
                         "target": "section1_end",
@@ -106,12 +76,54 @@
                         "target": "chapter_passed",
                         "type": "subtract",
                         "value": 1
+                    }
+                ],
+                "next": {
+                    "target": "~02",
+                    "type": "default"
+                },
+                "notes": [
+                    "this the second dialogue of section 1"
+                ],
+                "previous": "head"
+            },
+            "~02": {
+                "background_image": "bg1.png",
+                "background_music": "bgm1.ogg",
+                "contents": [
+                    "you cannot go back"
+                ],
+                "events": [
+                    {
+                        "target": "mod_n",
+                        "type": "set",
+                        "value": "chapter_passed + 1"
                     },
                     {
                         "target": "test_multi",
                         "type": "set",
-                        "value": "chapter_passed - 1"
+                        "value": "mod_n * 4"
+                    },
+                    {
+                        "target": "mod_result",
+                        "type": "set",
+                        "value": "(test_multi + 1) % 2"
                     }
+                ],
+                "next": {
+                    "target": "~03",
+                    "type": "scene"
+                }
+            },
+            "~03": {
+                "background_image": "bg2.png",
+                "background_music": "bgm2.ogg",
+                "character_images": [
+                    "test_character1.png&silent",
+                    "test_character2.png&silent"
+                ],
+                "contents": [
+                    "Hello I am test character 1."
                 ],
                 "narrator": "Test Character 1",
                 "next": {

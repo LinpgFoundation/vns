@@ -1,7 +1,6 @@
 #include "dialoguesManager.hpp"
 #include "scriptProcessor.hpp"
 #include "expressionParser.hpp"
-#include "number.hpp"
 
 // Getter for previous dialogue of current dialogue
 Dialogue *DialoguesManager::get_previous()
@@ -172,7 +171,11 @@ void DialoguesManager::set_current_dialogue_id(const std::string &id)
                     set_variable(e.target, value_str.substr(1, value_str.size() - 2));
                 } else
                 {
-                    set_variable(e.target, parse_expression(value_str));
+                    // get the result
+                    const Number result = parse_expression(value_str);
+                    // set the variable accordingly
+                    result.is_int() ? set_variable(e.target, result.get_int()) : set_variable(e.target,
+                                                                                              result.get_float());
                 }
             }
         } else
@@ -188,8 +191,8 @@ void DialoguesManager::set_current_dialogue_id(const std::string &id)
                 throw std::runtime_error("Unable to add to " + e.target + " because it is not a string");
             }
             // cast source variable as number
-            const Number n1 = std::holds_alternative<int>(current_value) ? Number(std::get<int>(current_value))
-                                                                         : Number(std::get<float>(current_value));
+            Number n1 = std::holds_alternative<int>(current_value) ? Number(std::get<int>(current_value)) : Number(
+                    std::get<float>(current_value));
             // make sure destination variable is a number
             if (std::holds_alternative<bool>(e.value))
             {
@@ -207,9 +210,9 @@ void DialoguesManager::set_current_dialogue_id(const std::string &id)
                                                                    : (std::holds_alternative<float>(e.value) ? Number(
                             std::get<float>(e.value)) : Number(parse_expression(std::get<std::string>(e.value))));
             // get the result
-            const Number result = n1.operate(e.type, n2);
+            n1.operate(e.type, n2);
             // set the variable accordingly
-            result.is_int() ? set_variable(e.target, result.get_int()) : set_variable(e.target, result.get_float());
+            n1.is_int() ? set_variable(e.target, n1.get_int()) : set_variable(e.target, n1.get_float());
         }
     }
 }
@@ -321,7 +324,7 @@ void DialoguesManager::remove_dialogue(const std::string &section, const std::st
 }
 
 // Parse a string expression
-float DialoguesManager::parse_expression(const std::string &expression) const
+Number DialoguesManager::parse_expression(const std::string &expression) const
 {
     ExpressionParser parser(expression, [this](const std::string &s) {
         return this->contains_variable(s);

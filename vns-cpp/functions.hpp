@@ -26,4 +26,7 @@ std::vector<std::string> split(const std::string &, char);
 // split by space
 std::vector<std::string> split(const std::string &);
 
+// Remove all whitespaces
+std::string remove_whitespace(const std::string &);
+
 #endif

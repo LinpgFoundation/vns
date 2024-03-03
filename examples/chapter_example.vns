@@ -10,13 +10,6 @@
 # this the first dialogue of section 1
 null:
 - This is a test message.
-# this the second dialogue of section 1
-null:
-- I hope it works.
-
-[block]
-null:
-- you cannot go back
 
 section1_end = true
 chapter_passed = 1
@@ -24,7 +17,18 @@ chapter_passed++
 chapter_passed*=3
 chapter_passed/=3
 chapter_passed--
-test_multi = chapter_passed - 1
+
+# this the second dialogue of section 1
+null:
+- I hope it works.
+
+mod_n = chapter_passed + 1
+test_multi = mod_n * 4
+mod_result = (test_multi + 1) % 2
+
+[block]
+null:
+- you cannot go back
 
 // section 2
 [scene]bg2.png

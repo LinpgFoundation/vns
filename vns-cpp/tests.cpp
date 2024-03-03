@@ -83,11 +83,17 @@ void TestDialoguesManager()
     test_dialogues_manager.load(EXAMPLE_VNS_TEST_FILE);
     test_dialogues_manager.set_section("dialog_example");
     test_dialogues_manager.next();
+    assert(test_dialogues_manager.get_current()->id == "~01");
+    assert(std::get<bool>(test_dialogues_manager.get_variable("section1_end")) == true);
+    assert(test_dialogues_manager.get_variable<int>("chapter_passed") == 1);
     test_dialogues_manager.next();
     test_dialogues_manager.next();
     assert(test_dialogues_manager.get_current()->id == "~03");
-    assert(std::get<bool>(test_dialogues_manager.get_variable("section1_end")) == true);
     assert(test_dialogues_manager.get_variable<int>("chapter_passed") == 1);
+    assert(test_dialogues_manager.get_variable<int>("mod_n") == 2);
+    assert(test_dialogues_manager.get_variable<int>("test_multi") == 8);
+    assert(test_dialogues_manager.get_variable<int>("mod_result") ==
+           test_dialogues_manager.get_variable<int>("chapter_passed"));
 }
 
 void TestAll()

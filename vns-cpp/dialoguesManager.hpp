@@ -2,6 +2,7 @@
 #define CONTENT_MANAGER_HPP
 
 #include "dialogue.hpp"
+#include "number.hpp"
 #include <unordered_set>
 
 class DialoguesManager
@@ -113,7 +114,7 @@ private:
     std::string last_dialog_id_;
 
     // Parse a string expression
-    float parse_expression(const std::string &) const;
+    Number parse_expression(const std::string &) const;
 };
 
 #endif
