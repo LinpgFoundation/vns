@@ -1,13 +1,16 @@
 #include <stdexcept>
 #include "number.hpp"
+#include "operation.hpp"
 
 void Number::add(const Number &o)
 {
     // If either of the values is a float, perform float addition.
     if (std::holds_alternative<float>(value) || std::holds_alternative<float>(o.value))
     {
-        value = (std::holds_alternative<float>(value) ? std::get<float>(value) : std::get<int>(value)) +
-                (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : std::get<int>(o.value));
+        value = (std::holds_alternative<float>(value) ? std::get<float>(value) : static_cast<float>(std::get<int>(
+                value))) +
+                (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : static_cast<float>(std::get<int>(
+                        o.value)));
     } else
     {
         // If both values are ints, perform int addition.
@@ -20,8 +23,10 @@ void Number::subtract(const Number &o)
     // If either of the values is a float, perform float subtraction.
     if (std::holds_alternative<float>(value) || std::holds_alternative<float>(o.value))
     {
-        value = (std::holds_alternative<float>(value) ? std::get<float>(value) : std::get<int>(value)) -
-                (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : std::get<int>(o.value));
+        value = (std::holds_alternative<float>(value) ? std::get<float>(value) : static_cast<float>(std::get<int>(
+                value))) -
+                (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : static_cast<float>(std::get<int>(
+                        value)));
     } else
     {
         // If both values are ints, perform int subtraction.
@@ -34,8 +39,10 @@ void Number::multiply(const Number &o)
     // If either of the values is a float, perform float multiplication.
     if (std::holds_alternative<float>(value) || std::holds_alternative<float>(o.value))
     {
-        value = (std::holds_alternative<float>(value) ? std::get<float>(value) : std::get<int>(value)) *
-                (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : std::get<int>(o.value));
+        value = (std::holds_alternative<float>(value) ? std::get<float>(value) : static_cast<float>(std::get<int>(
+                value))) *
+                (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : static_cast<float>(std::get<int>(
+                        value)));
     } else
     {
         // If both values are ints, perform int multiplication.
@@ -48,8 +55,10 @@ void Number::divide(const Number &o)
     // If either of the values is a float, perform float division.
     if (std::holds_alternative<float>(value) || std::holds_alternative<float>(o.value))
     {
-        value = (std::holds_alternative<float>(value) ? std::get<float>(value) : std::get<int>(value)) /
-                (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : std::get<int>(o.value));
+        value = (std::holds_alternative<float>(value) ? std::get<float>(value) : static_cast<float>(std::get<int>(
+                value))) /
+                (std::holds_alternative<float>(o.value) ? std::get<float>(o.value) : static_cast<float>(std::get<int>(
+                        value)));
     } else
     {
         // Check if the division results in a non-integer value when both are ints
@@ -80,19 +89,19 @@ void Number::mod(const Number &o)
 
 void Number::operate(const std::string &operation_name, const Number &o)
 {
-    if (operation_name == "add")
+    if (operation_name == operation::add)
     {
         add(o);
-    } else if (operation_name == "subtract")
+    } else if (operation_name == operation::subtract)
     {
         subtract(o);
-    } else if (operation_name == "multiply")
+    } else if (operation_name == operation::multiply)
     {
         multiply(o);
-    } else if (operation_name == "divide")
+    } else if (operation_name == operation::divide)
     {
         divide(o);
-    } else if (operation_name == "mod")
+    } else if (operation_name == operation::mod)
     {
         mod(o);
     } else

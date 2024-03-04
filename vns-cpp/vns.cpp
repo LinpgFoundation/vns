@@ -44,7 +44,7 @@ int main(const int argc, char **argv)
             // print json string
         else
         {
-            Compiler::compile(arguments_map["-i"], arguments_map.contains("-o") ? arguments_map["-o"] : "");
+            Compiler::compile(arguments_map["-i"], arguments_map.contains("-o") ? arguments_map["-o"] : std::string());
         }
     }
     return 0;

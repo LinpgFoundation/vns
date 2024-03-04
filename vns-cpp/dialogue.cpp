@@ -3,14 +3,14 @@
 Dialogue::Dialogue(const DialogueDataType &data, const std::string &content_id)
 {
     id = content_id;
-    background_image = cast<std::string>(data, "background_image", "");
-    background_music = cast<std::string>(data, "background_music", "");
+    background_image = cast<std::string>(data, "background_image", std::string());
+    background_music = cast<std::string>(data, "background_music", std::string());
     character_images = cast<std::vector<std::string>>(data, "character_images", {});
     contents = cast<std::vector<std::string>>(data, "contents", {});
-    narrator = cast<std::string>(data, "narrator", "");
-    previous = cast<std::string>(data, "previous", "");
+    narrator = cast<std::string>(data, "narrator", std::string());
+    previous = cast<std::string>(data, "previous", std::string());
     next = DialogueNext(cast<std::unordered_map<std::string, DialogueNextValueType>>(data, "next", {{"type",   "default"},
-                                                                                                    {"target", ""}}));
+                                                                                                    {"target", std::string()}}));
     notes = cast<std::vector<std::string>>(data, "notes", {});
     for (const EventDataType &e: cast<std::vector<EventDataType>>(data, "events", {}))
     {

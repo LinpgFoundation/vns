@@ -239,7 +239,7 @@ void DialoguesManager::set_section(const std::string &section)
 }
 
 // Does dialogue have given section name
-bool DialoguesManager::contains_section(const std::string &section)
+bool DialoguesManager::contains_section(const std::string &section) const
 {
     return dialog_data_.contains(section);
 }
@@ -302,9 +302,9 @@ void DialoguesManager::set_dialogue(const std::string &section, const std::strin
 }
 
 // Does section contain given dialogue id
-bool DialoguesManager::contains_dialogue(const std::string &section, const std::string &id)
+bool DialoguesManager::contains_dialogue(const std::string &section, const std::string &id) const
 {
-    return get_dialogues(section).contains(id);
+    return dialog_data_.contains(section) && dialog_data_.at(section).contains(id);
 }
 
 // Remove current dialogue

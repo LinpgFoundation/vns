@@ -5,6 +5,7 @@
 #include "functions.hpp"
 #include "scriptProcessor.hpp"
 #include "naming.hpp"
+#include "operation.hpp"
 
 std::string ScriptProcessor::get_id() const
 {
@@ -18,7 +19,7 @@ std::string ScriptProcessor::get_language() const
 
 std::string ScriptProcessor::ensure_not_null(const std::string &text)
 {
-    return iequals(text, "null") || iequals(text, "none") ? "" : text;
+    return iequals(text, "null") || iequals(text, "none") ? std::string() : text;
 }
 
 std::string ScriptProcessor::extract_parameter(const std::string &text)
@@ -370,7 +371,7 @@ void ScriptProcessor::convert(const size_t starting_index)
         } else if (const size_t eql_location = current_line.find('='); eql_location != std::string::npos)
         {
             // get the operation, set (a=1), add (a+=1), and so on, which is why eql_location matters
-            const std::string variable_action = operations_.contains(current_line[eql_location - 1]) ? operations_.at(
+            const std::string variable_action = operation::contains(current_line[eql_location - 1]) ? operation::get(
                     current_line[eql_location - 1]) : "set";
             // get the name of the variable
             const std::string variable_name = trim(
@@ -447,10 +448,11 @@ void ScriptProcessor::convert(const size_t starting_index)
             current_data_.events.emplace_back(variable_action, variable_name, event_value);
         } else if (current_line.ends_with("++"))
         {
-            current_data_.events.emplace_back("add", trim(current_line.substr(0, current_line.size() - 2)), 1);
+            current_data_.events.emplace_back(operation::add, trim(current_line.substr(0, current_line.size() - 2)), 1);
         } else if (current_line.ends_with("--"))
         {
-            current_data_.events.emplace_back("subtract", trim(current_line.substr(0, current_line.size() - 2)), 1);
+            current_data_.events.emplace_back(operation::subtract,
+                                              trim(current_line.substr(0, current_line.size() - 2)), 1);
         } else
         {
             terminated("Invalid code or content!", line_index);

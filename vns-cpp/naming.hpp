@@ -38,8 +38,6 @@ public:
 
     static std::unordered_map<std::string, std::unordered_set<std::string>> &get_database();
 
-    static std::string get_database_as_json();
-
     static void clear_database();
 
     static void update_database(std::string &);

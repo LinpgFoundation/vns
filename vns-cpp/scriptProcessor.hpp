@@ -41,12 +41,6 @@ private:
     std::vector<std::string> lines_;
     std::unordered_map<size_t, std::string> dialog_associate_key_;
 
-    const std::unordered_map<char, std::string> operations_ = {{'+', "add"},
-                                                               {'-', "subtract"},
-                                                               {'*', "multiply"},
-                                                               {'/', "divide"},
-                                                               {'%', "mod"}};
-
     bool blocked_;
 
     static std::string ensure_not_null(const std::string &);

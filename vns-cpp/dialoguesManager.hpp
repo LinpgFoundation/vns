@@ -69,7 +69,7 @@ public:
     void set_section(const std::string &);
 
     // Does dialogue have given section name
-    bool contains_section(const std::string &);
+    bool contains_section(const std::string &) const;
 
     // Remove section
     void remove_section(const std::string &);
@@ -96,7 +96,7 @@ public:
     void set_dialogue(const std::string &, const std::string &, DialogueDataType &);
 
     // Does section contain given dialogue id
-    bool contains_dialogue(const std::string &, const std::string &);
+    bool contains_dialogue(const std::string &, const std::string &) const;
 
     // Remove current dialogue
     void remove_current_dialogue();
