@@ -91,7 +91,7 @@ void TestDialoguesManager()
     assert(test_dialogues_manager.get_current()->id == "~03");
     assert(test_dialogues_manager.get_variable<int>("chapter_passed") == 1);
     assert(test_dialogues_manager.get_variable<int>("mod_n") == 2);
-    assert(test_dialogues_manager.get_variable<int>("test_multi") == 8);
+    assert(test_dialogues_manager.get_variable<int>("test_multi") == 9);
     assert(test_dialogues_manager.get_variable<int>("mod_result") ==
            test_dialogues_manager.get_variable<int>("chapter_passed"));
 }

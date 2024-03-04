@@ -105,16 +105,24 @@ Number ExpressionParser::parseNumber()
         {
             throw std::runtime_error("Cannot add " + data_s + " because it is not a number");
         }
-    }
+    } else
+    {
+        size_t pos;
         // it is a float?
-    else if (data_s.find('.') != std::string::npos)
-    {
-        number_t = std::stof(data_s);
-    }
-        // it is an integer?
-    else
-    {
-        number_t = std::stoi(data_s);
+        if (data_s.find('.') != std::string::npos)
+        {
+            number_t = std::stof(data_s, &pos);
+        }
+            // it is an integer?
+        else
+        {
+            number_t = std::stoi(data_s, &pos);
+        }
+        // Not all characters were processed, throw an error
+        if (pos != data_s.size())
+        {
+            throw std::runtime_error("String contains non-integer characters");
+        }
     }
 
     return Number(number_t);

@@ -23,8 +23,8 @@ null:
 - I hope it works.
 
 mod_n = chapter_passed + 1
-test_multi = mod_n * 4
-mod_result = (test_multi + 1) % 2
+test_multi = 1 + mod_n * 4
+mod_result = test_multi % 2
 
 [block]
 null:

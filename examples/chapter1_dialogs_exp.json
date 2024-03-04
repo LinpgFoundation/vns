@@ -1,6 +1,6 @@
 {
     "compiler": {
-        "compiledAt": 1709454700,
+        "compiledAt": 1709528695,
         "reversion": 1,
         "version": 2
     },
@@ -102,12 +102,12 @@
                     {
                         "target": "test_multi",
                         "type": "set",
-                        "value": "mod_n * 4"
+                        "value": "1 + mod_n * 4"
                     },
                     {
                         "target": "mod_result",
                         "type": "set",
-                        "value": "(test_multi + 1) % 2"
+                        "value": "test_multi % 2"
                     }
                 ],
                 "next": {

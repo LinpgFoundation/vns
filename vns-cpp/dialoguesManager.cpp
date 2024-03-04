@@ -68,7 +68,7 @@ bool DialoguesManager::contains_variable(const std::string &name) const
         return persistent_variables_.contains(name);
     } else
     {
-        return local_variables_.at(section_).contains(name);
+        return local_variables_.contains(section_) && local_variables_.at(section_).contains(name);
     }
 }
 

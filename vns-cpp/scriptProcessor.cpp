@@ -377,6 +377,12 @@ void ScriptProcessor::convert(const size_t starting_index)
                     current_line.substr(0, variable_action != "set" ? eql_location - 1 : eql_location));
             // get the value of the variable
             const std::string variable_value = trim(current_line.substr(eql_location + 1));
+            // make sure variable_value is not empty
+            if (variable_value.empty())
+            {
+                throw std::runtime_error(variable_name + " has empty value!");
+            }
+            // create a variant for holding
             EventValueType event_value;
             // if variable value is true (boolean)
             if (variable_value == "true")
@@ -407,28 +413,34 @@ void ScriptProcessor::convert(const size_t starting_index)
                     terminated("You can only set a string variable!");
                 }
                 event_value = variable_value;
-            }
+            } else
+            {
+                size_t pos;
                 // if variable value is float number
-            else if (variable_value.find('.') != std::string::npos)
-            {
-                try
+                if (variable_value.find('.') != std::string::npos)
                 {
-                    event_value = std::stof(variable_value);
-                } catch (std::invalid_argument &)
-                {
-                    // if variable value is number / math expression?
-                    event_value = variable_value;
+                    try
+                    {
+                        event_value = std::stof(variable_value, &pos);
+                    } catch (std::invalid_argument &)
+                    {
+                        pos = 0;
+                    }
                 }
-            }
-                // if variable value is int number?
-            else
-            {
-                try
+                    // if variable value is int number?
+                else
                 {
-                    event_value = std::stoi(variable_value);
-                } catch (std::invalid_argument &)
+                    try
+                    {
+                        event_value = std::stoi(variable_value, &pos);
+                    } catch (std::invalid_argument &)
+                    {
+                        pos = 0;
+                    }
+                }
+                // If not all characters were processed, then assume it is a number / math expression
+                if (pos != variable_value.size())
                 {
-                    // if variable value is number / math expression?
                     event_value = variable_value;
                 }
             }
