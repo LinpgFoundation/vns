@@ -49,16 +49,10 @@ std::string ScriptProcessor::extract_string(const std::string &text)
             "\nFail to compile due to: " + reason);
 }
 
-DialogueSectionsDataType ScriptProcessor::get_output() const
+DialoguesManager ScriptProcessor::get_output() const
 {
-    return output_.to_map();
+    return output_;
 }
-
-nlohmann::json ScriptProcessor::get_output_as_json() const
-{
-    return output_.to_json();
-}
-
 
 void ScriptProcessor::process(const std::filesystem::path &path)
 {
@@ -96,33 +90,37 @@ void ScriptProcessor::process(const std::filesystem::path &path)
 
     std::string last_label;
 
-    for (size_t index = 0; index < lines_.size(); ++index)
+    for (size_t i = 0; i < lines_.size(); ++i)
     {
-        lines_[index] = trim(lines_[index].substr(0, lines_[index].find(COMMENT_PREFIX)));
+        lines_[i] = trim(lines_[i].substr(0, lines_[i].find(COMMENT_PREFIX)));
 
-        if (lines_[index].starts_with(TAG_STARTS))
+        if (lines_[i].starts_with(TAG_STARTS))
         {
-            if (auto tag = extract_tag(lines_[index]); tag == "label")
+            if (auto tag = extract_tag(lines_[i]); tag == "label")
             {
                 if (!last_label.empty())
                 {
-                    terminated("This label is overwriting the previous one", index);
+                    terminated("This label is overwriting the previous one", i);
                 }
 
-                last_label = extract_parameter(lines_[index]);
+                last_label = extract_parameter(lines_[i]);
                 if (RESERVED_WORDS.contains(last_label))
                 {
-                    terminated("You cannot use reserved word '" + last_label + "' as a label", index);
+                    terminated("You cannot use reserved word '" + last_label + "' as a label", i);
                 }
             } else if (tag == "section")
             {
                 current_index = 0;
             }
-        } else if (lines_[index].ends_with(':'))
+        } else if (lines_[i].ends_with(':'))
         {
-            dialog_associate_key_[index] =
-                    current_index == 0 ? "head" : last_label.empty() ? (current_index < 10 ? "~0" + std::to_string(
-                            current_index) : "~" + std::to_string(current_index)) : last_label;
+            dialog_associate_key_[i] = current_index == 0 ? "head" : last_label.empty() ? (current_index < 10 ? "~0" +
+                                                                                                                std::to_string(
+                                                                                                                        current_index)
+                                                                                                              : "~" +
+                                                                                                                std::to_string(
+                                                                                                                        current_index))
+                                                                                        : last_label;
             last_label.clear();
             ++current_index;
         }
@@ -218,7 +216,7 @@ void ScriptProcessor::convert(const size_t starting_index)
             {
                 if (!previous_.empty())
                 {
-                    output_.get_dialogue(section_, previous_).set_next();
+                    output_.get_dialogue(section_, previous_).remove_next();
                 }
                 // if section has no content, then remove head
                 if (output_.contains_section(section_) && output_.get_dialogues(section_).size() == 1 &&
@@ -235,7 +233,7 @@ void ScriptProcessor::convert(const size_t starting_index)
             } else if (tag == "end")
             {
                 assert(!previous_.empty());
-                output_.get_dialogue(section_, previous_).set_next();
+                output_.get_dialogue(section_, previous_).remove_next();
             } else if (tag == "scene")
             {
                 assert(!previous_.empty());
@@ -371,7 +369,7 @@ void ScriptProcessor::convert(const size_t starting_index)
         } else if (const size_t eql_location = current_line.find('='); eql_location != std::string::npos)
         {
             // get the operation, set (a=1), add (a+=1), and so on, which is why eql_location matters
-            const std::string variable_action = operation::contains(current_line[eql_location - 1]) ? operation::get(
+            const std::string variable_action = operation::has(current_line[eql_location - 1]) ? operation::get(
                     current_line[eql_location - 1]) : "set";
             // get the name of the variable
             const std::string variable_name = trim(
@@ -458,6 +456,6 @@ void ScriptProcessor::convert(const size_t starting_index)
             terminated("Invalid code or content!", line_index);
         }
         // Move to the next line
-        line_index++;
+        ++line_index;
     }
 }

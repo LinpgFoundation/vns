@@ -54,5 +54,4 @@ private:
     DialogueNextValueType target_;
 };
 
-const DialogueNext kNullDialogueNext;
 #endif

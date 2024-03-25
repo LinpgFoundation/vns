@@ -90,23 +90,23 @@ Number ExpressionParser::parseNumber()
         ++index;
     }
     const std::string data_s = buffer.substr(start, index - start);
-    number number_t;
     // if the number extracted is the name of a variable
     if (contains_variable_(data_s))
     {
         EventValueType value = get_variable_(data_s);
         if (std::holds_alternative<int>(value))
         {
-            number_t = std::get<int>(value);
+            return Number(std::get<int>(value));
         } else if (std::holds_alternative<float>(value))
         {
-            number_t = std::get<float>(value);
+            return Number(std::get<float>(value));
         } else
         {
             throw std::runtime_error("Cannot add " + data_s + " because it is not a number");
         }
     } else
     {
+        number number_t;
         size_t pos;
         // it is a float?
         if (data_s.find('.') != std::string::npos)
@@ -123,7 +123,6 @@ Number ExpressionParser::parseNumber()
         {
             throw std::runtime_error("String contains non-integer characters");
         }
+        return Number(number_t);
     }
-
-    return Number(number_t);
 }

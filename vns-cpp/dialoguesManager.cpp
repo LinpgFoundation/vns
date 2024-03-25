@@ -25,7 +25,7 @@ void DialoguesManager::load(const std::filesystem::path &path)
 {
     ScriptProcessor processor;
     processor.process(path);
-    update(processor.get_output());
+    update(processor.get_output().to_map());
 }
 
 // Check if data is empty

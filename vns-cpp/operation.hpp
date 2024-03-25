@@ -30,7 +30,7 @@ struct operation
         }
     }
 
-    static bool contains(char symbol)
+    static bool has(char symbol)
     {
         return symbol == '+' || symbol == '-' || symbol == '*' || symbol == '/' || symbol == '%';
     }

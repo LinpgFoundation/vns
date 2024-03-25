@@ -26,9 +26,7 @@ public:
 
     void process(const std::filesystem::path &);
 
-    [[nodiscard]] DialogueSectionsDataType get_output() const;
-
-    [[nodiscard]] nlohmann::json get_output_as_json() const;
+    [[nodiscard]] DialoguesManager get_output() const;
 
 private:
     std::filesystem::path path_;

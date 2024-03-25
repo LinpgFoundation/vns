@@ -27,7 +27,7 @@ struct Dialogue
 
     void set_next(const std::unordered_map<std::string, DialogueNextValueType> &);
 
-    void set_next();
+    void remove_next();
 
     [[nodiscard]] DialogueDataType to_map() const;
 

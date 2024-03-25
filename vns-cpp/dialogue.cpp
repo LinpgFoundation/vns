@@ -30,10 +30,10 @@ void Dialogue::set_next(std::string type, DialogueNextValueType target)
 
 void Dialogue::set_next(const std::unordered_map<std::string, DialogueNextValueType> &data)
 {
-    next = data.empty() ? kNullDialogueNext : DialogueNext(data);
+    next = data.empty() ? DialogueNext() : DialogueNext(data);
 }
 
-void Dialogue::set_next()
+void Dialogue::remove_next()
 {
     set_next({});
 }
