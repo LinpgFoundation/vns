@@ -72,3 +72,13 @@ std::vector<std::string> split(const std::string &str)
 {
     return split(str, ' ');
 }
+
+// Remove all whitespaces
+std::string remove_whitespace(const std::string &input)
+{
+    std::string result = input; // Make a copy of the input string
+    result.erase(std::remove_if(result.begin(), result.end(), [](unsigned char x) {
+        return std::isspace(x);
+    }), result.end());
+    return result;
+}

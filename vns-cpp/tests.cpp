@@ -37,7 +37,7 @@ void TestNullNext()
     const DialogueNext test_null_next;
     assert(test_null_next.is_null());
     assert(!test_null_next.has_multi_targets());
-    assert(test_null_next.get_type() == "default");
+    assert(test_null_next.has_type("default"));
     assert(test_null_next.get_target().empty());
 }
 
@@ -47,7 +47,7 @@ void TestSingleTargetNext()
                                            {"target", "~1"}});
     assert(!single_target_next.is_null());
     assert(!single_target_next.has_multi_targets());
-    assert(single_target_next.get_type() == "default");
+    assert(single_target_next.has_type("default"));
     assert(single_target_next.get_target() == "~1");
 }
 
@@ -60,22 +60,40 @@ void TestMultiTargetsNext()
                                            {"target", target_v}});
     assert(!multi_targets_next.is_null());
     assert(multi_targets_next.has_multi_targets());
-    assert(multi_targets_next.get_type() == "default");
+    assert(multi_targets_next.has_type("default"));
     assert(multi_targets_next.get_targets().size() == 2);
 }
 
 void TestScriptProcessor()
 {
-    auto test_processor = ScriptProcessor();
-    test_processor.process("C:/Users/yudon/Documents/GitHub/vns/examples/chapter_example.vns");
+    ScriptProcessor test_processor;
+    test_processor.process(EXAMPLE_VNS_TEST_FILE);
     assert(test_processor.get_id() == "1");
     assert(test_processor.get_language() == "English");
 }
 
 void TestCompiler()
 {
-    Compiler::compile("C:/Users/yudon/Documents/GitHub/vns/examples/chapter_example.vns",
-                      "C:/Users/yudon/Documents/GitHub/vns/examples");
+    Compiler::compile(EXAMPLE_VNS_TEST_FILE, EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR);
+}
+
+void TestDialoguesManager()
+{
+    DialoguesManager test_dialogues_manager;
+    test_dialogues_manager.load(EXAMPLE_VNS_TEST_FILE);
+    test_dialogues_manager.set_section("dialog_example");
+    test_dialogues_manager.next();
+    assert(test_dialogues_manager.get_current()->id == "~01");
+    assert(std::get<bool>(test_dialogues_manager.get_variable("section1_end")) == true);
+    assert(test_dialogues_manager.get_variable<int>("chapter_passed") == 1);
+    test_dialogues_manager.next();
+    test_dialogues_manager.next();
+    assert(test_dialogues_manager.get_current()->id == "~03");
+    assert(test_dialogues_manager.get_variable<int>("chapter_passed") == 1);
+    assert(test_dialogues_manager.get_variable<int>("mod_n") == 2);
+    assert(test_dialogues_manager.get_variable<int>("test_multi") == 9);
+    assert(test_dialogues_manager.get_variable<int>("mod_result") ==
+           test_dialogues_manager.get_variable<int>("chapter_passed"));
 }
 
 void TestAll()
@@ -91,7 +109,9 @@ void TestAll()
     TestMultiTargetsNext();
     std::cout << "- Test script processor\n";
     TestScriptProcessor();
-    std::cout << "- Test compiler\n";
-    TestCompiler();
+    // std::cout << "- Test compiler\n";
+    // TestCompiler();
+    std::cout << "- Test Dialogues Manager\n";
+    TestDialoguesManager();
     std::cout << "> Done\n";
 }

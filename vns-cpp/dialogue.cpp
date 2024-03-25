@@ -3,15 +3,19 @@
 Dialogue::Dialogue(const DialogueDataType &data, const std::string &content_id)
 {
     id = content_id;
-    background_image = cast<std::string>(data, "background_image", "");
-    background_music = cast<std::string>(data, "background_music", "");
+    background_image = cast<std::string>(data, "background_image", std::string());
+    background_music = cast<std::string>(data, "background_music", std::string());
     character_images = cast<std::vector<std::string>>(data, "character_images", {});
     contents = cast<std::vector<std::string>>(data, "contents", {});
-    narrator = cast<std::string>(data, "narrator", "");
-    previous = cast<std::string>(data, "previous", "");
+    narrator = cast<std::string>(data, "narrator", std::string());
+    previous = cast<std::string>(data, "previous", std::string());
     next = DialogueNext(cast<std::unordered_map<std::string, DialogueNextValueType>>(data, "next", {{"type",   "default"},
-                                                                                                    {"target", ""}}));
-    comments = cast<std::vector<std::string>>(data, "comments", {});
+                                                                                                    {"target", std::string()}}));
+    notes = cast<std::vector<std::string>>(data, "notes", {});
+    for (const EventDataType &e: cast<std::vector<EventDataType>>(data, "events", {}))
+    {
+        events.emplace_back(e);
+    }
 }
 
 bool Dialogue::has_next() const
@@ -26,7 +30,12 @@ void Dialogue::set_next(std::string type, DialogueNextValueType target)
 
 void Dialogue::set_next(const std::unordered_map<std::string, DialogueNextValueType> &data)
 {
-    next = data.empty() ? kNullDialogueNext : DialogueNext(data);
+    next = data.empty() ? DialogueNext() : DialogueNext(data);
+}
+
+void Dialogue::remove_next()
+{
+    set_next({});
 }
 
 DialogueDataType Dialogue::to_map() const
@@ -46,8 +55,17 @@ DialogueDataType Dialogue::to_map() const
         map_data["narrator"] = narrator;
     if (has_next())
         map_data["next"] = next.to_map();
-    if (!comments.empty())
-        map_data["comments"] = comments;
+    if (!notes.empty())
+        map_data["notes"] = notes;
+    if (!events.empty())
+    {
+        std::vector<EventDataType> events_in_maps;
+        for (const Event &e: events)
+        {
+            events_in_maps.push_back(e.to_map());
+        }
+        map_data["events"] = events_in_maps;
+    }
     return map_data;
 }
 
@@ -68,7 +86,16 @@ nlohmann::json Dialogue::to_json() const
         json_data["narrator"] = narrator;
     if (has_next())
         json_data["next"] = next.to_json();
-    if (!comments.empty())
-        json_data["comments"] = comments;
+    if (!notes.empty())
+        json_data["notes"] = notes;
+    if (!events.empty())
+    {
+        std::vector<nlohmann::json> events_in_maps;
+        for (const Event &e: events)
+        {
+            events_in_maps.push_back(e.to_json());
+        }
+        json_data["events"] = events_in_maps;
+    }
     return json_data;
 }

@@ -5,8 +5,9 @@
 #include <unordered_map>
 #include <vector>
 #include "dialogueNext.hpp"
+#include "Event.hpp"
 
-using DialogueDataType = std::unordered_map<std::string, std::variant<std::string, std::vector<std::string>, std::unordered_map<std::string, DialogueNextValueType>>>;
+using DialogueDataType = std::unordered_map<std::string, std::variant<std::string, std::vector<std::string>, std::unordered_map<std::string, DialogueNextValueType>, std::vector<EventDataType>>>;
 
 using DialogueSectionDataType = std::unordered_map<std::string, DialogueDataType>;
 
@@ -26,6 +27,8 @@ struct Dialogue
 
     void set_next(const std::unordered_map<std::string, DialogueNextValueType> &);
 
+    void remove_next();
+
     [[nodiscard]] DialogueDataType to_map() const;
 
     [[nodiscard]] nlohmann::json to_json() const;
@@ -37,7 +40,8 @@ struct Dialogue
     std::vector<std::string> character_images;
     std::vector<std::string> contents;
     std::string narrator;
-    std::vector<std::string> comments;
+    std::vector<std::string> notes;
+    std::vector<Event> events;
     std::string id;
 
     template<typename T> static T cast(const DialogueDataType &data, const std::string &k, T default_v)

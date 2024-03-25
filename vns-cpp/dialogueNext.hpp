@@ -23,15 +23,17 @@ public:
 
     explicit DialogueNext(const std::unordered_map<std::string, DialogueNextValueType> &data) : DialogueNext(
             data.contains("type") ? std::get<std::string>(data.at("type")) : "default",
-            data.contains("target") ? data.at("target") : "")
+            data.contains("target") ? data.at("target") : std::string())
     {
     }
 
-    DialogueNext() : DialogueNext("default", "")
+    DialogueNext() : DialogueNext("default", std::string())
     {
     }
 
     [[nodiscard]] std::string get_type() const;
+
+    [[nodiscard]] bool has_type(const std::string &) const;
 
     [[nodiscard]] std::string get_target() const;
 
@@ -52,5 +54,4 @@ private:
     DialogueNextValueType target_;
 };
 
-const DialogueNext kNullDialogueNext;
 #endif

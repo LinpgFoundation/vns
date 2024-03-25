@@ -13,14 +13,14 @@ int main(const int argc, char **argv)
     const std::unordered_set<std::string> arguments_with_input = {"-i", "-o", "-n"};
     const std::unordered_set<std::string> arguments_without_input = {"-h", "-s", "-t"};
     std::unordered_map<std::string, std::string> arguments_map;
-    for (int i = 1; i < argc; i++)
+    for (size_t i = 1; i < argc; ++i)
     {
         if (std::string current_arg = argv[i]; arguments_with_input.contains(current_arg))
         {
             arguments_map[current_arg] = argv[++i];
         } else if (arguments_without_input.contains(current_arg))
         {
-            arguments_map[current_arg] = "";
+            arguments_map[current_arg].clear();
         }
     }
     // update naming database
@@ -44,7 +44,7 @@ int main(const int argc, char **argv)
             // print json string
         else
         {
-            Compiler::compile(arguments_map["-i"], arguments_map.contains("-o") ? arguments_map["-o"] : "");
+            Compiler::compile(arguments_map["-i"], arguments_map.contains("-o") ? arguments_map["-o"] : std::string());
         }
     }
     return 0;

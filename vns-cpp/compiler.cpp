@@ -5,19 +5,20 @@
 #include <iostream>
 
 // get the info of compiler
-std::unordered_map<std::string, int> Compiler::get_compiler_info()
+std::unordered_map<std::string, size_t> Compiler::get_compiler_info()
 {
     return {{"version",    VERSION},
             {"reversion",  REVISION},
-            {"compiledAt", static_cast<int>(std::time(nullptr))}};
+            {"compiledAt", static_cast<size_t>(std::time(nullptr))}};
 }
 
 // load data from file directly
-DialogueFileDataType Compiler::load(const std::filesystem::path &path)
+std::unordered_map<std::string, std::variant<DialogueSectionsDataType, std::unordered_map<std::string, size_t>, std::string>>
+Compiler::load(const std::filesystem::path &path)
 {
     ScriptProcessor processor;
     processor.process(path);
-    return {{"dialogs",  processor.get_output()},
+    return {{"dialogs",  processor.get_output().to_map()},
             {"compiler", get_compiler_info()},
             {"id",       processor.get_id()},
             {"language", processor.get_language()}};
@@ -35,7 +36,7 @@ nlohmann::json Compiler::load_as_json(const std::filesystem::path &path)
     ScriptProcessor processor;
     processor.process(path);
     nlohmann::json json_data;
-    json_data["dialogs"] = processor.get_output_as_json();
+    json_data["dialogs"] = processor.get_output().to_json();
     json_data["compiler"] = get_compiler_info();
     json_data["id"] = processor.get_id();
     json_data["language"] = processor.get_language();
