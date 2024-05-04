@@ -3,10 +3,19 @@
     "name": "Visual Novel Script",
     "patterns": [
         {
-            "include": "#keywords"
+            "include": "#strings"
         },
         {
-            "include": "#strings"
+            "include": "#double_quotation"
+        },
+        {
+            "include": "#single_quotation"
+        },
+        {
+            "include": "#double-slash"
+        },
+        {
+            "include": "#keywords"
         },
         {
             "include": "#heading"
@@ -15,12 +24,18 @@
             "include": "#number-sign"
         },
         {
-            "include": "#double-slash"
+            "include": "#boolean"
+        },
+        {
+            "include": "#numbers"
+        },
+        {
+            "include": "#variables"
         }
     ],
     "repository": {
         "double-slash": {
-            "begin": "\\/",
+            "begin": "\\/\\/",
             "end": "\n",
             "name": "comment.line.double-slash"
         },
@@ -35,8 +50,8 @@
                     "name": "keyword.control.vns"
                 },
                 {
-                    "match": "->",
-                    "name": "keyword.control.vns"
+                    "match": "\\+|\\-|\\*|\\/|\\>|\\<|\\=|\\%",
+                    "name": "keyword.operator.math"
                 }
             ]
         },
@@ -49,6 +64,24 @@
             "begin": "- ",
             "end": "\n",
             "name": "string.unquoted.vns"
+        },
+        "double_quotation": {
+            "begin": "\"",
+            "end": "\"",
+            "name": "string.unquoted.vns"
+        },
+        "single_quotation": {
+            "begin": "'",
+            "end": "'",
+            "name": "string.unquoted.vns"
+        },
+        "boolean": {
+            "match": "\\b(true|false)\\b",
+            "name": "constant.language.boolean"
+        },
+        "numbers": {
+            "match": "\\b\\d+\\b",
+            "name": "constant.numeric.integer"
         }
     },
     "scopeName": "source.vns"
