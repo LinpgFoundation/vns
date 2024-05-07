@@ -16,10 +16,10 @@ class ExpressionParser
 public:
     ExpressionParser(
             const std::string &expression, const std::function<bool(std::string)> &contains_variable,
-            const std::function<EventValueType(std::string)> &get_variable) : index(0),
-                                                                              buffer(remove_whitespace(expression)),
-                                                                              contains_variable_(contains_variable),
-                                                                              get_variable_(get_variable)
+            const std::function<event_data_t(std::string)> &get_variable) : index(0),
+                                                                            buffer(remove_whitespace(expression)),
+                                                                            contains_variable_(contains_variable),
+                                                                            get_variable_(get_variable)
     {
     }
 
@@ -30,7 +30,7 @@ private:
     size_t index;
     const std::string buffer;
     const std::function<bool(std::string)> &contains_variable_;
-    const std::function<EventValueType(std::string)> &get_variable_;
+    const std::function<event_data_t(std::string)> &get_variable_;
 
     // Parse an expression
     Number parseExpression();

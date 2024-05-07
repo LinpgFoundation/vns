@@ -7,31 +7,31 @@
 #include <variant>
 #include "libs/nlohmann/json.hpp"
 
-using EventValueType = std::variant<bool, int, float, std::string>;
-using EventDataType = std::unordered_map<std::string, EventValueType>;
+using event_data_t = std::variant<bool, int, float, std::string>;
+using event_t = std::unordered_map<std::string, event_data_t>;
 
 struct Event
 {
 
-    Event(std::string type, std::string target, EventValueType value) : type(std::move(type)),
-                                                                        target(std::move(target)),
-                                                                        value(std::move(value))
+    Event(std::string type, std::string target, event_data_t value) : type(std::move(type)),
+                                                                      target(std::move(target)),
+                                                                      value(std::move(value))
     {
     }
 
-    explicit Event(EventDataType data) : Event(std::get<std::string>(data["type"]),
-                                               std::get<std::string>(data["target"]), data["value"])
+    explicit Event(event_t data) : Event(std::get<std::string>(data["type"]),
+                                         std::get<std::string>(data["target"]), data["value"])
     {
     }
 
 
-    [[nodiscard]] EventDataType to_map() const;
+    [[nodiscard]] event_t to_map() const;
 
     [[nodiscard]] nlohmann::json to_json() const;
 
     const std::string type;
     const std::string target;
-    const EventValueType value;
+    const event_data_t value;
 };
 
 

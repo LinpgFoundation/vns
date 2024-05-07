@@ -18,7 +18,7 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
     // Initialize visual novel data management module
     DialoguesManager content_manager;
     // Update data to the management module
-    content_manager.update(std::any_cast<DialogueSectionsDataType>(data.at("dialogs")));
+    content_manager.update(std::any_cast<dialogue_content_t>(data.at("dialogs")));
 
     // string stream to store results
     std::stringstream result_ss;

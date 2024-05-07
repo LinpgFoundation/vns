@@ -1,6 +1,6 @@
 #include "dialogue.hpp"
 
-Dialogue::Dialogue(const DialogueDataType &data, const std::string &content_id)
+Dialogue::Dialogue(const dialogue_data_t &data, const std::string &content_id)
 {
     id = content_id;
     background_image = cast<std::string>(data, "background_image", std::string());
@@ -9,10 +9,10 @@ Dialogue::Dialogue(const DialogueDataType &data, const std::string &content_id)
     contents = cast<std::vector<std::string>>(data, "contents", {});
     narrator = cast<std::string>(data, "narrator", std::string());
     previous = cast<std::string>(data, "previous", std::string());
-    next = DialogueNext(cast<std::unordered_map<std::string, DialogueNextValueType>>(data, "next", {{"type",   "default"},
-                                                                                                    {"target", std::string()}}));
+    next = DialogueNext(cast<std::unordered_map<std::string, dialogue_next_t>>(data, "next", {{"type",   "default"},
+                                                                                              {"target", std::string()}}));
     notes = cast<std::vector<std::string>>(data, "notes", {});
-    for (const EventDataType &e: cast<std::vector<EventDataType>>(data, "events", {}))
+    for (const event_t &e: cast<std::vector<event_t>>(data, "events", {}))
     {
         events.emplace_back(e);
     }
@@ -23,12 +23,12 @@ bool Dialogue::has_next() const
     return !next.is_null();
 }
 
-void Dialogue::set_next(std::string type, DialogueNextValueType target)
+void Dialogue::set_next(std::string type, dialogue_next_t target)
 {
     next = DialogueNext(std::move(type), std::move(target));
 }
 
-void Dialogue::set_next(const std::unordered_map<std::string, DialogueNextValueType> &data)
+void Dialogue::set_next(const std::unordered_map<std::string, dialogue_next_t> &data)
 {
     next = data.empty() ? DialogueNext() : DialogueNext(data);
 }
@@ -38,9 +38,9 @@ void Dialogue::remove_next()
     set_next({});
 }
 
-DialogueDataType Dialogue::to_map() const
+dialogue_data_t Dialogue::to_map() const
 {
-    DialogueDataType map_data;
+    dialogue_data_t map_data;
     if (!background_image.empty())
         map_data["background_image"] = background_image;
     if (!background_music.empty())
@@ -59,7 +59,7 @@ DialogueDataType Dialogue::to_map() const
         map_data["notes"] = notes;
     if (!events.empty())
     {
-        std::vector<EventDataType> events_in_maps;
+        std::vector<event_t> events_in_maps;
         for (const Event &e: events)
         {
             events_in_maps.push_back(e.to_map());

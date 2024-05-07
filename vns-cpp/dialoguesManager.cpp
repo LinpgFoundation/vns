@@ -41,7 +41,7 @@ void DialoguesManager::clear()
 }
 
 // Update data
-void DialoguesManager::update(const DialogueSectionsDataType &data)
+void DialoguesManager::update(const dialogue_content_t &data)
 {
     for (const auto &[section_name, section_dialogues]: data)
     {
@@ -73,7 +73,7 @@ bool DialoguesManager::contains_variable(const std::string &name) const
 }
 
 // Get variable
-EventValueType DialoguesManager::get_variable(const std::string &name) const
+event_data_t DialoguesManager::get_variable(const std::string &name) const
 {
     if (name.starts_with('@'))
     {
@@ -88,7 +88,7 @@ EventValueType DialoguesManager::get_variable(const std::string &name) const
 }
 
 // Set variable
-void DialoguesManager::set_variable(const std::string &name, const EventValueType &value)
+void DialoguesManager::set_variable(const std::string &name, const event_data_t &value)
 {
     if (name.starts_with('@'))
     {
@@ -103,9 +103,9 @@ void DialoguesManager::set_variable(const std::string &name, const EventValueTyp
 }
 
 // Get data
-DialogueSectionsDataType DialoguesManager::to_map() const
+dialogue_content_t DialoguesManager::to_map() const
 {
-    DialogueSectionsDataType data_map;
+    dialogue_content_t data_map;
     for (const auto &[section_name, section_dialogues]: dialog_data_)
     {
         if (!section_dialogues.empty())
@@ -180,7 +180,7 @@ void DialoguesManager::set_current_dialogue_id(const std::string &id)
             }
         } else
         {
-            const EventValueType current_value = get_variable(e.target);
+            const event_data_t current_value = get_variable(e.target);
 
             // make sure source variable is a number
             if (std::holds_alternative<bool>(current_value))
@@ -263,13 +263,13 @@ std::unordered_map<std::string, Dialogue> &DialoguesManager::get_dialogues(const
 }
 
 // Set current section dialogue contents
-void DialoguesManager::set_current_section_dialogues(const DialogueSectionDataType &data)
+void DialoguesManager::set_current_section_dialogues(const dialogue_section_t &data)
 {
     set_dialogues(section_, data);
 }
 
 // Set section dialogue contents by section name
-void DialoguesManager::set_dialogues(const std::string &section, const DialogueSectionDataType &data)
+void DialoguesManager::set_dialogues(const std::string &section, const dialogue_section_t &data)
 {
     // make sure dialog_data will have given section as a key
     if (!dialog_data_.contains(section))
@@ -290,13 +290,13 @@ Dialogue &DialoguesManager::get_dialogue(const std::string &section, const std::
 }
 
 // Set current dialogue data
-void DialoguesManager::set_current_dialogue(DialogueDataType &data)
+void DialoguesManager::set_current_dialogue(dialogue_data_t &data)
 {
     set_dialogue(section_, current_dialog_id_, data);
 }
 
 // Set dialogue data
-void DialoguesManager::set_dialogue(const std::string &section, const std::string &id, DialogueDataType &data)
+void DialoguesManager::set_dialogue(const std::string &section, const std::string &id, dialogue_data_t &data)
 {
     get_dialogues(section)[id] = Dialogue(data, id);
 }

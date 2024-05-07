@@ -1,6 +1,6 @@
 #include "dialogueNext.hpp"
 
-std::unordered_map<std::string, DialogueNextValueType> DialogueNext::to_map() const
+std::unordered_map<std::string, dialogue_next_t> DialogueNext::to_map() const
 {
     return {{"type",   type_},
             {"target", target_}};
@@ -48,9 +48,9 @@ std::string DialogueNext::get_target() const
     return std::get<std::string>(target_);
 }
 
-MultiTargetsType DialogueNext::get_targets() const
+multi_targets_t DialogueNext::get_targets() const
 {
-    return std::get<MultiTargetsType>(target_);
+    return std::get<multi_targets_t>(target_);
 }
 
 bool DialogueNext::is_null() const

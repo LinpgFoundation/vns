@@ -55,7 +55,7 @@ void TestMultiTargetsNext()
 {
     const std::unordered_map<std::string, std::string> t1 = {{"hello1", "world1"}};
     const std::unordered_map<std::string, std::string> t2 = {{"hello2", "world2"}};
-    const MultiTargetsType target_v = {t1, t2};
+    const multi_targets_t target_v = {t1, t2};
     const DialogueNext multi_targets_next({{"type",   "default"},
                                            {"target", target_v}});
     assert(!multi_targets_next.is_null());

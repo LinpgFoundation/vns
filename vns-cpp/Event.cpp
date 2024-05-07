@@ -1,6 +1,6 @@
 #include "Event.hpp"
 
-EventDataType Event::to_map() const
+event_t Event::to_map() const
 {
     return {{"type",   type},
             {"target", target},

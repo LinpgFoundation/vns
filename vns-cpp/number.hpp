@@ -4,12 +4,12 @@
 #include <variant>
 #include <string>
 
-using number = std::variant<int, float>;
+using number_t = std::variant<int, float>;
 
 struct Number
 {
 
-    explicit Number(const number &data) : value(data)
+    explicit Number(const number_t &data) : value(data)
     {
     }
 

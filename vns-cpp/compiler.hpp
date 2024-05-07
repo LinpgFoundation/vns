@@ -11,7 +11,7 @@ class Compiler
 public:
     static std::unordered_map<std::string, size_t> get_compiler_info();
 
-    static std::unordered_map<std::string, std::variant<DialogueSectionsDataType, std::unordered_map<std::string, size_t>, std::string>>
+    static std::unordered_map<std::string, std::variant<dialogue_content_t, std::unordered_map<std::string, size_t>, std::string>>
     load(const std::filesystem::path &);
 
     static void compile(const std::filesystem::path &);

@@ -7,7 +7,8 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(vns_python_wrapper, m) {
+PYBIND11_MODULE(vns_python_wrapper, m)
+{
 
     // Add docstring for the module
     m.doc() = "Python bindings for the VNS C++ library";
@@ -44,8 +45,8 @@ PYBIND11_MODULE(vns_python_wrapper, m) {
             .def_static("load", &Compiler::load, "Load a vns file");
 
     py::class_<DialogueNext>(m, "DialogueNext", "Class for representing the dialogue next")
-            .def(py::init<std::string, DialogueNextValueType>())
-            .def(py::init<const std::unordered_map<std::string, DialogueNextValueType> &>(),
+            .def(py::init<std::string, dialogue_next_t>())
+            .def(py::init<const std::unordered_map<std::string, dialogue_next_t> &>(),
                  "Initialize a ContentNext object from a dict")
             .def("get_type", &DialogueNext::get_type, "Get the type of the next")
             .def("has_type", &DialogueNext::has_type, "Whether the next has given type")
@@ -57,14 +58,14 @@ PYBIND11_MODULE(vns_python_wrapper, m) {
             .def("to_dict", &DialogueNext::to_map, "Convert the next object to a dict");
 
     py::class_<Event>(m, "Event", "Class for representing the event struct")
-            .def(py::init<std::string, std::string, EventValueType>())
-            .def(py::init<EventDataType>())
+            .def(py::init<std::string, std::string, event_data_t>())
+            .def(py::init<event_t>())
             .def("to_dict", &Event::to_map)
             .def_readonly("type", &Event::type)
             .def_readonly("target", &Event::target);
 
     py::class_<Dialogue>(m, "Dialogue", "Class representing dialogue content")
-            .def(py::init<const DialogueDataType &, const std::string &>())
+            .def(py::init<const dialogue_data_t &, const std::string &>())
             .def_readwrite("previous", &Dialogue::previous)
             .def_readwrite("next", &Dialogue::next)
             .def_readwrite("background_image", &Dialogue::background_image)
@@ -76,10 +77,10 @@ PYBIND11_MODULE(vns_python_wrapper, m) {
             .def_readonly("events", &Dialogue::events)
             .def_readwrite("id", &Dialogue::id)
             .def("has_next", &Dialogue::has_next, "Check if the dialogue has next")
-            .def("set_next", py::overload_cast<std::string, DialogueNextValueType>(&Dialogue::set_next),
+            .def("set_next", py::overload_cast<std::string, dialogue_next_t>(&Dialogue::set_next),
                  "Set dialogue next")
             .def("set_next",
-                 py::overload_cast<const std::unordered_map<std::string, DialogueNextValueType> &>(&Dialogue::set_next),
+                 py::overload_cast<const std::unordered_map<std::string, dialogue_next_t> &>(&Dialogue::set_next),
                  "Set dialogue next")
             .def("remove_next", &Dialogue::remove_next, "Remove dialogue next")
             .def("to_dict", &Dialogue::to_map, "Convert the dialogue object to a dict");
@@ -98,7 +99,7 @@ PYBIND11_MODULE(vns_python_wrapper, m) {
             .def("next", &DialoguesManager::next, "Go to next dialogue")
             .def("contains_variable", &DialoguesManager::contains_variable, "Contains variable")
             .def("get_variable",
-                 (EventValueType (DialoguesManager::*)(const std::string &) const) &DialoguesManager::get_variable,
+                 (event_data_t (DialoguesManager::*)(const std::string &) const) &DialoguesManager::get_variable,
                  "Get variable")
             .def("get_bool_variable", [](const DialoguesManager &self, const std::string &name) {
                 return self.get_variable<bool>(name);

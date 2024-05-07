@@ -93,7 +93,7 @@ Number ExpressionParser::parseNumber()
     // if the number extracted is the name of a variable
     if (contains_variable_(data_s))
     {
-        EventValueType value = get_variable_(data_s);
+        event_data_t value = get_variable_(data_s);
         if (std::holds_alternative<int>(value))
         {
             return Number(std::get<int>(value));
@@ -106,23 +106,23 @@ Number ExpressionParser::parseNumber()
         }
     } else
     {
-        number number_t;
+        number_t number_tmp;
         size_t pos;
         // it is a float?
         if (data_s.find('.') != std::string::npos)
         {
-            number_t = std::stof(data_s, &pos);
+            number_tmp = std::stof(data_s, &pos);
         }
             // it is an integer?
         else
         {
-            number_t = std::stoi(data_s, &pos);
+            number_tmp = std::stoi(data_s, &pos);
         }
         // Not all characters were processed, throw an error
         if (pos != data_s.size())
         {
             throw std::runtime_error("String contains non-integer characters");
         }
-        return Number(number_t);
+        return Number(number_tmp);
     }
 }

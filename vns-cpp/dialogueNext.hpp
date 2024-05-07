@@ -10,18 +10,18 @@
 #include <vector>
 #include "libs/nlohmann/json.hpp"
 
-using MultiTargetsType = std::vector<std::unordered_map<std::string, std::string>>;
+using multi_targets_t = std::vector<std::unordered_map<std::string, std::string>>;
 
-using DialogueNextValueType = std::variant<std::string, MultiTargetsType>;
+using dialogue_next_t = std::variant<std::string, multi_targets_t>;
 
 class DialogueNext
 {
 public:
-    DialogueNext(std::string type, DialogueNextValueType target) : type_(std::move(type)), target_(std::move(target))
+    DialogueNext(std::string type, dialogue_next_t target) : type_(std::move(type)), target_(std::move(target))
     {
     }
 
-    explicit DialogueNext(const std::unordered_map<std::string, DialogueNextValueType> &data) : DialogueNext(
+    explicit DialogueNext(const std::unordered_map<std::string, dialogue_next_t> &data) : DialogueNext(
             data.contains("type") ? std::get<std::string>(data.at("type")) : "default",
             data.contains("target") ? data.at("target") : std::string())
     {
@@ -37,7 +37,7 @@ public:
 
     [[nodiscard]] std::string get_target() const;
 
-    [[nodiscard]] MultiTargetsType get_targets() const;
+    [[nodiscard]] std::vector<std::unordered_map<std::string, std::string>> get_targets() const;
 
     [[nodiscard]] bool has_single_target() const;
 
@@ -45,13 +45,13 @@ public:
 
     [[nodiscard]] bool is_null() const;
 
-    [[nodiscard]] std::unordered_map<std::string, DialogueNextValueType> to_map() const;
+    [[nodiscard]] std::unordered_map<std::string, dialogue_next_t> to_map() const;
 
     [[nodiscard]] nlohmann::json to_json() const;
 
 private:
     std::string type_;
-    DialogueNextValueType target_;
+    dialogue_next_t target_;
 };
 
 #endif

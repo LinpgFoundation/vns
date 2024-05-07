@@ -7,15 +7,15 @@
 #include "dialogueNext.hpp"
 #include "Event.hpp"
 
-using DialogueDataType = std::unordered_map<std::string, std::variant<std::string, std::vector<std::string>, std::unordered_map<std::string, DialogueNextValueType>, std::vector<EventDataType>>>;
+using dialogue_data_t = std::unordered_map<std::string, std::variant<std::string, std::vector<std::string>, std::unordered_map<std::string, dialogue_next_t>, std::vector<event_t>>>;
 
-using DialogueSectionDataType = std::unordered_map<std::string, DialogueDataType>;
+using dialogue_section_t = std::unordered_map<std::string, dialogue_data_t>;
 
-using DialogueSectionsDataType = std::unordered_map<std::string, DialogueSectionDataType>;
+using dialogue_content_t = std::unordered_map<std::string, dialogue_section_t>;
 
 struct Dialogue
 {
-    Dialogue(const DialogueDataType &, const std::string &);
+    Dialogue(const dialogue_data_t &, const std::string &);
 
     Dialogue() : Dialogue({}, "head")
     {
@@ -23,13 +23,13 @@ struct Dialogue
 
     [[nodiscard]] bool has_next() const;
 
-    void set_next(std::string, DialogueNextValueType);
+    void set_next(std::string, dialogue_next_t);
 
-    void set_next(const std::unordered_map<std::string, DialogueNextValueType> &);
+    void set_next(const std::unordered_map<std::string, dialogue_next_t> &);
 
     void remove_next();
 
-    [[nodiscard]] DialogueDataType to_map() const;
+    [[nodiscard]] dialogue_data_t to_map() const;
 
     [[nodiscard]] nlohmann::json to_json() const;
 
@@ -44,7 +44,7 @@ struct Dialogue
     std::vector<Event> events;
     std::string id;
 
-    template<typename T> static T cast(const DialogueDataType &data, const std::string &k, T default_v)
+    template<typename T> static T cast(const dialogue_data_t &data, const std::string &k, T default_v)
     {
         const auto it = data.find(k);
         if (it != data.end())

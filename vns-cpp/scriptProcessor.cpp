@@ -226,7 +226,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                 }
                 section_ = extract_string(current_line);
                 output_.set_dialogues(section_, {});
-                DialogueDataType dialogue_data;
+                dialogue_data_t dialogue_data;
                 output_.set_dialogue(section_, "head", dialogue_data);
                 current_data_ = Dialogue({}, "head");
                 previous_.clear();
@@ -258,7 +258,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                     terminated("Invalid option syntax: '->' cannot be found!", line_index);
                 }
                 // get current targets
-                MultiTargetsType current_targets;
+                multi_targets_t current_targets;
                 if (output_.get_dialogue(section_, previous_).next.has_type("options"))
                 {
                     current_targets = output_.get_dialogue(section_, previous_).next.get_targets();
@@ -362,7 +362,7 @@ void ScriptProcessor::convert(const size_t starting_index)
 
             previous_ = dialog_associate_key_[line_index];
             line_index += current_data_.contents.size();
-            DialogueDataType current_data_map = current_data_.to_map();
+            dialogue_data_t current_data_map = current_data_.to_map();
             output_.set_dialogue(section_, previous_, current_data_map);
             current_data_.notes.clear();
             current_data_.events.clear();
@@ -382,7 +382,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                 throw std::runtime_error(variable_name + " has empty value!");
             }
             // create a variant for holding
-            EventValueType event_value;
+            event_data_t event_value;
             // if variable value is true (boolean)
             if (variable_value == "true")
             {

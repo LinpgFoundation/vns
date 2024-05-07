@@ -27,7 +27,7 @@ public:
     void clear();
 
     // Update data
-    void update(const DialogueSectionsDataType &);
+    void update(const dialogue_content_t &);
 
     // Go to next dialogue
     void next();
@@ -36,7 +36,7 @@ public:
     bool contains_variable(const std::string &) const;
 
     // Get variable
-    EventValueType get_variable(const std::string &) const;
+    event_data_t get_variable(const std::string &) const;
 
     // Get variable with Type
     template<typename T> T get_variable(const std::string &name) const
@@ -45,10 +45,10 @@ public:
     }
 
     // Set variable
-    void set_variable(const std::string &, const EventValueType &);
+    void set_variable(const std::string &, const event_data_t &);
 
     // Get data
-    [[nodiscard]] DialogueSectionsDataType to_map() const;
+    [[nodiscard]] dialogue_content_t to_map() const;
 
     // Get data as json
     [[nodiscard]] nlohmann::json to_json() const;
@@ -81,19 +81,19 @@ public:
     [[nodiscard]] std::unordered_map<std::string, Dialogue> &get_dialogues(const std::string &section);
 
     // Set current section dialogue contents
-    void set_current_section_dialogues(const DialogueSectionDataType &);
+    void set_current_section_dialogues(const dialogue_section_t &);
 
     // Set section dialogue contents by section name
-    void set_dialogues(const std::string &section, const DialogueSectionDataType &data);
+    void set_dialogues(const std::string &section, const dialogue_section_t &data);
 
     // Get dialogue data
     [[nodiscard]] Dialogue &get_dialogue(const std::string &, const std::string &);
 
     // Set current dialogue data
-    void set_current_dialogue(DialogueDataType &);
+    void set_current_dialogue(dialogue_data_t &);
 
     // Set dialogue data
-    void set_dialogue(const std::string &, const std::string &, DialogueDataType &);
+    void set_dialogue(const std::string &, const std::string &, dialogue_data_t &);
 
     // Does section contain given dialogue id
     bool contains_dialogue(const std::string &, const std::string &) const;
@@ -106,9 +106,9 @@ public:
 
 private:
     std::unordered_map<std::string, std::unordered_map<std::string, Dialogue>> dialog_data_;
-    std::unordered_map<std::string, std::unordered_map<std::string, EventValueType>> local_variables_;
-    std::unordered_map<std::string, EventValueType> global_variables_;
-    std::unordered_map<std::string, EventValueType> persistent_variables_;
+    std::unordered_map<std::string, std::unordered_map<std::string, event_data_t>> local_variables_;
+    std::unordered_map<std::string, event_data_t> global_variables_;
+    std::unordered_map<std::string, event_data_t> persistent_variables_;
     std::string section_;
     std::string current_dialog_id_ = "head";
     std::string last_dialog_id_;
