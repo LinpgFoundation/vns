@@ -54,6 +54,7 @@ PYBIND11_MODULE(vns_python_wrapper, m)
             .def("get_targets", &DialogueNext::get_targets, "Get the targets of the next")
             .def("has_single_target", &DialogueNext::has_single_target, "Check if the next has a single target")
             .def("has_multi_targets", &DialogueNext::has_multi_targets, "Check if the next has multiple targets")
+            .def("contains_target", &DialogueNext::contains_target, "Check if the next is/contains given target")
             .def("is_null", &DialogueNext::is_null, "Check if the next is null")
             .def("to_dict", &DialogueNext::to_map, "Convert the next object to a dict");
 
@@ -91,7 +92,6 @@ PYBIND11_MODULE(vns_python_wrapper, m)
                  "Get previous dialogue")
             .def("get_current", &DialoguesManager::get_current, py::return_value_policy::reference,
                  "Get current dialogue")
-            .def("get_last", &DialoguesManager::get_last, py::return_value_policy::reference, "Get last dialogue")
             .def("load", &DialoguesManager::load, "load dialogue data from vns file")
             .def("empty", &DialoguesManager::empty, "Check if data is empty")
             .def("clear", &DialoguesManager::clear, "Clear data")

@@ -33,6 +33,14 @@ bool DialogueNext::has_multi_targets() const
     return !has_single_target();
 }
 
+bool DialogueNext::contains_target(const std::string &theTarget) const
+{
+    return has_single_target() ? get_target() == theTarget : std::ranges::any_of(get_targets(),
+                                                                                 [&theTarget](const auto &pair) {
+                                                                                     return pair.at("id") == theTarget;
+                                                                                 });
+}
+
 std::string DialogueNext::get_type() const
 {
     return type_;

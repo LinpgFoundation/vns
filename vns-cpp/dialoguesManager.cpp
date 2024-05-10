@@ -14,12 +14,6 @@ Dialogue *DialoguesManager::get_current()
     return &dialog_data_[section_][current_dialog_id_];
 }
 
-// Getter for last selected dialogue
-Dialogue *DialoguesManager::get_last()
-{
-    return &dialog_data_[section_][last_dialog_id_];
-}
-
 // load dialogue data from vns file
 void DialoguesManager::load(const std::filesystem::path &path)
 {
@@ -43,10 +37,24 @@ void DialoguesManager::clear()
 // Update data
 void DialoguesManager::update(const dialogue_content_t &data)
 {
+    // reset section_
+    section_.clear();
+    // make sure there is no empty section name
+    if (data.contains(std::string()))
+    {
+        throw std::runtime_error("Section name cannot be an empty string!");
+    }
+    // init data to Dialogue object(s)
     for (const auto &[section_name, section_dialogues]: data)
     {
+        // use first section name as current selected section
+        if (section_.empty())
+        {
+            section_ = section_name;
+        }
         set_dialogues(section_name, section_dialogues);
     }
+    // set id to head
     set_current_dialogue_id("head");
 }
 
@@ -147,7 +155,12 @@ std::string DialoguesManager::get_current_dialogue_id() const
 // Set current dialogue id
 void DialoguesManager::set_current_dialogue_id(const std::string &id)
 {
-    last_dialog_id_ = current_dialog_id_;
+    // make sure id exists in current section
+    if (!contains_dialogue(section_, id))
+    {
+        throw std::runtime_error("Dialogue id '" + id + "' does exists");
+    }
+    // update dialogue id
     current_dialog_id_ = id;
     // process events
     for (const Event &e: get_current()->events)
@@ -234,8 +247,7 @@ std::unordered_set<std::string> DialoguesManager::get_sections() const
 void DialoguesManager::set_section(const std::string &section)
 {
     section_ = section;
-    current_dialog_id_ = "head";
-    last_dialog_id_.clear();
+    set_current_dialogue_id("head");
 }
 
 // Does dialogue have given section name
@@ -247,7 +259,22 @@ bool DialoguesManager::contains_section(const std::string &section) const
 // Remove section
 void DialoguesManager::remove_section(const std::string &section)
 {
+    // erase the section from dialog_data_
     dialog_data_.erase(section);
+    // if current section did not get removed, then everything should be fine
+    if (section != section_)
+        return;
+    // in the case where current section got remove
+    // and result in dialog_data_ becoming empty
+    if (dialog_data_.empty())
+    {
+        // force reset
+        section_.clear();
+        current_dialog_id_ = "head";
+        return;
+    }
+    // if not, then use the first key as current section
+    set_section(dialog_data_.begin()->first);
 }
 
 // Get current section dialogue contents
@@ -272,7 +299,7 @@ void DialoguesManager::set_current_section_dialogues(const dialogue_section_t &d
 void DialoguesManager::set_dialogues(const std::string &section, const dialogue_section_t &data)
 {
     // make sure dialog_data will have given section as a key
-    if (!dialog_data_.contains(section))
+    if (!contains_section(section))
     {
         dialog_data_[section] = {};
     }
@@ -280,6 +307,11 @@ void DialoguesManager::set_dialogues(const std::string &section, const dialogue_
     for (const auto &[dialogue_id, dialogue_data]: data)
     {
         dialog_data_[section][dialogue_id] = Dialogue(dialogue_data, dialogue_id);
+    }
+    // if current_dialog_id_ no longer exists, then reset it to head
+    if (section == section_ && !contains_dialogue(section_, current_dialog_id_))
+    {
+        set_current_dialogue_id("head");
     }
 }
 
@@ -316,10 +348,78 @@ void DialoguesManager::remove_current_dialogue()
 // Remove dialogue
 void DialoguesManager::remove_dialogue(const std::string &section, const std::string &id)
 {
-    get_dialogues(section).erase(id);
+    // get current section dialogues map pointer
+    auto &currentSectionDialogues = get_dialogues(section);
+    // the dialogue that needs to remove
+    const Dialogue &theOneToRemove = get_dialogue(section, id);
+    // if removing head
+    if (id == "head")
+    {
+        if (!theOneToRemove.has_next())
+        {
+            throw std::runtime_error("Cannot remove head when there is no next");
+        } else if (theOneToRemove.next.has_multi_targets())
+        {
+            throw std::runtime_error("Cannot remove head when head.next has multiple targets.");
+        }
+        dialogue_data_t theNextDialogueData = get_dialogue(section, theOneToRemove.next.get_target()).to_map();
+        // head will not have prev
+        theNextDialogueData.erase("previous");
+        // if current_dialog_id_ got removed, then set current_dialog_id_ back to head
+        if (theOneToRemove.next.get_target() == current_dialog_id_)
+        {
+            set_current_dialogue_id("head");
+        }
+        // remove old next
+        currentSectionDialogues.erase(theOneToRemove.next.get_target());
+        // use next data as head data
+        set_dialogue(section, id, theNextDialogueData);
+        // update next prev
+        get_dialogue(section, get_dialogue(section, id).next.get_target()).previous = id;
+        // that is it
+        return;
+    }
+
+    // if dialogue has only one next, the try to search all the dialogues,
+    // and replace next with theOneToRemove.next
+    if (theOneToRemove.next.has_single_target())
+    {
+        const std::string currNextTarget = theOneToRemove.next.get_target();
+        for (auto &e: currentSectionDialogues)
+        {
+            // if dialogue does not have target, then do nothing
+            if (!e.second.next.contains_target(id))
+            {
+                continue;
+            }
+            // if next has only one target, then simple replace it
+            if (e.second.next.has_single_target())
+            {
+                e.second.next = DialogueNext(e.second.next.get_type(), currNextTarget);
+                continue;
+            }
+            // if next has target as (more than) one of the targets, then need to find all and replace it/them
+            auto theDialogTargets = e.second.next.get_targets();
+            std::for_each(theDialogTargets.begin(), theDialogTargets.end(), [&id, currNextTarget](auto &p) {
+                if (p.at("id") == id)
+                {
+                    p["id"] = currNextTarget;
+                }
+            });
+            e.second.next = DialogueNext(e.second.next.get_type(), theDialogTargets);
+        }
+        // if next is not empty, then also need to update next.prev
+        if (!currNextTarget.empty())
+        {
+            get_dialogue(section, currNextTarget).previous = theOneToRemove.previous;
+        }
+    }
+    // remove dialogue from map
+    currentSectionDialogues.erase(id);
+    // if current_dialog_id_ got removed, then set current_dialog_id_ back to head
     if (id == current_dialog_id_)
     {
-        current_dialog_id_.clear();
+        set_current_dialogue_id("head");
     }
 }
 

@@ -43,6 +43,8 @@ public:
 
     [[nodiscard]] bool has_multi_targets() const;
 
+    [[nodiscard]] bool contains_target(const std::string &theTarget) const;
+
     [[nodiscard]] bool is_null() const;
 
     [[nodiscard]] std::unordered_map<std::string, dialogue_next_t> to_map() const;

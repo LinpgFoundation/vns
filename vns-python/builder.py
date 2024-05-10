@@ -2,7 +2,7 @@ from os import path as OS_PATH
 
 from linpgtoolbox.builder import Builder
 
-# 需要额外包括的文件
+# any additional files that needs to be included
 additional_files: tuple[str, ...] = (
     OS_PATH.join(OS_PATH.dirname(__file__), r"../README.md"),
     OS_PATH.join(OS_PATH.dirname(__file__), r"../LICENSE"),
@@ -12,7 +12,7 @@ Builder.CACHE_NEED_REMOVE.append("cmake-build-debug")
 Builder.CACHE_NEED_REMOVE.append("extern")
 Builder.CACHE_NEED_REMOVE.append("wrapper.cpp")
 
-# 编译源代码
+# compile the code
 Builder.compile(
     "pyvns",
     additional_files=additional_files,
@@ -22,14 +22,14 @@ Builder.compile(
     options={"enable_multiprocessing": True, "auto_cmake": True},
 )
 
-# 提示编译完成
+# prompt user that the compiling process has completed
 for i in range(2):
     print("")
 print("--------------------Done!--------------------")
 for i in range(2):
     print("")
 
-# 打包上传最新的文件
+# upload the last version of the package
 """
 action: str = input("Do you want to package and upload the latest build (Y/n):")
 if action == "Y":

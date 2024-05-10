@@ -14,9 +14,6 @@ public:
     // Getter for current dialogue
     Dialogue *get_current();
 
-    // Getter for last selected dialogue
-    Dialogue *get_last();
-
     // load dialogue data from vns file
     void load(const std::filesystem::path &);
 
@@ -111,7 +108,6 @@ private:
     std::unordered_map<std::string, event_data_t> persistent_variables_;
     std::string section_;
     std::string current_dialog_id_ = "head";
-    std::string last_dialog_id_;
 
     // Parse a string expression
     Number parse_expression(const std::string &) const;

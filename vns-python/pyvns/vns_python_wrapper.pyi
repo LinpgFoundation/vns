@@ -121,6 +121,11 @@ class DialogueNext:
         Initialize a ContentNext object from a dict
         """
 
+    def contains_target(self, arg0: str) -> bool:
+        """
+        Check if the next is/contains given target
+        """
+
     def get_target(self) -> str:
         """
         Get the target of the next
@@ -230,11 +235,6 @@ class DialoguesManager:
     def get_int_variable(self, arg0: str) -> int:
         """
         Get variable as int
-        """
-
-    def get_last(self) -> Dialogue:
-        """
-        Get last dialogue
         """
 
     def get_previous(self) -> Dialogue:

@@ -66,7 +66,7 @@ void ScriptProcessor::process(const std::filesystem::path &path)
     }
 
     // read file
-    if (path_.extension().compare(SCRIPTS_FILE_EXTENSION) == 0)
+    if (path_.extension() == SCRIPTS_FILE_EXTENSION)
     {
         if (std::ifstream f(path_); f.is_open())
         {

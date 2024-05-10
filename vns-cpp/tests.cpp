@@ -80,10 +80,24 @@ void TestCompiler()
 void TestDialoguesManager()
 {
     DialoguesManager test_dialogues_manager;
+    // make sure section has been init as empty string
+    assert(test_dialogues_manager.get_section().empty());
+    // load test file
     test_dialogues_manager.load(EXAMPLE_VNS_TEST_FILE);
+    // test_dialogues_manager's default section will be set to dialog_example
+    assert(test_dialogues_manager.get_section() == "dialog_example");
+    // test_dialogues_manager's default current dialogue will be set to head
+    assert(test_dialogues_manager.get_current()->id == "head");
+    // test set set_current_dialogue_id
+    test_dialogues_manager.set_current_dialogue_id("~01");
+    assert(test_dialogues_manager.get_current()->id == "~01");
+    // set section again and see whether current dialogue id has been set back to head
     test_dialogues_manager.set_section("dialog_example");
+    assert(test_dialogues_manager.get_current_dialogue_id() == "head");
+    // test next
     test_dialogues_manager.next();
     assert(test_dialogues_manager.get_current()->id == "~01");
+    // test events and variables
     assert(std::get<bool>(test_dialogues_manager.get_variable("section1_end")) == true);
     assert(test_dialogues_manager.get_variable<int>("chapter_passed") == 1);
     test_dialogues_manager.next();
@@ -94,6 +108,54 @@ void TestDialoguesManager()
     assert(test_dialogues_manager.get_variable<int>("test_multi") == 9);
     assert(test_dialogues_manager.get_variable<int>("mod_result") ==
            test_dialogues_manager.get_variable<int>("chapter_passed"));
+    assert(test_dialogues_manager.get_current_section_dialogues().size() == 6);
+    assert(test_dialogues_manager.get_current()->has_next() &&
+           test_dialogues_manager.get_current()->next.has_single_target());
+    assert(test_dialogues_manager.get_current()->next.has_single_target());
+    assert(test_dialogues_manager.get_current()->next.get_target() == "~04");
+    // test remove section
+    test_dialogues_manager.set_dialogues("test_remove_section", {{"head", {}}});
+    test_dialogues_manager.set_section("test_remove_section");
+    test_dialogues_manager.remove_section("test_remove_section");
+    test_dialogues_manager.set_section("dialog_example");
+    assert(test_dialogues_manager.get_current()->id == "head");
+    // test remove head
+    test_dialogues_manager.remove_current_dialogue();
+    assert(test_dialogues_manager.get_current()->id == "head");
+    assert(test_dialogues_manager.get_current()->previous.empty());
+    assert(test_dialogues_manager.get_current()->has_next());
+    assert(test_dialogues_manager.get_current()->next.has_single_target());
+    assert(test_dialogues_manager.get_current()->next.get_target() == "~02");
+    // check if current head's next is correct
+    test_dialogues_manager.next();
+    assert(test_dialogues_manager.get_current()->id == "~02");
+    assert(test_dialogues_manager.get_current()->previous == "head");
+    assert(test_dialogues_manager.get_current()->next.has_single_target());
+    assert(test_dialogues_manager.get_current()->next.get_target() == "~03");
+    // remove ~02 and see whether everything is correct
+    test_dialogues_manager.remove_current_dialogue();
+    // not that current dialogue will be reset back to head
+    assert(test_dialogues_manager.get_current()->id == "head");
+    assert(test_dialogues_manager.get_current()->previous.empty());
+    assert(test_dialogues_manager.get_current()->has_next());
+    assert(test_dialogues_manager.get_current()->next.has_single_target());
+    assert(test_dialogues_manager.get_current()->next.get_target() == "~03");
+    // ~03 should be the new head.next
+    test_dialogues_manager.next();
+    assert(test_dialogues_manager.get_current()->id == "~03");
+    assert(test_dialogues_manager.get_current()->previous == "head");
+    assert(test_dialogues_manager.get_current()->next.has_single_target());
+    assert(test_dialogues_manager.get_current()->next.get_target() == "~04");
+    // remove jumping_point1 and see if ~04 got updated correctly
+    test_dialogues_manager.remove_dialogue(test_dialogues_manager.get_section(), "jumping_point1");
+    assert(!test_dialogues_manager.contains_dialogue(test_dialogues_manager.get_section(), "jumping_point1"));
+    assert(test_dialogues_manager.get_current()->id == "~03");
+    assert(test_dialogues_manager.get_current()->previous == "head");
+    assert(test_dialogues_manager.get_current()->next.has_single_target());
+    assert(test_dialogues_manager.get_current()->next.get_target() == "~04");
+    test_dialogues_manager.next();
+    assert(test_dialogues_manager.get_current()->next.has_multi_targets());
+    assert(!test_dialogues_manager.get_current()->next.contains_target("jumping_point1"));
 }
 
 void TestAll()
