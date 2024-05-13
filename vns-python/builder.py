@@ -4,13 +4,20 @@ from linpgtoolbox.builder import Builder
 
 # any additional files that needs to be included
 additional_files: tuple[str, ...] = (
-    OS_PATH.join(OS_PATH.dirname(__file__), r"../README.md"),
-    OS_PATH.join(OS_PATH.dirname(__file__), r"../LICENSE"),
+    OS_PATH.join(OS_PATH.dirname(__file__), "..", "README.md"),
+    OS_PATH.join(OS_PATH.dirname(__file__), "..", "LICENSE"),
 )
 
 Builder.CACHE_NEED_REMOVE.append("cmake-build-debug")
 Builder.CACHE_NEED_REMOVE.append("extern")
 Builder.CACHE_NEED_REMOVE.append("wrapper.cpp")
+
+# always use the latest version of cpp code
+Builder.remove(OS_PATH.join(OS_PATH.dirname(__file__), "pyvns", "extern", "vns-cpp"))
+Builder.copy(
+    (OS_PATH.join(OS_PATH.dirname(__file__), "..", "vns-cpp"),),
+    OS_PATH.join(OS_PATH.dirname(__file__), "pyvns", "extern"),
+)
 
 # compile the code
 Builder.compile(

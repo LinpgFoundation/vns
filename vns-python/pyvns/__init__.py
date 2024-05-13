@@ -1,4 +1,4 @@
-from .vns_python_wrapper import Compiler, Dialogue, DialoguesManager, Naming, Event
+from .vns_python_wrapper import Compiler, Dialogue, DialoguesManager, Event, Naming
 
 dialogue_data_t = dict[
     str,

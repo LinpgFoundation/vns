@@ -5,13 +5,13 @@
 // Getter for previous dialogue of current dialogue
 Dialogue *DialoguesManager::get_previous()
 {
-    return &dialog_data_[section_][get_current()->previous];
+    return &dialog_data_.at(section_).at(get_current()->previous);
 }
 
 // Getter for current dialogue
 Dialogue *DialoguesManager::get_current()
 {
-    return &dialog_data_[section_][current_dialog_id_];
+    return &dialog_data_.at(section_).at(current_dialog_id_);
 }
 
 // load dialogue data from vns file
@@ -62,7 +62,7 @@ void DialoguesManager::update(const dialogue_content_t &data)
 void DialoguesManager::next()
 {
     set_current_dialogue_id(get_current()->next.has_single_target() ? get_current()->next.get_target()
-                                                                    : get_current()->next.get_targets()[0]["id"]);
+                                                                    : get_current()->next.get_targets()[0].at("id"));
 }
 
 // Contains variable
@@ -121,7 +121,7 @@ dialogue_content_t DialoguesManager::to_map() const
             data_map[section_name] = {};
             for (const auto &[dialogue_id, the_dialogue]: section_dialogues)
             {
-                data_map[section_name][dialogue_id] = the_dialogue.to_map();
+                data_map.at(section_name)[dialogue_id] = the_dialogue.to_map();
             }
         }
     }
@@ -139,7 +139,7 @@ nlohmann::json DialoguesManager::to_json() const
             data_map[section_name] = {};
             for (const auto &[dialogue_id, the_dialogue]: section_dialogues)
             {
-                data_map[section_name][dialogue_id] = the_dialogue.to_json();
+                data_map.at(section_name)[dialogue_id] = the_dialogue.to_json();
             }
         }
     }
@@ -156,10 +156,7 @@ std::string DialoguesManager::get_current_dialogue_id() const
 void DialoguesManager::set_current_dialogue_id(const std::string &id)
 {
     // make sure id exists in current section
-    if (!contains_dialogue(section_, id))
-    {
-        throw std::runtime_error("Dialogue id '" + id + "' does exists");
-    }
+    ensure_dialogue_existence(section_, id);
     // update dialogue id
     current_dialog_id_ = id;
     // process events
@@ -306,7 +303,7 @@ void DialoguesManager::set_dialogues(const std::string &section, const dialogue_
     // loop through the data and init data as dialogue object(s)
     for (const auto &[dialogue_id, dialogue_data]: data)
     {
-        dialog_data_[section][dialogue_id] = Dialogue(dialogue_data, dialogue_id);
+        dialog_data_.at(section)[dialogue_id] = Dialogue(dialogue_data, dialogue_id);
     }
     // if current_dialog_id_ no longer exists, then reset it to head
     if (section == section_ && !contains_dialogue(section_, current_dialog_id_))
@@ -318,7 +315,8 @@ void DialoguesManager::set_dialogues(const std::string &section, const dialogue_
 // Get dialogue data
 Dialogue &DialoguesManager::get_dialogue(const std::string &section, const std::string &id)
 {
-    return get_dialogues(section)[id];
+    ensure_dialogue_existence(section, id);
+    return get_dialogues(section).at(id);
 }
 
 // Set current dialogue data
@@ -339,6 +337,17 @@ bool DialoguesManager::contains_dialogue(const std::string &section, const std::
     return dialog_data_.contains(section) && dialog_data_.at(section).contains(id);
 }
 
+// Make sure dialogue exists
+void DialoguesManager::ensure_dialogue_existence(const std::string &section, const std::string &id) const
+{
+    if (!contains_dialogue(section, id))
+    {
+        std::stringstream msg;
+        msg << "Dialogue id " << '"' << id << '"' << " does exist in section " << '"' << section << '"' << '!';
+        throw std::runtime_error(msg.str());
+    }
+}
+
 // Remove current dialogue
 void DialoguesManager::remove_current_dialogue()
 {
@@ -346,10 +355,10 @@ void DialoguesManager::remove_current_dialogue()
 }
 
 // Remove dialogue
-void DialoguesManager::remove_dialogue(const std::string &section, const std::string &id)
+void DialoguesManager::remove_dialogue(const std::string &section, const std::string id)
 {
     // get current section dialogues map pointer
-    auto &currentSectionDialogues = get_dialogues(section);
+    std::unordered_map<std::string, Dialogue> &theDialogues = get_dialogues(section);
     // the dialogue that needs to remove
     const Dialogue &theOneToRemove = get_dialogue(section, id);
     // if removing head
@@ -370,12 +379,12 @@ void DialoguesManager::remove_dialogue(const std::string &section, const std::st
         {
             set_current_dialogue_id("head");
         }
+        // update next prev
+        get_dialogue(section, theOneToRemove.next.get_target()).previous = id;
         // remove old next
-        currentSectionDialogues.erase(theOneToRemove.next.get_target());
+        theDialogues.erase(theOneToRemove.next.get_target());
         // use next data as head data
         set_dialogue(section, id, theNextDialogueData);
-        // update next prev
-        get_dialogue(section, get_dialogue(section, id).next.get_target()).previous = id;
         // that is it
         return;
     }
@@ -385,7 +394,7 @@ void DialoguesManager::remove_dialogue(const std::string &section, const std::st
     if (theOneToRemove.next.has_single_target())
     {
         const std::string currNextTarget = theOneToRemove.next.get_target();
-        for (auto &e: currentSectionDialogues)
+        for (auto &e: theDialogues)
         {
             // if dialogue does not have target, then do nothing
             if (!e.second.next.contains_target(id))
@@ -414,13 +423,13 @@ void DialoguesManager::remove_dialogue(const std::string &section, const std::st
             get_dialogue(section, currNextTarget).previous = theOneToRemove.previous;
         }
     }
-    // remove dialogue from map
-    currentSectionDialogues.erase(id);
     // if current_dialog_id_ got removed, then set current_dialog_id_ back to head
-    if (id == current_dialog_id_)
+    if (section == section_ && id == current_dialog_id_)
     {
-        set_current_dialogue_id("head");
+        set_current_dialogue_id(get_current()->previous.empty() ? "head" : get_current()->previous);
     }
+    // remove dialogue from map
+    theDialogues.erase(id);
 }
 
 // Parse a string expression

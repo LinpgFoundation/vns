@@ -99,7 +99,7 @@ public:
     void remove_current_dialogue();
 
     // Remove dialogue
-    void remove_dialogue(const std::string &, const std::string &);
+    void remove_dialogue(const std::string &, std::string);
 
 private:
     std::unordered_map<std::string, std::unordered_map<std::string, Dialogue>> dialog_data_;
@@ -111,6 +111,9 @@ private:
 
     // Parse a string expression
     Number parse_expression(const std::string &) const;
+
+    // Make sure dialogue exists
+    void ensure_dialogue_existence(const std::string &, const std::string &) const;
 };
 
 #endif

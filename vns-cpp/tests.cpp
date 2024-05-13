@@ -120,7 +120,11 @@ void TestDialoguesManager()
     test_dialogues_manager.set_section("dialog_example");
     assert(test_dialogues_manager.get_current()->id == "head");
     // test remove head
+    assert(test_dialogues_manager.get_current()->has_next());
+    assert(test_dialogues_manager.get_current()->next.has_single_target());
+    assert(test_dialogues_manager.get_current()->next.get_target() == "~01");
     test_dialogues_manager.remove_current_dialogue();
+    assert(!test_dialogues_manager.contains_dialogue(test_dialogues_manager.get_section(), "~01"));
     assert(test_dialogues_manager.get_current()->id == "head");
     assert(test_dialogues_manager.get_current()->previous.empty());
     assert(test_dialogues_manager.get_current()->has_next());
@@ -134,6 +138,7 @@ void TestDialoguesManager()
     assert(test_dialogues_manager.get_current()->next.get_target() == "~03");
     // remove ~02 and see whether everything is correct
     test_dialogues_manager.remove_current_dialogue();
+    assert(!test_dialogues_manager.contains_dialogue(test_dialogues_manager.get_section(), "~02"));
     // not that current dialogue will be reset back to head
     assert(test_dialogues_manager.get_current()->id == "head");
     assert(test_dialogues_manager.get_current()->previous.empty());
