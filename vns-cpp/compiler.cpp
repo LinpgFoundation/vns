@@ -1,8 +1,8 @@
 ﻿#include <ctime>
 #include "version.hpp"
 #include "compiler.hpp"
-#include <fstream>
 #include <iostream>
+#include "functions.hpp"
 
 // get the info of compiler
 std::unordered_map<std::string, size_t> Compiler::get_compiler_info()
@@ -74,17 +74,6 @@ void Compiler::save(const nlohmann::json &json_data, const std::filesystem::path
     std::string lang = json_data["language"];
     file_name << "chapter" << id << "_dialogs_" << lang << ".json";
     const std::filesystem::path file_path = dir_path / file_name.str();
-    std::ofstream outputFile(file_path);
-    // Check if the file is open
-    if (outputFile.is_open())
-    {
-        // Save the JSON object to the file
-        outputFile << std::setw(4) << json_data << "\n";
-        std::cout << "JSON data saved to file: " << file_path << "\n";
-        // Close the file stream
-        outputFile.close();
-    } else
-    {
-        std::cerr << "Error opening file: " << file_path << "\n";
-    }
+    save_json(file_path);
+    std::cout << "JSON data saved to file: " << file_path << "\n";
 }
