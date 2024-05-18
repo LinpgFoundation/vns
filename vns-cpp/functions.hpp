@@ -34,6 +34,6 @@ std::string remove_whitespace(const std::string &);
 nlohmann::json load_json(const std::filesystem::path &);
 
 // Save a json file
-void save_json(const std::filesystem::path &);
+void save_json(const std::filesystem::path &, const nlohmann::json &);
 
 #endif

@@ -5,6 +5,7 @@
 #include <iostream>
 #include "scriptProcessor.hpp"
 #include "compiler.hpp"
+#include "validator.hpp"
 
 void TestNameWithoutTag()
 {
@@ -75,6 +76,11 @@ void TestScriptProcessor()
 void TestCompiler()
 {
     Compiler::compile(EXAMPLE_VNS_TEST_FILE, EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR);
+    std::filesystem::path outFileName = "chapter1_dialogs_English.json";
+    std::filesystem::path jsonPath = EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR / outFileName;
+    assert(std::filesystem::exists(jsonPath));
+    assert(Validator().validate(jsonPath));
+    std::filesystem::remove(jsonPath);
 }
 
 void TestDialoguesManager()
@@ -176,8 +182,8 @@ void TestAll()
     TestMultiTargetsNext();
     std::cout << "- Test script processor\n";
     TestScriptProcessor();
-    // std::cout << "- Test compiler\n";
-    // TestCompiler();
+    std::cout << "- Test compiler\n";
+    TestCompiler();
     std::cout << "- Test Dialogues Manager\n";
     TestDialoguesManager();
     std::cout << "> Done\n";

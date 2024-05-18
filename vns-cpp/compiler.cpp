@@ -73,7 +73,5 @@ void Compiler::save(const nlohmann::json &json_data, const std::filesystem::path
     std::string id = json_data["id"];
     std::string lang = json_data["language"];
     file_name << "chapter" << id << "_dialogs_" << lang << ".json";
-    const std::filesystem::path file_path = dir_path / file_name.str();
-    save_json(file_path);
-    std::cout << "JSON data saved to file: " << file_path << "\n";
+    save_json(dir_path / file_name.str(), json_data);
 }

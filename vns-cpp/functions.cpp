@@ -87,7 +87,7 @@ std::string remove_whitespace(const std::string &input)
 // Load a json file
 nlohmann::json load_json(const std::filesystem::path &jsonPath)
 {
-    std::ifstream json_file("path_to_your_file.json");
+    std::ifstream json_file(jsonPath);
     nlohmann::json j;
     if (json_file.is_open())
     {
@@ -110,14 +110,14 @@ nlohmann::json load_json(const std::filesystem::path &jsonPath)
 }
 
 // Save a json file
-void save_json(const std::filesystem::path &jsonPath)
+void save_json(const std::filesystem::path &jsonPath, const nlohmann::json &jsonData)
 {
     std::ofstream outputFile(jsonPath);
     // Check if the file is open
     if (outputFile.is_open())
     {
         // Save the JSON object to the file
-        outputFile << std::setw(4) << jsonPath << "\n";
+        outputFile << std::setw(4) << jsonData << "\n";
         // Close the file stream
         outputFile.close();
     } else
