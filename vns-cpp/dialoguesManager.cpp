@@ -379,12 +379,24 @@ void DialoguesManager::remove_dialogue(const std::string &section, const std::st
         {
             set_current_dialogue_id("head");
         }
-        // update next prev
-        get_dialogue(section, theOneToRemove.next.get_target()).previous = id;
         // remove old next
         theDialogues.erase(theOneToRemove.next.get_target());
         // use next data as head data
         set_dialogue(section, id, theNextDialogueData);
+        // fix new head's next(s)'s previous to head.id
+        if (theOneToRemove.has_next())
+        {
+            if (theOneToRemove.next.has_single_target())
+            {
+                get_dialogue(section, theOneToRemove.next.get_target()).previous = id;
+            } else
+            {
+                for (auto &t: theOneToRemove.next.get_targets())
+                {
+                    get_dialogue(section, t["id"]).previous = id;
+                }
+            }
+        }
         // that is it
         return;
     }
