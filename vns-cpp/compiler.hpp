@@ -3,7 +3,7 @@
 
 #include <filesystem>
 #include <unordered_map>
-#include "libs/nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 #include "scriptProcessor.hpp"
 
 class Compiler

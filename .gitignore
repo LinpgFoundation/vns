@@ -157,7 +157,7 @@ vns-python/src/
 vns-vscode/*.vsix
 vns-vscode/LICENSE
 .vs/
-vns-cpp/libs/
+vns-cpp/extern/
 vns-cpp/CMakeUserPresets.json
 vns-python/pyvns/vns.exe
 vns-python/pyvns/extern/

@@ -8,7 +8,7 @@
 #include <string>
 #include <variant>
 #include <vector>
-#include "libs/nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 
 using multi_targets_t = std::vector<std::unordered_map<std::string, std::string>>;
 

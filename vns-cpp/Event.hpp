@@ -5,7 +5,7 @@
 #include <utility>
 #include <unordered_map>
 #include <variant>
-#include "libs/nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 
 using event_data_t = std::variant<bool, int, float, std::string>;
 using event_t = std::unordered_map<std::string, event_data_t>;

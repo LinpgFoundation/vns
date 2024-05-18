@@ -11,7 +11,8 @@ endif ()
 
 project(vns)
 
-file(GLOB SOURCES "libs/*/*.h" "libs/*/*.cpp" "libs/*/*.hpp")
+# Add the json library
+add_subdirectory(extern/json)
 
 # Add source to this project's executable.
 add_executable(vns ${SOURCES} vns.cpp vns.hpp scriptProcessor.cpp naming.cpp naming.hpp dialogue.hpp dialogue.cpp
@@ -22,5 +23,7 @@ add_executable(vns ${SOURCES} vns.cpp vns.hpp scriptProcessor.cpp naming.cpp nam
 if (CMAKE_VERSION VERSION_GREATER 3.12)
     set_property(TARGET vns PROPERTY CXX_STANDARD 20)
 endif ()
+
+target_link_libraries(vns PRIVATE nlohmann_json::nlohmann_json)
 
 # TODO: Add tests and install targets if needed.

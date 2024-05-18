@@ -1,7 +1,7 @@
 ﻿#include "naming.hpp"
 #include <ranges>
 #include <sstream>
-#include "libs/nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 
 // Constructor
 Naming::Naming(const std::string &the_name)
