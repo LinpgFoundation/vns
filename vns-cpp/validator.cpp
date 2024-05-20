@@ -1,8 +1,12 @@
 #include "validator.hpp"
 #include "functions.hpp"
+#include "schema.hpp"
+
+// Initialize Validator's global VALIDATOR
+const nlohmann::json_schema::json_validator Validator::VALIDATOR(VNS_SCHEMA);
 
 // validate whether given json object is valid vsn format dialogues
-bool Validator::validate(const nlohmann::json &jsonObj) const
+bool Validator::validate(const nlohmann::json &jsonObj)
 {
     try
     {
@@ -15,13 +19,13 @@ bool Validator::validate(const nlohmann::json &jsonObj) const
 }
 
 // validate whether given json file has valid vsn format dialogues
-bool Validator::validate(const std::filesystem::path &jsonPath) const
+bool Validator::validate(const std::filesystem::path &jsonPath)
 {
     return validate(load_json(jsonPath));
 }
 
 // ensure given json object is valid vsn format dialogues, throw error if not
-void Validator::ensure(const nlohmann::json &jsonObj) const
+void Validator::ensure(const nlohmann::json &jsonObj)
 {
     if (!validate(jsonObj))
     {
@@ -30,7 +34,7 @@ void Validator::ensure(const nlohmann::json &jsonObj) const
 }
 
 // ensure given json file has valid vsn format dialogues, throw error if not
-void Validator::ensure(const std::filesystem::path &jsonPath) const
+void Validator::ensure(const std::filesystem::path &jsonPath)
 {
     if (!validate(jsonPath))
     {

@@ -82,7 +82,7 @@ void TestCompiler()
     std::filesystem::path jsonPath = EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR / outFileName;
     assert(std::filesystem::exists(jsonPath));
     // make sure file is in correct format
-    Validator().ensure(jsonPath);
+    Validator::ensure(jsonPath);
     // try load json file
     DialoguesManager test_dialogues_manager;
     test_dialogues_manager.load(jsonPath);

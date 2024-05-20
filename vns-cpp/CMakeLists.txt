@@ -22,7 +22,7 @@ add_executable(vns ${SOURCES} vns.cpp vns.hpp scriptProcessor.cpp naming.cpp nam
         dialogueNext.hpp dialogueNext.cpp scriptProcessor.hpp functions.hpp tests.hpp tests.cpp functions.cpp
         compiler.hpp compiler.cpp version.hpp dialoguesManager.hpp dialoguesManager.cpp decompiler.cpp decompiler.hpp
         Event.cpp Event.hpp expressionParser.cpp expressionParser.hpp number.cpp number.hpp operation.hpp
-        validator.hpp validator.cpp)
+        validator.hpp validator.cpp schema.hpp)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
     set_property(TARGET vns PROPERTY CXX_STANDARD 20)

@@ -26,8 +26,7 @@ void DialoguesManager::load(const std::filesystem::path &path)
     } else if (path.extension() == ".json")
     {
         nlohmann::json data = load_json(path);
-        Validator vns_validator;
-        vns_validator.ensure(data);
+        Validator::ensure(data);
         update(data.at("dialogues"));
     } else
     {
