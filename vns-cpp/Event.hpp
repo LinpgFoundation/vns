@@ -19,17 +19,21 @@ struct Event
     {
     }
 
-    explicit Event(event_t data) : Event(std::get<std::string>(data["type"]),
-                                         std::get<std::string>(data["target"]), data["value"])
+    explicit Event(const event_t &data) : Event(std::get<std::string>(data.at("type")),
+                                                std::get<std::string>(data.at("target")), data.at("value"))
     {
     }
 
+    explicit Event(const nlohmann::json &data) : Event(data.at("type"),
+                                                       data.at("target"), retrieve_value(data))
+    {
+    }
 
     [[nodiscard]] event_t to_map() const;
 
     [[nodiscard]] nlohmann::json to_json() const;
 
-    [[nodiscard]] static Event from_json(const nlohmann::json &);
+    [[nodiscard]] static event_data_t retrieve_value(const nlohmann::json &);
 
     const std::string type;
     const std::string target;

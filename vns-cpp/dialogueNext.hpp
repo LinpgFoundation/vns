@@ -12,18 +12,25 @@
 
 using multi_targets_t = std::vector<std::unordered_map<std::string, std::string>>;
 
-using dialogue_next_t = std::variant<std::string, multi_targets_t>;
+using dialogue_next_target_t = std::variant<std::string, multi_targets_t>;
+
+using dialogue_next_t = std::unordered_map<std::string, dialogue_next_target_t>;
 
 class DialogueNext
 {
 public:
-    DialogueNext(std::string type, dialogue_next_t target) : type_(std::move(type)), target_(std::move(target))
+    DialogueNext(std::string type, dialogue_next_target_t target) : type_(std::move(type)), target_(std::move(target))
     {
     }
 
-    explicit DialogueNext(const std::unordered_map<std::string, dialogue_next_t> &data) : DialogueNext(
+    explicit DialogueNext(const dialogue_next_t &data) : DialogueNext(
             data.contains("type") ? std::get<std::string>(data.at("type")) : "default",
             data.contains("target") ? data.at("target") : std::string())
+    {
+    }
+
+    explicit DialogueNext(const nlohmann::json &data) : DialogueNext(
+            data.contains("type") ? data.at("type") : "default", retrieve_target(data))
     {
     }
 
@@ -47,15 +54,15 @@ public:
 
     [[nodiscard]] bool is_null() const;
 
-    [[nodiscard]] std::unordered_map<std::string, dialogue_next_t> to_map() const;
+    [[nodiscard]] dialogue_next_t to_map() const;
 
     [[nodiscard]] nlohmann::json to_json() const;
 
-    [[nodiscard]] static DialogueNext from_json(const nlohmann::json &);
-
 private:
     std::string type_;
-    dialogue_next_t target_;
+    dialogue_next_target_t target_;
+
+    [[nodiscard]] static dialogue_next_target_t retrieve_target(const nlohmann::json &);
 };
 
 #endif

@@ -43,7 +43,7 @@ bool DialogueNext::is_null() const
     return has_single_target() ? get_target().empty() : get_targets().empty();
 }
 
-std::unordered_map<std::string, dialogue_next_t> DialogueNext::to_map() const
+dialogue_next_t DialogueNext::to_map() const
 {
     return {{"type",   type_},
             {"target", target_}};
@@ -66,9 +66,9 @@ nlohmann::json DialogueNext::to_json() const
     return json_data;
 }
 
-DialogueNext DialogueNext::from_json(const nlohmann::json &data)
+dialogue_next_target_t DialogueNext::retrieve_target(const nlohmann::json &data)
 {
-    dialogue_next_t target_;
+    dialogue_next_target_t target_;
     if (!data.contains("target"))
     {
         target_ = std::string();
@@ -79,5 +79,5 @@ DialogueNext DialogueNext::from_json(const nlohmann::json &data)
     {
         target_ = data.at("target").get<std::vector<std::unordered_map<std::string, std::string>>>();
     }
-    return {data.contains("type") ? data.at("type").get<std::string>() : "default", target_};
+    return target_;
 }

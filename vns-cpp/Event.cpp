@@ -19,7 +19,7 @@ nlohmann::json Event::to_json() const
     return json_data;
 }
 
-Event Event::from_json(const nlohmann::json &data)
+event_data_t Event::retrieve_value(const nlohmann::json &data)
 {
     event_data_t val;
     if (data.at("value").is_boolean())
@@ -38,6 +38,5 @@ Event Event::from_json(const nlohmann::json &data)
     {
         throw std::runtime_error("Event data has unsupported type as value!");
     }
-
-    return {data.at("type"), data.at("target"), val};
+    return val;
 }

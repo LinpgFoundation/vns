@@ -228,7 +228,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                 output_.set_dialogues(section_, dialogue_section_t());
                 dialogue_data_t dialogue_data;
                 output_.set_dialogue(section_, "head", dialogue_data);
-                current_data_ = Dialogue("head", {});
+                current_data_ = Dialogue("head");
                 previous_.clear();
             } else if (tag == "end")
             {

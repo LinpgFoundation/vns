@@ -44,8 +44,8 @@ void TestNullNext()
 
 void TestSingleTargetNext()
 {
-    const DialogueNext single_target_next({{"type",   "default"},
-                                           {"target", "~1"}});
+    const DialogueNext single_target_next(dialogue_next_t({{"type",   "default"},
+                                                           {"target", "~1"}}));
     assert(!single_target_next.is_null());
     assert(!single_target_next.has_multi_targets());
     assert(single_target_next.has_type("default"));
@@ -57,8 +57,8 @@ void TestMultiTargetsNext()
     const std::unordered_map<std::string, std::string> t1 = {{"hello1", "world1"}};
     const std::unordered_map<std::string, std::string> t2 = {{"hello2", "world2"}};
     const multi_targets_t target_v = {t1, t2};
-    const DialogueNext multi_targets_next({{"type",   "default"},
-                                           {"target", target_v}});
+    const DialogueNext multi_targets_next(dialogue_next_t({{"type",   "default"},
+                                                           {"target", target_v}}));
     assert(!multi_targets_next.is_null());
     assert(multi_targets_next.has_multi_targets());
     assert(multi_targets_next.has_type("default"));

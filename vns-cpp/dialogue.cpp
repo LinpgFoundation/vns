@@ -3,18 +3,38 @@
 Dialogue::Dialogue(const std::string &content_id, const dialogue_data_t &data)
 {
     id = content_id;
-    background_image = cast<std::string>(data, "background_image", std::string());
-    background_music = cast<std::string>(data, "background_music", std::string());
-    character_images = cast<std::vector<std::string>>(data, "character_images", {});
-    contents = cast<std::vector<std::string>>(data, "contents", {});
-    narrator = cast<std::string>(data, "narrator", std::string());
-    previous = cast<std::string>(data, "previous", std::string());
-    next = DialogueNext(cast<std::unordered_map<std::string, dialogue_next_t>>(data, "next", {{"type",   "default"},
-                                                                                              {"target", std::string()}}));
-    notes = cast<std::vector<std::string>>(data, "notes", {});
-    for (const event_t &e: cast<std::vector<event_t>>(data, "events", {}))
+    background_image = cast<std::string>(data, "background_image");
+    background_music = cast<std::string>(data, "background_music");
+    character_images = cast<std::vector<std::string>>(data, "character_images");
+    contents = cast<std::vector<std::string>>(data, "contents");
+    narrator = cast<std::string>(data, "narrator");
+    previous = cast<std::string>(data, "previous");
+    next = DialogueNext(cast<dialogue_next_t>(data, "next"));
+    notes = cast<std::vector<std::string>>(data, "notes");
+    for (const event_t &e: cast<std::vector<event_t>>(data, "events"))
     {
         events.emplace_back(e);
+    }
+}
+
+Dialogue::Dialogue(const std::string &content_id, const nlohmann::json &data)
+{
+    id = content_id;
+    background_image = cast<std::string>(data, "background_image");
+    background_music = cast<std::string>(data, "background_music");
+    character_images = cast<std::vector<std::string>>(data, "character_images");
+    contents = cast<std::vector<std::string>>(data, "contents");
+    narrator = cast<std::string>(data, "narrator");
+    previous = cast<std::string>(data, "previous");
+    if (data.contains("next"))
+        next = DialogueNext(data.at("next"));
+    notes = cast<std::vector<std::string>>(data, "notes");
+    if (data.contains("events"))
+    {
+        for (const nlohmann::json &e: data.at("events"))
+        {
+            events.emplace_back(e);
+        }
     }
 }
 
@@ -23,12 +43,12 @@ bool Dialogue::has_next() const
     return !next.is_null();
 }
 
-void Dialogue::set_next(std::string type, dialogue_next_t target)
+void Dialogue::set_next(const std::string &type, const dialogue_next_target_t &target)
 {
-    next = DialogueNext(std::move(type), std::move(target));
+    next = DialogueNext(type, target);
 }
 
-void Dialogue::set_next(const std::unordered_map<std::string, dialogue_next_t> &data)
+void Dialogue::set_next(const dialogue_next_t &data)
 {
     next = data.empty() ? DialogueNext() : DialogueNext(data);
 }
@@ -98,36 +118,4 @@ nlohmann::json Dialogue::to_json() const
         json_data["events"] = events_in_maps;
     }
     return json_data;
-}
-
-Dialogue Dialogue::from_json(const std::string &content_id, const nlohmann::json &data)
-{
-    dialogue_data_t data_m;
-    if (data.contains("background_image"))
-        data_m["background_image"] = data.at("background_image").get<std::string>();
-    if (data.contains("background_music"))
-        data_m["background_music"] = data.at("background_music").get<std::string>();
-    if (data.contains("character_images"))
-        data_m["character_images"] = data.at("character_images").get<std::vector<std::string>>();
-    if (data.contains("contents"))
-        data_m["contents"] = data.at("contents").get<std::vector<std::string>>();
-    if (data.contains("narrator"))
-        data_m["narrator"] = data.at("narrator").get<std::string>();
-    if (data.contains("previous"))
-        data_m["previous"] = data.at("previous").get<std::string>();
-    if (data.contains("next"))
-        data_m["next"] = DialogueNext::from_json(data.at("next")).to_map();
-    if (data.contains("notes"))
-        data_m["notes"] = data.at("notes").get<std::vector<std::string>>();
-    if (data.contains("events"))
-    {
-        std::vector<event_t> events;
-        for (const nlohmann::json &e: data.at("events"))
-        {
-            events.push_back(Event::from_json(e).to_map());
-        }
-        data_m["events"] = events;
-    }
-
-    return {content_id, data_m};
 }

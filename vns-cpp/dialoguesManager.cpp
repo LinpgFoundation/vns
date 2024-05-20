@@ -390,7 +390,7 @@ void DialoguesManager::set_dialogue(const std::string &section, const std::strin
 // Set dialogue data
 void DialoguesManager::set_dialogue(const std::string &section, const std::string &id, const nlohmann::json &data)
 {
-    get_dialogues(section)[id] = Dialogue::from_json(id, data);
+    get_dialogues(section)[id] = Dialogue(id, data);
 }
 
 // Does section contain given dialogue id
