@@ -27,7 +27,7 @@ const nlohmann::json VNS_SCHEMA = R"(
                 ],
                 "type": "object"
             },
-            "dialogs": {
+            "dialogues": {
                 "additionalProperties": {
                     "properties": {
                         "background_image": {
@@ -110,7 +110,7 @@ const nlohmann::json VNS_SCHEMA = R"(
         },
         "required": [
             "compiler",
-            "dialogs",
+            "dialogues",
             "id",
             "language"
         ],
@@ -127,11 +127,17 @@ public:
     {
     }
 
-    // validate whether given json object is valid vsn format dialogue
+    // validate whether given json object is valid vsn format dialogues
     [[nodiscard]] bool validate(const nlohmann::json &) const;
 
-    // validate whether a json file has valid vsn format dialogue
+    // validate whether given json file has valid vsn format dialogues
     [[nodiscard]] bool validate(const std::filesystem::path &) const;
+
+    // ensure given json object is valid vsn format dialogues, throw error if not
+    void ensure(const nlohmann::json &) const;
+
+    // ensure given json file has valid vsn format dialogues, throw error if not
+    void ensure(const std::filesystem::path &) const;
 };
 
 #endif

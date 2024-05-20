@@ -18,3 +18,26 @@ nlohmann::json Event::to_json() const
     }, value);
     return json_data;
 }
+
+Event Event::from_json(const nlohmann::json &data)
+{
+    event_data_t val;
+    if (data.at("value").is_boolean())
+    {
+        val = data.at("value").get<bool>();
+    } else if (data.at("value").is_number_integer())
+    {
+        val = data.at("value").get<int>();
+    } else if (data.at("value").is_number_float())
+    {
+        val = data.at("value").get<float>();
+    } else if (data.at("value").is_string())
+    {
+        val = data.at("value").get<std::string>();
+    } else
+    {
+        throw std::runtime_error("Event data has unsupported type as value!");
+    }
+
+    return {data.at("type"), data.at("target"), val};
+}

@@ -16,7 +16,7 @@ public:
     static const std::string inline COMMENT_PREFIX = "//";
     static const std::string inline NOTE_PREFIX = "#";
 
-    ScriptProcessor() : current_data_({}, "head"), blocked_(false)
+    ScriptProcessor() : current_data_("head", {}), blocked_(false)
     {
     }
 

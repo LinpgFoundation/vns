@@ -18,10 +18,10 @@ Compiler::load(const std::filesystem::path &path)
 {
     ScriptProcessor processor;
     processor.process(path);
-    return {{"dialogs",  processor.get_output().to_map()},
-            {"compiler", get_compiler_info()},
-            {"id",       processor.get_id()},
-            {"language", processor.get_language()}};
+    return {{"dialogues", processor.get_output().to_map()},
+            {"compiler",  get_compiler_info()},
+            {"id",        processor.get_id()},
+            {"language",  processor.get_language()}};
 }
 
 // load data in the form of json string from file directly
@@ -36,7 +36,7 @@ nlohmann::json Compiler::load_as_json(const std::filesystem::path &path)
     ScriptProcessor processor;
     processor.process(path);
     nlohmann::json json_data;
-    json_data["dialogs"] = processor.get_output().to_json();
+    json_data["dialogues"] = processor.get_output().to_json();
     json_data["compiler"] = get_compiler_info();
     json_data["id"] = processor.get_id();
     json_data["language"] = processor.get_language();

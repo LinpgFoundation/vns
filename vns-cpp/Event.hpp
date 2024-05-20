@@ -29,6 +29,8 @@ struct Event
 
     [[nodiscard]] nlohmann::json to_json() const;
 
+    [[nodiscard]] static Event from_json(const nlohmann::json &);
+
     const std::string type;
     const std::string target;
     const event_data_t value;

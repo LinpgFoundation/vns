@@ -1,6 +1,7 @@
 #include "dialoguesManager.hpp"
 #include "scriptProcessor.hpp"
 #include "expressionParser.hpp"
+#include "validator.hpp"
 
 // Getter for previous dialogue of current dialogue
 Dialogue *DialoguesManager::get_previous()
@@ -17,9 +18,21 @@ Dialogue *DialoguesManager::get_current()
 // load dialogue data from vns file
 void DialoguesManager::load(const std::filesystem::path &path)
 {
-    ScriptProcessor processor;
-    processor.process(path);
-    update(processor.get_output().to_map());
+    if (path.extension() == ScriptProcessor::SCRIPTS_FILE_EXTENSION)
+    {
+        ScriptProcessor processor;
+        processor.process(path);
+        update(processor.get_output().to_map());
+    } else if (path.extension() == ".json")
+    {
+        nlohmann::json data = load_json(path);
+        Validator vns_validator;
+        vns_validator.ensure(data);
+        update(data.at("dialogues"));
+    } else
+    {
+        throw std::runtime_error("The format of given file is not supported: " + path.string());
+    }
 }
 
 // Check if data is empty
@@ -46,6 +59,30 @@ void DialoguesManager::update(const dialogue_content_t &data)
     }
     // init data to Dialogue object(s)
     for (const auto &[section_name, section_dialogues]: data)
+    {
+        // use first section name as current selected section
+        if (section_.empty())
+        {
+            section_ = section_name;
+        }
+        set_dialogues(section_name, section_dialogues);
+    }
+    // set id to head
+    set_current_dialogue_id("head");
+}
+
+// Update data
+void DialoguesManager::update(const nlohmann::json &data)
+{
+    // reset section_
+    section_.clear();
+    // make sure there is no empty section name
+    if (data.contains(std::string()))
+    {
+        throw std::runtime_error("Section name cannot be an empty string!");
+    }
+    // init data to Dialogue object(s)
+    for (const auto &[section_name, section_dialogues]: data.items())
     {
         // use first section name as current selected section
         if (section_.empty())
@@ -301,9 +338,29 @@ void DialoguesManager::set_dialogues(const std::string &section, const dialogue_
         dialog_data_[section] = {};
     }
     // loop through the data and init data as dialogue object(s)
-    for (const auto &[dialogue_id, dialogue_data]: data)
+    for (const auto &pair: data)
     {
-        dialog_data_.at(section)[dialogue_id] = Dialogue(dialogue_data, dialogue_id);
+        set_dialogue(section, pair.first, pair.second);
+    }
+    // if current_dialog_id_ no longer exists, then reset it to head
+    if (section == section_ && !contains_dialogue(section_, current_dialog_id_))
+    {
+        set_current_dialogue_id("head");
+    }
+}
+
+// Set section dialogue contents by section name
+void DialoguesManager::set_dialogues(const std::string &section, const nlohmann::json &data)
+{
+    // make sure dialog_data will have given section as a key
+    if (!contains_section(section))
+    {
+        dialog_data_[section] = {};
+    }
+    // loop through the data and init data as dialogue object(s)
+    for (const auto &[dialogue_id, dialogue_json]: data.items())
+    {
+        set_dialogue(section, dialogue_id, dialogue_json);
     }
     // if current_dialog_id_ no longer exists, then reset it to head
     if (section == section_ && !contains_dialogue(section_, current_dialog_id_))
@@ -326,9 +383,15 @@ void DialoguesManager::set_current_dialogue(dialogue_data_t &data)
 }
 
 // Set dialogue data
-void DialoguesManager::set_dialogue(const std::string &section, const std::string &id, dialogue_data_t &data)
+void DialoguesManager::set_dialogue(const std::string &section, const std::string &id, const dialogue_data_t &data)
 {
-    get_dialogues(section)[id] = Dialogue(data, id);
+    get_dialogues(section)[id] = Dialogue(id, data);
+}
+
+// Set dialogue data
+void DialoguesManager::set_dialogue(const std::string &section, const std::string &id, const nlohmann::json &data)
+{
+    get_dialogues(section)[id] = Dialogue::from_json(id, data);
 }
 
 // Does section contain given dialogue id

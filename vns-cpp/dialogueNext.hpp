@@ -51,6 +51,8 @@ public:
 
     [[nodiscard]] nlohmann::json to_json() const;
 
+    [[nodiscard]] static DialogueNext from_json(const nlohmann::json &);
+
 private:
     std::string type_;
     dialogue_next_t target_;

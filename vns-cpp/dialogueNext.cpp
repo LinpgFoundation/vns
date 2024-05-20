@@ -1,28 +1,5 @@
 #include "dialogueNext.hpp"
 
-std::unordered_map<std::string, dialogue_next_t> DialogueNext::to_map() const
-{
-    return {{"type",   type_},
-            {"target", target_}};
-}
-
-nlohmann::json DialogueNext::to_json() const
-{
-    nlohmann::json json_data;
-    if (!is_null())
-    {
-        json_data["type"] = type_;
-        if (has_multi_targets())
-        {
-            json_data["target"] = get_targets();
-        } else
-        {
-            json_data["target"] = get_target();
-        }
-    }
-    return json_data;
-}
-
 bool DialogueNext::has_single_target() const
 {
     return std::holds_alternative<std::string>(target_);
@@ -64,4 +41,43 @@ multi_targets_t DialogueNext::get_targets() const
 bool DialogueNext::is_null() const
 {
     return has_single_target() ? get_target().empty() : get_targets().empty();
+}
+
+std::unordered_map<std::string, dialogue_next_t> DialogueNext::to_map() const
+{
+    return {{"type",   type_},
+            {"target", target_}};
+}
+
+nlohmann::json DialogueNext::to_json() const
+{
+    nlohmann::json json_data;
+    if (!is_null())
+    {
+        json_data["type"] = type_;
+        if (has_multi_targets())
+        {
+            json_data["target"] = get_targets();
+        } else
+        {
+            json_data["target"] = get_target();
+        }
+    }
+    return json_data;
+}
+
+DialogueNext DialogueNext::from_json(const nlohmann::json &data)
+{
+    dialogue_next_t target_;
+    if (!data.contains("target"))
+    {
+        target_ = std::string();
+    } else if (data.at("target").is_string())
+    {
+        target_ = data.at("target").get<std::string>();
+    } else
+    {
+        target_ = data.at("target").get<std::vector<std::unordered_map<std::string, std::string>>>();
+    }
+    return {data.contains("type") ? data.at("type").get<std::string>() : "default", target_};
 }

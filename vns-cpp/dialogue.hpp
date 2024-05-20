@@ -15,9 +15,9 @@ using dialogue_content_t = std::unordered_map<std::string, dialogue_section_t>;
 
 struct Dialogue
 {
-    Dialogue(const dialogue_data_t &, const std::string &);
+    Dialogue(const std::string &, const dialogue_data_t &);
 
-    Dialogue() : Dialogue({}, "head")
+    Dialogue() : Dialogue("head", {})
     {
     }
 
@@ -32,6 +32,8 @@ struct Dialogue
     [[nodiscard]] dialogue_data_t to_map() const;
 
     [[nodiscard]] nlohmann::json to_json() const;
+
+    [[nodiscard]] static Dialogue from_json(const std::string &, const nlohmann::json &);
 
     std::string previous;
     DialogueNext next;

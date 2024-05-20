@@ -222,13 +222,13 @@ void ScriptProcessor::convert(const size_t starting_index)
                 if (output_.contains_section(section_) && output_.get_dialogues(section_).size() == 1 &&
                     output_.get_dialogue(section_, "head").to_json().empty())
                 {
-                    output_.set_dialogues(section_, {});
+                    output_.set_dialogues(section_, dialogue_section_t());
                 }
                 section_ = extract_string(current_line);
-                output_.set_dialogues(section_, {});
+                output_.set_dialogues(section_, dialogue_section_t());
                 dialogue_data_t dialogue_data;
                 output_.set_dialogue(section_, "head", dialogue_data);
-                current_data_ = Dialogue({}, "head");
+                current_data_ = Dialogue("head", {});
                 previous_.clear();
             } else if (tag == "end")
             {

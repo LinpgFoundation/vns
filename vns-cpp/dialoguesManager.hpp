@@ -26,6 +26,9 @@ public:
     // Update data
     void update(const dialogue_content_t &);
 
+    // Update data
+    void update(const nlohmann::json &);
+
     // Go to next dialogue
     void next();
 
@@ -83,6 +86,9 @@ public:
     // Set section dialogue contents by section name
     void set_dialogues(const std::string &section, const dialogue_section_t &data);
 
+    // Set section dialogue contents by section name
+    void set_dialogues(const std::string &section, const nlohmann::json &data);
+
     // Get dialogue data
     [[nodiscard]] Dialogue &get_dialogue(const std::string &, const std::string &);
 
@@ -90,7 +96,10 @@ public:
     void set_current_dialogue(dialogue_data_t &);
 
     // Set dialogue data
-    void set_dialogue(const std::string &, const std::string &, dialogue_data_t &);
+    void set_dialogue(const std::string &, const std::string &, const dialogue_data_t &);
+
+    // Set dialogue data
+    void set_dialogue(const std::string &, const std::string &, const nlohmann::json &);
 
     // Does section contain given dialogue id
     bool contains_dialogue(const std::string &, const std::string &) const;

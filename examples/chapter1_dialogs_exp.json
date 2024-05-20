@@ -1,10 +1,10 @@
 {
     "compiler": {
-        "compiledAt": 1709528695,
+        "compiledAt": 1716178802,
         "reversion": 1,
         "version": 2
     },
-    "dialogs": {
+    "dialogues": {
         "dialog_example": {
             "head": {
                 "background_image": "bg1.png",

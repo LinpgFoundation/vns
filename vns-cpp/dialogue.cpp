@@ -1,6 +1,6 @@
 #include "dialogue.hpp"
 
-Dialogue::Dialogue(const dialogue_data_t &data, const std::string &content_id)
+Dialogue::Dialogue(const std::string &content_id, const dialogue_data_t &data)
 {
     id = content_id;
     background_image = cast<std::string>(data, "background_image", std::string());
@@ -98,4 +98,36 @@ nlohmann::json Dialogue::to_json() const
         json_data["events"] = events_in_maps;
     }
     return json_data;
+}
+
+Dialogue Dialogue::from_json(const std::string &content_id, const nlohmann::json &data)
+{
+    dialogue_data_t data_m;
+    if (data.contains("background_image"))
+        data_m["background_image"] = data.at("background_image").get<std::string>();
+    if (data.contains("background_music"))
+        data_m["background_music"] = data.at("background_music").get<std::string>();
+    if (data.contains("character_images"))
+        data_m["character_images"] = data.at("character_images").get<std::vector<std::string>>();
+    if (data.contains("contents"))
+        data_m["contents"] = data.at("contents").get<std::vector<std::string>>();
+    if (data.contains("narrator"))
+        data_m["narrator"] = data.at("narrator").get<std::string>();
+    if (data.contains("previous"))
+        data_m["previous"] = data.at("previous").get<std::string>();
+    if (data.contains("next"))
+        data_m["next"] = DialogueNext::from_json(data.at("next")).to_map();
+    if (data.contains("notes"))
+        data_m["notes"] = data.at("notes").get<std::vector<std::string>>();
+    if (data.contains("events"))
+    {
+        std::vector<event_t> events;
+        for (const nlohmann::json &e: data.at("events"))
+        {
+            events.push_back(Event::from_json(e).to_map());
+        }
+        data_m["events"] = events;
+    }
+
+    return {content_id, data_m};
 }

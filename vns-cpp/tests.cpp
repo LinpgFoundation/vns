@@ -75,11 +75,27 @@ void TestScriptProcessor()
 
 void TestCompiler()
 {
+    // compile file
     Compiler::compile(EXAMPLE_VNS_TEST_FILE, EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR);
+    // make sure output file exists
     std::filesystem::path outFileName = "chapter1_dialogs_English.json";
     std::filesystem::path jsonPath = EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR / outFileName;
     assert(std::filesystem::exists(jsonPath));
-    assert(Validator().validate(jsonPath));
+    // make sure file is in correct format
+    Validator().ensure(jsonPath);
+    // try load json file
+    DialoguesManager test_dialogues_manager;
+    test_dialogues_manager.load(jsonPath);
+    // test_dialogues_manager's default section will be set to dialog_example
+    assert(test_dialogues_manager.get_section() == "dialog_example");
+    // test_dialogues_manager's default current dialogue will be set to head
+    assert(test_dialogues_manager.get_current()->id == "head");
+    // test_dialogues_manager's head should have single target next
+    assert(test_dialogues_manager.get_current()->has_next());
+    assert(test_dialogues_manager.get_current()->next.has_single_target());
+    // test_dialogues_manager's head should have ~01 as the next
+    assert(test_dialogues_manager.get_current()->next.get_target() == "~01");
+    // remove output json file as it is no longer needed
     std::filesystem::remove(jsonPath);
 }
 
@@ -120,7 +136,7 @@ void TestDialoguesManager()
     assert(test_dialogues_manager.get_current()->next.has_single_target());
     assert(test_dialogues_manager.get_current()->next.get_target() == "~04");
     // test remove section
-    test_dialogues_manager.set_dialogues("test_remove_section", {{"head", {}}});
+    test_dialogues_manager.set_dialogues("test_remove_section", dialogue_section_t({{"head", {}}}));
     test_dialogues_manager.set_section("test_remove_section");
     test_dialogues_manager.remove_section("test_remove_section");
     test_dialogues_manager.set_section("dialog_example");
