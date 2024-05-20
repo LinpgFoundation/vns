@@ -26,7 +26,7 @@ int main(const int argc, char **argv)
     // update naming database
     if (arguments_map.contains("-n"))
     {
-        Naming::update_database(arguments_map["-n"]);
+        Naming::update_database(arguments_map.at("-n"));
     }
     // run tests
     if (arguments_map.contains("-t"))
@@ -39,12 +39,13 @@ int main(const int argc, char **argv)
         // save as json
         if (arguments_map.contains("-s"))
         {
-            std::cout << Compiler::load_as_string(arguments_map["-i"]) << "\n";
+            std::cout << Compiler::load_as_string(arguments_map.at("-i")) << "\n";
         }
             // print json string
         else
         {
-            Compiler::compile(arguments_map["-i"], arguments_map.contains("-o") ? arguments_map["-o"] : std::string());
+            Compiler::compile(arguments_map.at("-i"),
+                              arguments_map.contains("-o") ? arguments_map.at("-o") : std::string());
         }
     }
     return 0;

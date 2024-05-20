@@ -455,7 +455,7 @@ void DialoguesManager::remove_dialogue(const std::string &section, const std::st
             {
                 for (auto &t: theOneToRemove.next.get_targets())
                 {
-                    get_dialogue(section, t["id"]).previous = id;
+                    get_dialogue(section, t.at("id")).previous = id;
                 }
             }
         }

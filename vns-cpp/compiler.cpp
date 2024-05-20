@@ -70,8 +70,8 @@ void Compiler::compile(const std::filesystem::path &path, const std::filesystem:
 void Compiler::save(const nlohmann::json &json_data, const std::filesystem::path &dir_path)
 {
     std::stringstream file_name;
-    std::string id = json_data["id"];
-    std::string lang = json_data["language"];
+    std::string id = json_data.at("id");
+    std::string lang = json_data.at("language");
     file_name << "chapter" << id << "_dialogs_" << lang << ".json";
     save_json(dir_path / file_name.str(), json_data);
 }
