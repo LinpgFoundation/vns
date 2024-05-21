@@ -13,8 +13,19 @@ using dialogue_section_t = std::unordered_map<std::string, dialogue_data_t>;
 
 using dialogue_content_t = std::unordered_map<std::string, dialogue_section_t>;
 
-struct Dialogue
+class Dialogue
 {
+    template<typename T> static T cast(const dialogue_data_t &data, const std::string &k)
+    {
+        return data.contains(k) ? std::get<T>(data.at(k)) : T();
+    }
+
+    template<typename T> static T cast(const nlohmann::json &data, const std::string &k)
+    {
+        return data.contains(k) ? data.at(k).get<T>() : T();
+    }
+
+public:
     explicit Dialogue(const std::string &, const dialogue_data_t &);
 
     explicit Dialogue(const std::string &, const nlohmann::json &);
@@ -49,16 +60,6 @@ struct Dialogue
     std::vector<std::string> notes;
     std::vector<Event> events;
     std::string id;
-
-    template<typename T> static T cast(const dialogue_data_t &data, const std::string &k)
-    {
-        return data.contains(k) ? std::get<T>(data.at(k)) : T();
-    }
-
-    template<typename T> static T cast(const nlohmann::json &data, const std::string &k)
-    {
-        return data.contains(k) ? data.at(k).get<T>() : T();
-    }
 };
 
 #endif

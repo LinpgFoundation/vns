@@ -10,9 +10,11 @@
 using event_data_t = std::variant<bool, int, float, std::string>;
 using event_t = std::unordered_map<std::string, event_data_t>;
 
-struct Event
+class Event
 {
+    [[nodiscard]] static event_data_t retrieve_value(const nlohmann::json &);
 
+public:
     Event(std::string type, std::string target, event_data_t value) : type(std::move(type)),
                                                                       target(std::move(target)),
                                                                       value(std::move(value))
@@ -32,8 +34,6 @@ struct Event
     [[nodiscard]] event_t to_map() const;
 
     [[nodiscard]] nlohmann::json to_json() const;
-
-    [[nodiscard]] static event_data_t retrieve_value(const nlohmann::json &);
 
     const std::string type;
     const std::string target;
