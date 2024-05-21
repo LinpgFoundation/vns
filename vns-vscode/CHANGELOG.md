@@ -17,3 +17,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Added
 - Added syntax highlight for branch symbol "->".
+
+## [2.2.0] - 2024-5-21
+
+### Added
+- Added syntax highlight for variables and operations.
