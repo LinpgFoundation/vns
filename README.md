@@ -19,8 +19,8 @@ The development of the VNS can be traced all the way back to the initial stages 
 Ultimately, the team opted for a design inspired by doubly linked list, but implemented using dictionary (HashMap for Java forks). This approach not only facilitated easier access to the data but also  streamlined the saving process, enabling compatibility with formats like JSON or YAML. This method preserved readability while efficiently  managing the dialogue. Today, the current system closely resembles our initial design, with only a few subtle refinements:
 
 ```yaml
-compiledAt: ...
-dialogs:
+compiler: ...
+dialogues:
   dialog1:
     head:
       background_image: bg1.jpg
@@ -83,6 +83,10 @@ Dipper:
 ```
 
 This script would display the background image `bg1.png` and the character images `character1.png` and `character2.png`. Mabel would then say "Hello my name is Mabel!" and "How are you doing today!". Next, `character1.png` would be hidden and Dipper would say "Hi Mabel! I'm doing well, thanks for asking." Finally, the script would end.
+
+# Wiki:
+
+If you would like to learn more about VNS, please visit [**vsn.wiki**](https://vns.wiki/).
 
 # License:
 
