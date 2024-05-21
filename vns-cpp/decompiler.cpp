@@ -111,9 +111,6 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
         }
     }
 
-    // Write the stop symbol
-    result_ss << "\n" << TAG_STARTS << "end" << TAG_ENDS << "\n";
-
     // Save the decompiled script
     std::ofstream out(out_path);
     out << result_ss.str();

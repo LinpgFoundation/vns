@@ -1,7 +1,7 @@
 {
     "compiler": {
-        "compiledAt": 1716178802,
-        "reversion": 1,
+        "compiledAt": 1716322057,
+        "reversion": 2,
         "version": 2
     },
     "dialogues": {
@@ -38,6 +38,22 @@
                     }
                 ],
                 "narrator": "Test Character 3",
+                "next": {
+                    "target": "~07",
+                    "type": "default"
+                }
+            },
+            "last_one": {
+                "background_image": "bg2.png",
+                "background_music": "bgm2.ogg",
+                "character_images": [
+                    "test_character1.png&silent",
+                    "test_character2.png&silent"
+                ],
+                "contents": [
+                    "Ok this is the end"
+                ],
+                "narrator": "Test Character 2",
                 "previous": "~04"
             },
             "~01": {
@@ -152,7 +168,7 @@
                             "text": "click here to go to jump point 1"
                         },
                         {
-                            "id": "",
+                            "id": "last_one",
                             "text": "click here to go to the end"
                         }
                     ],
@@ -162,6 +178,20 @@
                     "this the second dialogue of section 2"
                 ],
                 "previous": "~03"
+            },
+            "~07": {
+                "background_image": "bg2.png",
+                "background_music": "bgm2.ogg",
+                "character_images": [
+                    "test_character1.png&silent",
+                    "test_character2.png&silent"
+                ],
+                "contents": [
+                    "My previous should be jump point 1",
+                    "And the next should be None"
+                ],
+                "narrator": "Test Character 3",
+                "previous": "jumping_point1"
             }
         }
     },

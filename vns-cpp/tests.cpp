@@ -130,7 +130,7 @@ void TestDialoguesManager()
     assert(test_dialogues_manager.get_variable<int>("test_multi") == 9);
     assert(test_dialogues_manager.get_variable<int>("mod_result") ==
            test_dialogues_manager.get_variable<int>("chapter_passed"));
-    assert(test_dialogues_manager.get_current_section_dialogues().size() == 6);
+    assert(test_dialogues_manager.get_current_section_dialogues().size() == 8);
     assert(test_dialogues_manager.get_current()->has_next() &&
            test_dialogues_manager.get_current()->next.has_single_target());
     assert(test_dialogues_manager.get_current()->next.has_single_target());

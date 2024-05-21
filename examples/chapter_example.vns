@@ -27,6 +27,7 @@ test_multi = 1 + mod_n * 4
 mod_result = test_multi % 2
 
 [block]
+
 null:
 - you cannot go back
 
@@ -41,9 +42,20 @@ Test Character 1:
 Test Character 2:
 - Hello I am test character 2.
 [option]click here to go to jump point 1 -> jumping_point1
-[option]click here to go to the end -> null
+[option]click here to go to the end -> last_one
+
+[label]last_one
+Test Character 2:
+- Ok this is the end
+
+[end]
 
 [label]jumping_point1
 say = "hi"
+
 Test Character 3:
 - Welcome to jump point 1
+
+Test Character 3:
+- My previous should be jump point 1
+- And the next should be None

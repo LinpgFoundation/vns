@@ -6,7 +6,7 @@
 // Getter for previous dialogue of current dialogue
 Dialogue *DialoguesManager::get_previous()
 {
-    return &dialog_data_.at(section_).at(get_current()->previous);
+    return get_current()->previous.empty() ? nullptr : &dialog_data_.at(section_).at(get_current()->previous);
 }
 
 // Getter for current dialogue

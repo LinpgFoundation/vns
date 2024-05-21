@@ -96,7 +96,7 @@ void ScriptProcessor::process(const std::filesystem::path &path)
 
         if (lines_[i].starts_with(TAG_STARTS))
         {
-            if (auto tag = extract_tag(lines_[i]); tag == "label")
+            if (const std::string tag = extract_tag(lines_[i]); tag == "label")
             {
                 if (!last_label.empty())
                 {
@@ -232,8 +232,11 @@ void ScriptProcessor::convert(const size_t starting_index)
                 previous_.clear();
             } else if (tag == "end")
             {
-                assert(!previous_.empty());
-                output_.get_dialogue(section_, previous_).remove_next();
+                if (!previous_.empty())
+                {
+                    output_.get_dialogue(section_, previous_).remove_next();
+                    previous_.clear();
+                }
             } else if (tag == "scene")
             {
                 assert(!previous_.empty());
@@ -264,7 +267,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                     current_targets = output_.get_dialogue(section_, previous_).next.get_targets();
                 }
                 // get value string
-                auto src_to_target = extract_string(current_line);
+                const std::string src_to_target = extract_string(current_line);
                 // push text and id map
                 current_targets.push_back({{"text", trim(src_to_target.substr(0, src_to_target.find("->")))},
                                            {"id",   ensure_not_null(
@@ -291,7 +294,7 @@ void ScriptProcessor::convert(const size_t starting_index)
             {
                 narrator_possible_images = Naming::get_database()[narrator_lower_case];
             }
-            for (auto &character_image: current_data_.character_images)
+            for (std::string &character_image: current_data_.character_images)
             {
                 Naming name_data(character_image);
                 if (narrator_possible_images.contains(name_data.get_name()))
@@ -326,13 +329,13 @@ void ScriptProcessor::convert(const size_t starting_index)
 
             if (!previous_.empty())
             {
-                if (!blocked_)
-                {
-                    current_data_.previous = previous_;
-                } else
+                if (blocked_)
                 {
                     current_data_.previous.clear();
                     blocked_ = false;
+                } else
+                {
+                    current_data_.previous = previous_;
                 }
 
                 if (output_.contains_dialogue(section_, previous_))
@@ -362,8 +365,7 @@ void ScriptProcessor::convert(const size_t starting_index)
 
             previous_ = dialog_associate_key_[line_index];
             line_index += current_data_.contents.size();
-            dialogue_data_t current_data_map = current_data_.to_map();
-            output_.set_dialogue(section_, previous_, current_data_map);
+            output_.set_dialogue(section_, previous_, current_data_.to_map());
             current_data_.notes.clear();
             current_data_.events.clear();
         } else if (const size_t eql_location = current_line.find('='); eql_location != std::string::npos)
