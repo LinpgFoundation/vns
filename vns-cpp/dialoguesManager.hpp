@@ -57,7 +57,7 @@ public:
     [[nodiscard]] std::string get_current_dialogue_id() const;
 
     // Set current dialogue id
-    void set_current_dialogue_id(const std::string &id);
+    void set_current_dialogue_id(const std::string &);
 
     // Get current section name
     [[nodiscard]] std::string get_section() const;
@@ -78,16 +78,16 @@ public:
     [[nodiscard]] std::unordered_map<std::string, Dialogue> &get_current_section_dialogues();
 
     // Get section dialogue contents by section name
-    [[nodiscard]] std::unordered_map<std::string, Dialogue> &get_dialogues(const std::string &section);
+    [[nodiscard]] std::unordered_map<std::string, Dialogue> &get_dialogues(const std::string &);
 
     // Set current section dialogue contents
     void set_current_section_dialogues(const dialogue_section_t &);
 
     // Set section dialogue contents by section name
-    void set_dialogues(const std::string &section, const dialogue_section_t &data);
+    void set_dialogues(const std::string &, const dialogue_section_t &);
 
     // Set section dialogue contents by section name
-    void set_dialogues(const std::string &section, const nlohmann::json &data);
+    void set_dialogues(const std::string &, const nlohmann::json &);
 
     // Get dialogue data
     [[nodiscard]] Dialogue &get_dialogue(const std::string &, const std::string &);

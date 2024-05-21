@@ -106,7 +106,7 @@ std::unordered_map<std::string, std::unordered_set<std::string>> &Naming::get_da
 
 void Naming::clear_database()
 {
-    return DATABASE_.clear();
+    DATABASE_.clear();
 }
 
 // update database

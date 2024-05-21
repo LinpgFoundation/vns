@@ -8,11 +8,14 @@ project(vns_python_wrapper)
 # find python
 find_package(Python COMPONENTS Interpreter Development)
 
-# specify needed source files
-file(GLOB SOURCES "extern/vns-cpp/libs/*/*.h" "extern/vns-cpp/libs/*/*.cpp" "extern/vns-cpp/libs/*/*.hpp" "extern/vns-cpp/*.h" "extern/vns-cpp/*.cpp")
-
 # add pybind11
 add_subdirectory(extern/pybind11)
 
+# add vns-cpp
+add_subdirectory(extern/vns-cpp)
+
 # add source files
 pybind11_add_module(vns_python_wrapper ${SOURCES} wrapper.cpp)
+
+# link libraries
+target_link_libraries(vns_python_wrapper PRIVATE nlohmann_json::nlohmann_json nlohmann_json_schema_validator vns_lib)

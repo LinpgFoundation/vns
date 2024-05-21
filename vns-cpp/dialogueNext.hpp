@@ -50,7 +50,7 @@ public:
 
     [[nodiscard]] bool has_multi_targets() const;
 
-    [[nodiscard]] bool contains_target(const std::string &theTarget) const;
+    [[nodiscard]] bool contains_target(const std::string &) const;
 
     [[nodiscard]] bool is_null() const;
 

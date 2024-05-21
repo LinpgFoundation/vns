@@ -4,6 +4,7 @@
 #include "extern/vns-cpp/naming.hpp"
 #include "extern/vns-cpp/compiler.hpp"
 #include "extern/vns-cpp/dialoguesManager.hpp"
+#include "extern/vns-cpp/validator.hpp"
 
 namespace py = pybind11;
 
@@ -21,32 +22,34 @@ PYBIND11_MODULE(vns_python_wrapper, m)
             .def("contains_tag", &Naming::contains_tag, "Check if the name contains a tag")
             .def("insert_tag", &Naming::insert_tag, "Insert a tag to the name")
             .def("erase_tag", &Naming::erase_tag, "Erase a tag from the name")
-            .def("equal", (bool (Naming::*)(const std::string &) const) &Naming::equal,
+            .def("equal", py::overload_cast<const std::string &>(&Naming::equal, py::const_),
                  "Check if the name is equal to a given naming string")
-            .def("equal", (bool (Naming::*)(const std::string &, bool) const) &Naming::equal,
+            .def("equal", py::overload_cast<const std::string &, bool>(&Naming::equal, py::const_),
                  "Check if the name is equal to a given naming string, with an option to force absolute equality")
-            .def("equal", (bool (Naming::*)(const Naming &) const) &Naming::equal,
+            .def("equal", py::overload_cast<const Naming &>(&Naming::equal, py::const_),
                  "Check if the name is equal to another Naming object")
-            .def("equal", (bool (Naming::*)(const Naming &, bool) const) &Naming::equal,
+            .def("equal", py::overload_cast<const Naming &, bool>(&Naming::equal, py::const_),
                  "Check if the name is equal to another Naming object, with an option to force absolute equality")
             .def_static("get_database", &Naming::get_database, py::return_value_policy::reference,
                         "Get the character name database")
             .def_static("clear_database", &Naming::clear_database, "Clear the character naming database")
-            .def_static("update_database", (void (*)(std::string &)) &Naming::update_database,
+            .def_static("update_database", py::overload_cast<std::string &>(&Naming::update_database),
                         "Update the character naming database from a JSON string")
-            .def_static("update_database", (void (*)(
-                                const std::unordered_map<std::string, std::unordered_set<std::string>> &)) &Naming::update_database,
+            .def_static("update_database",
+                        py::overload_cast<const std::unordered_map<std::string, std::unordered_set<std::string>> &>(
+                                &Naming::update_database),
                         "Update the character naming database from a dict of names and sets of tags")
-            .def_static("update_database", (void (*)(
-                                const std::unordered_map<std::string, std::vector<std::string>> &)) &Naming::update_database,
+            .def_static("update_database",
+                        py::overload_cast<const std::unordered_map<std::string, std::vector<std::string>> &>(
+                                &Naming::update_database),
                         "Update the character naming database from a dict of names and vectors of tags");
 
     py::class_<Compiler>(m, "Compiler", "Compiler for compiling vns files")
             .def_static("load", &Compiler::load, "Load a vns file");
 
     py::class_<DialogueNext>(m, "DialogueNext", "Class for representing the dialogue next")
-            .def(py::init<std::string, dialogue_next_t>())
-            .def(py::init<const std::unordered_map<std::string, dialogue_next_t> &>(),
+            .def(py::init<std::string, dialogue_next_target_t>())
+            .def(py::init<const dialogue_next_t &>(),
                  "Initialize a ContentNext object from a dict")
             .def("get_type", &DialogueNext::get_type, "Get the type of the next")
             .def("has_type", &DialogueNext::has_type, "Whether the next has given type")
@@ -66,7 +69,7 @@ PYBIND11_MODULE(vns_python_wrapper, m)
             .def_readonly("target", &Event::target);
 
     py::class_<Dialogue>(m, "Dialogue", "Class representing dialogue content")
-            .def(py::init<const dialogue_data_t &, const std::string &>())
+            .def(py::init<const std::string &, const dialogue_data_t &>())
             .def_readwrite("previous", &Dialogue::previous)
             .def_readwrite("next", &Dialogue::next)
             .def_readwrite("background_image", &Dialogue::background_image)
@@ -78,13 +81,18 @@ PYBIND11_MODULE(vns_python_wrapper, m)
             .def_readonly("events", &Dialogue::events)
             .def_readwrite("id", &Dialogue::id)
             .def("has_next", &Dialogue::has_next, "Check if the dialogue has next")
-            .def("set_next", py::overload_cast<std::string, dialogue_next_t>(&Dialogue::set_next),
-                 "Set dialogue next")
             .def("set_next",
-                 py::overload_cast<const std::unordered_map<std::string, dialogue_next_t> &>(&Dialogue::set_next),
+                 py::overload_cast<const std::string &, const dialogue_next_target_t &>(&Dialogue::set_next),
                  "Set dialogue next")
+            .def("set_next", py::overload_cast<const dialogue_next_t &>(&Dialogue::set_next), "Set dialogue next")
             .def("remove_next", &Dialogue::remove_next, "Remove dialogue next")
             .def("to_dict", &Dialogue::to_map, "Convert the dialogue object to a dict");
+
+    py::class_<Validator>(m, "Validator", "Class for validating vns format json file")
+            .def_static("validate", py::overload_cast<const std::filesystem::path &>(Validator::validate),
+                        "Validate a JSON file against VSN format dialogues")
+            .def_static("ensure", py::overload_cast<const std::filesystem::path &>(Validator::ensure),
+                        "Ensure a JSON file is valid VSN format, throw error if not");
 
     py::class_<DialoguesManager>(m, "DialoguesManager", "Class for managing dialogue contents")
             .def(py::init<>())
@@ -95,7 +103,7 @@ PYBIND11_MODULE(vns_python_wrapper, m)
             .def("load", &DialoguesManager::load, "load dialogue data from vns file")
             .def("empty", &DialoguesManager::empty, "Check if data is empty")
             .def("clear", &DialoguesManager::clear, "Clear data")
-            .def("update", &DialoguesManager::update, "Update data")
+            .def("update", py::overload_cast<const dialogue_content_t &>(&DialoguesManager::update), "Update data")
             .def("next", &DialoguesManager::next, "Go to next dialogue")
             .def("contains_variable", &DialoguesManager::contains_variable, "Contains variable")
             .def("get_variable",
@@ -126,13 +134,16 @@ PYBIND11_MODULE(vns_python_wrapper, m)
                  py::return_value_policy::reference, "Get current section dialogue contents")
             .def("set_current_section_dialogues", &DialoguesManager::set_current_section_dialogues,
                  "Set current section dialogue contents")
-            .def("set_dialogues", &DialoguesManager::set_dialogues, "Set section dialogue contents by section name")
+            .def("set_dialogues",
+                 py::overload_cast<const std::string &, const dialogue_section_t &>(&DialoguesManager::set_dialogues),
+                 "Set section dialogue contents by section name")
             .def("get_dialogues", &DialoguesManager::get_dialogues, py::return_value_policy::reference,
                  "Get current dialogue data")
             .def("get_dialogue", &DialoguesManager::get_dialogue, py::return_value_policy::reference,
                  "Get dialogue data by ID")
             .def("set_current_dialogue", &DialoguesManager::set_current_dialogue, "Set current dialogue data")
-            .def("set_dialogue", &DialoguesManager::set_dialogue, "Set current dialogue data by ID")
+            .def("set_dialogue", py::overload_cast<const std::string &, const std::string &, const dialogue_data_t &>(
+                    &DialoguesManager::set_dialogue), "Set current dialogue data by ID")
             .def("contains_dialogue", &DialoguesManager::contains_dialogue,
                  "Check if section contains given dialogue ID")
             .def("remove_current_dialogue", &DialoguesManager::remove_current_dialogue, "Remove current dialogue")

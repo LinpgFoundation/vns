@@ -13,6 +13,7 @@ __all__ = [
     "DialoguesManager",
     "Event",
     "Naming",
+    "Validator",
 ]
 
 class Compiler:
@@ -61,14 +62,14 @@ class Dialogue:
     previous: str
     def __init__(
         self,
-        arg0: dict[
+        arg0: str,
+        arg1: dict[
             str,
             str
             | list[str]
             | dict[str, str | list[dict[str, str]]]
             | list[dict[str, bool | int | float | str]],
         ],
-        arg1: str,
     ) -> None: ...
     def has_next(self) -> bool:
         """
@@ -514,4 +515,21 @@ class Naming:
     def to_string(self) -> str:
         """
         Retrieve naming as string
+        """
+
+class Validator:
+    """
+    Class for validating vns format json file
+    """
+
+    @staticmethod
+    def ensure(arg0: str) -> None:
+        """
+        Ensure a JSON file is valid VSN format, throw error if not
+        """
+
+    @staticmethod
+    def validate(arg0: str) -> bool:
+        """
+        Validate a JSON file against VSN format dialogues
         """

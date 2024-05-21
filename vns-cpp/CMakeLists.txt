@@ -30,4 +30,12 @@ endif ()
 
 target_link_libraries(vns PRIVATE nlohmann_json::nlohmann_json nlohmann_json_schema_validator)
 
+add_library(vns_lib STATIC ${SOURCES} scriptProcessor.cpp naming.cpp naming.hpp dialogue.hpp dialogue.cpp
+        dialogueNext.hpp dialogueNext.cpp scriptProcessor.hpp functions.hpp functions.cpp
+        compiler.hpp compiler.cpp version.hpp dialoguesManager.hpp dialoguesManager.cpp decompiler.cpp decompiler.hpp
+        Event.cpp Event.hpp expressionParser.cpp expressionParser.hpp number.cpp number.hpp operation.hpp
+        validator.hpp validator.cpp schema.hpp)
+
+target_link_libraries(vns_lib PRIVATE nlohmann_json::nlohmann_json nlohmann_json_schema_validator)
+
 # TODO: Add tests and install targets if needed.
