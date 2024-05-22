@@ -14,9 +14,9 @@ Builder.CACHE_NEED_REMOVE.append("wrapper.cpp")
 
 # always use the latest version of cpp code
 Builder.remove(OS_PATH.join(OS_PATH.dirname(__file__), "pyvns", "extern", "vns-cpp"))
-Builder.copy(
-    (OS_PATH.join(OS_PATH.dirname(__file__), "..", "vns-cpp"),),
-    OS_PATH.join(OS_PATH.dirname(__file__), "pyvns", "extern"),
+Builder.copy_repo(
+    OS_PATH.join(OS_PATH.dirname(__file__), "..", "vns-cpp"),
+    OS_PATH.join(OS_PATH.dirname(__file__), "pyvns", "extern", "vns-cpp"),
 )
 
 # compile the code

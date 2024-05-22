@@ -1,0 +1,9 @@
+[submodule "vns-cpp/extern/json"]
+	path = vns-cpp/extern/json
+	url = https://github.com/nlohmann/json.git
+[submodule "vns-cpp/extern/json-schema-validator"]
+	path = vns-cpp/extern/json-schema-validator
+	url = https://github.com/pboettch/json-schema-validator.git
+[submodule "vns-python/pyvns/extern/pybind11"]
+	path = vns-python/pyvns/extern/pybind11
+	url = https://github.com/pybind/pybind11.git
