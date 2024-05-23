@@ -371,11 +371,11 @@ void ScriptProcessor::convert(const size_t starting_index)
         } else if (const size_t eql_location = current_line.find('='); eql_location != std::string::npos)
         {
             // get the operation, set (a=1), add (a+=1), and so on, which is why eql_location matters
-            const std::string variable_action = operation::has(current_line[eql_location - 1]) ? operation::get(
-                    current_line[eql_location - 1]) : "set";
+            const std::string_view variable_action = operation::has(current_line[eql_location - 1]) ? operation::get(
+                    current_line[eql_location - 1]) : operation::set;
             // get the name of the variable
             const std::string variable_name = trim(
-                    current_line.substr(0, variable_action != "set" ? eql_location - 1 : eql_location));
+                    current_line.substr(0, variable_action != operation::set ? eql_location - 1 : eql_location));
             // get the value of the variable
             const std::string variable_value = trim(current_line.substr(eql_location + 1));
             // make sure variable_value is not empty
@@ -388,7 +388,7 @@ void ScriptProcessor::convert(const size_t starting_index)
             // if variable value is true (boolean)
             if (variable_value == "true")
             {
-                if (variable_action != "set")
+                if (variable_action != operation::set)
                 {
                     terminated("You can only set a boolean variable!");
                 }
@@ -397,7 +397,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                 // if variable value is false (boolean)
             else if (variable_value == "false")
             {
-                if (variable_action != "set")
+                if (variable_action != operation::set)
                 {
                     terminated("You can only set a boolean variable!");
                 }
@@ -409,7 +409,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                 if (!variable_value.ends_with('"'))
                 {
                     terminated("Possible missing close quotation mark for string", line_index);
-                } else if (variable_action != "set")
+                } else if (variable_action != operation::set)
                 {
                     terminated("You can only set a string variable!");
                 }

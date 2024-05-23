@@ -21,12 +21,18 @@ public:
     {
     }
 
+    Event(const std::string_view type, std::string target, event_data_t value) : type(type),
+                                                                                 target(std::move(target)),
+                                                                                 value(std::move(value))
+    {
+    }
+
     explicit Event(const event_t &data) : Event(std::get<std::string>(data.at("type")),
                                                 std::get<std::string>(data.at("target")), data.at("value"))
     {
     }
 
-    explicit Event(const nlohmann::json &data) : Event(data.at("type"),
+    explicit Event(const nlohmann::json &data) : Event(data.at("type").get<std::string>(),
                                                        data.at("target"), retrieve_value(data))
     {
     }

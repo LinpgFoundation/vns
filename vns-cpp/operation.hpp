@@ -5,13 +5,14 @@
 
 struct operation
 {
-    constexpr static const std::string add = "add";
-    constexpr static const std::string subtract = "subtract";
-    constexpr static const std::string multiply = "multiply";
-    constexpr static const std::string divide = "divide";
-    constexpr static const std::string mod = "mod";
+    constexpr static const std::string_view add = "add";
+    constexpr static const std::string_view subtract = "subtract";
+    constexpr static const std::string_view multiply = "multiply";
+    constexpr static const std::string_view divide = "divide";
+    constexpr static const std::string_view mod = "mod";
+    constexpr static const std::string_view set = "set";
 
-    static std::string get(char symbol)
+    static std::string_view get(char symbol)
     {
         switch (symbol)
         {
