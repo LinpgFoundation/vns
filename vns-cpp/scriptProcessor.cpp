@@ -5,6 +5,7 @@
 #include "functions.hpp"
 #include "scriptProcessor.hpp"
 #include "naming.hpp"
+#include "operation.hpp"
 
 std::string ScriptProcessor::get_id() const
 {
@@ -18,7 +19,7 @@ std::string ScriptProcessor::get_language() const
 
 std::string ScriptProcessor::ensure_not_null(const std::string &text)
 {
-    return iequals(text, "null") || iequals(text, "none") ? "" : text;
+    return iequals(text, "null") || iequals(text, "none") ? std::string() : text;
 }
 
 std::string ScriptProcessor::extract_parameter(const std::string &text)
@@ -38,70 +39,34 @@ std::string ScriptProcessor::extract_string(const std::string &text)
 
 [[noreturn]] void ScriptProcessor::terminated(const std::string &reason) const
 {
+    throw std::runtime_error("File \"" + path_.string() + "\", failed to compile due to: " + reason);
+}
+
+[[noreturn]] void ScriptProcessor::terminated(const std::string &reason, const size_t &line_index) const
+{
     throw std::runtime_error(
-            "File \"" + path_.string() + "\", line " + std::to_string(line_index_ + 1) + "\n  " + get_current_line() +
+            "File \"" + path_.string() + "\", line " + std::to_string(line_index + 1) + "\n  " + lines_[line_index] +
             "\nFail to compile due to: " + reason);
 }
 
-[[noreturn]] void ScriptProcessor::preprocess_terminated(const std::string &reason) const
+DialoguesManager ScriptProcessor::get_output() const
 {
-    throw std::runtime_error("File \"" + path_.string() + "\" failed to compile due to: " + reason);
+    return output_;
 }
-
-std::string ScriptProcessor::get_current_line() const
-{
-    return lines_[line_index_];
-}
-
-DialogueSectionsDataType ScriptProcessor::get_output() const
-{
-    DialogueSectionsDataType output;
-    for (const auto &[section_name, section_contents]: output_)
-    {
-        if (!section_contents.empty())
-        {
-            output[section_name] = {};
-            for (const auto &[dialogue_id, dialogue_content]: section_contents)
-            {
-                output[section_name][dialogue_id] = dialogue_content.to_map();
-            }
-        }
-    }
-    return output;
-}
-
-nlohmann::json ScriptProcessor::get_output_as_json() const
-{
-    nlohmann::json output;
-    for (const auto &[section_name, section_contents]: output_)
-    {
-        if (!section_contents.empty())
-        {
-            nlohmann::json section;
-            for (const auto &[dialogue_id, dialogue_content]: section_contents)
-            {
-                section[dialogue_id] = dialogue_content.to_json();
-            }
-            output[section_name] = section;
-        }
-    }
-    return output;
-}
-
 
 void ScriptProcessor::process(const std::filesystem::path &path)
 {
     path_ = path;
-    int current_index = 0;
+    size_t current_index = 0;
 
     //make sure file exists
     if (!exists(path_))
     {
-        preprocess_terminated("File does not exist!");
+        terminated("File does not exist!");
     }
 
     // read file
-    if (path_.extension().compare(SCRIPTS_FILE_EXTENSION) == 0)
+    if (path_.extension() == SCRIPTS_FILE_EXTENSION)
     {
         if (std::ifstream f(path_); f.is_open())
         {
@@ -113,46 +78,50 @@ void ScriptProcessor::process(const std::filesystem::path &path)
             f.close();
         } else
         {
-            preprocess_terminated("File is occupied!");
+            terminated("File is occupied!");
         }
     }
 
     // make sure file is not empty
     if (lines_.empty())
     {
-        preprocess_terminated("Cannot convert an empty script file!");
+        terminated("Cannot convert an empty script file!");
     }
 
     std::string last_label;
 
-    for (size_t index = 0; index < lines_.size(); ++index)
+    for (size_t i = 0; i < lines_.size(); ++i)
     {
-        lines_[index] = trim(lines_[index].substr(0, lines_[index].find(NOTE_PREFIX)));
+        lines_[i] = trim(lines_[i].substr(0, lines_[i].find(COMMENT_PREFIX)));
 
-        if (lines_[index].find(TAG_STARTS) == 0)
+        if (lines_[i].starts_with(TAG_STARTS))
         {
-            if (auto tag = extract_tag(lines_[index]); tag == "label")
+            if (const std::string tag = extract_tag(lines_[i]); tag == "label")
             {
                 if (!last_label.empty())
                 {
-                    terminated("This label is overwriting the previous one");
+                    terminated("This label is overwriting the previous one", i);
                 }
 
-                last_label = extract_parameter(lines_[index]);
+                last_label = extract_parameter(lines_[i]);
                 if (RESERVED_WORDS.contains(last_label))
                 {
-                    terminated("You cannot use reserved word '" + last_label + "' as a label");
+                    terminated("You cannot use reserved word '" + last_label + "' as a label", i);
                 }
             } else if (tag == "section")
             {
                 current_index = 0;
             }
-        } else if (lines_[index].find(':') != std::string::npos)
+        } else if (lines_[i].ends_with(':'))
         {
-            dialog_associate_key_[index] =
-                    current_index == 0 ? "head" : last_label.empty() ? (current_index < 10 ? "~0" + std::to_string(
-                            current_index) : "~" + std::to_string(current_index)) : last_label;
-            last_label = "";
+            dialog_associate_key_[i] = current_index == 0 ? "head" : last_label.empty() ? (current_index < 10 ? "~0" +
+                                                                                                                std::to_string(
+                                                                                                                        current_index)
+                                                                                                              : "~" +
+                                                                                                                std::to_string(
+                                                                                                                        current_index))
+                                                                                        : last_label;
+            last_label.clear();
             ++current_index;
         }
     }
@@ -175,25 +144,27 @@ void ScriptProcessor::process(const std::filesystem::path &path)
     }
 }
 
-void ScriptProcessor::convert(const int starting_index)
+void ScriptProcessor::convert(const size_t starting_index)
 {
-    line_index_ = starting_index;
+    size_t line_index = starting_index;
 
-    while (line_index_ < lines_.size())
+    while (line_index < lines_.size())
     {
-        if (std::string current_line = get_current_line(); current_line.empty() ||
-                                                           lines_[line_index_].find(NOTE_PREFIX) == 0)
+        // obtain current line as a pointer
+        const std::string &current_line = lines_[line_index];
+        // Skip empty lines or lines starting with #
+        if (current_line.empty() || lines_[line_index].starts_with(COMMENT_PREFIX))
         {
-            // Skip empty lines or lines starting with #
             // Do nothing
-        } else if (current_line.find(COMMENT_PREFIX) == 0)
+        } else if (current_line.starts_with(NOTE_PREFIX))
         {
-            // Accumulate comments
-            current_data_.comments.push_back(current_line.substr(COMMENT_PREFIX.length() + 1));
-        } else if (current_line.find(TAG_STARTS) == 0)
+            // Accumulate notes
+            current_data_.notes.push_back(current_line.substr(NOTE_PREFIX.length() + 1));
+        } else if (current_line.starts_with(TAG_STARTS))
         {
             std::string tag = extract_tag(current_line);
 
+            // check if the tag is an alternative of another tag
             if (ALTERNATIVES.contains(tag))
             {
                 tag = ALTERNATIVES.at(tag);
@@ -236,7 +207,7 @@ void ScriptProcessor::convert(const int starting_index)
                 id_ = extract_parameter(current_line);
                 if (id_.empty())
                 {
-                    terminated("Chapter id cannot be None!");
+                    terminated("Chapter id cannot be None!", line_index);
                 }
             } else if (tag == "language")
             {
@@ -245,71 +216,73 @@ void ScriptProcessor::convert(const int starting_index)
             {
                 if (!previous_.empty())
                 {
-                    output_[section_][previous_].set_next({});
+                    output_.get_dialogue(section_, previous_).remove_next();
                 }
                 // if section has no content, then remove head
-                if (output_[section_].size() == 1 && output_[section_]["head"].to_json().empty())
+                if (output_.contains_section(section_) && output_.get_dialogues(section_).size() == 1 &&
+                    output_.get_dialogue(section_, "head").to_json().empty())
                 {
-                    output_[section_].clear();
+                    output_.set_dialogues(section_, dialogue_section_t());
                 }
                 section_ = extract_string(current_line);
-                output_[section_] = {};
-                output_[section_]["head"] = Dialogue({}, "head");
-                current_data_ = Dialogue({}, "head");
-                previous_ = "";
+                output_.set_dialogues(section_, dialogue_section_t());
+                dialogue_data_t dialogue_data;
+                output_.set_dialogue(section_, "head", dialogue_data);
+                current_data_ = Dialogue("head");
+                previous_.clear();
             } else if (tag == "end")
             {
-                assert(!previous_.empty());
-                output_[section_][previous_].set_next({});
+                if (!previous_.empty())
+                {
+                    output_.get_dialogue(section_, previous_).remove_next();
+                    previous_.clear();
+                }
             } else if (tag == "scene")
             {
                 assert(!previous_.empty());
-                if (output_[section_][previous_].next.has_multi_targets())
+                if (output_.get_dialogue(section_, previous_).next.has_multi_targets())
                 {
-                    output_[section_][previous_].set_next("scene", output_[section_][previous_].next.get_targets());
+                    output_.get_dialogue(section_, previous_).set_next("scene", output_.get_dialogue(section_,
+                                                                                                     previous_).next.get_targets());
                 } else
                 {
-                    output_[section_][previous_].set_next("scene", output_[section_][previous_].next.get_target());
+                    output_.get_dialogue(section_, previous_).set_next("scene", output_.get_dialogue(section_,
+                                                                                                     previous_).next.get_target());
                 }
                 current_data_.background_image = extract_parameter(current_line);
                 blocked_ = true;
             } else if (tag == "block")
             {
-                if (!previous_.empty())
-                {
-                    output_[section_][previous_].set_next({});
-                }
-                current_data_ = Dialogue({}, "id_needed");
-                previous_ = "";
+                blocked_ = true;
             } else if (tag == "option")
             {
                 if (current_data_.contents.empty())
                 {
-                    terminated("Invalid option syntax: '->' cannot be found!");
+                    terminated("Invalid option syntax: '->' cannot be found!", line_index);
                 }
                 // get current targets
-                MultiTargetsType current_targets;
-                if (output_[section_][previous_].next.get_type() == "options")
+                multi_targets_t current_targets;
+                if (output_.get_dialogue(section_, previous_).next.has_type("options"))
                 {
-                    current_targets = output_[section_][previous_].next.get_targets();
+                    current_targets = output_.get_dialogue(section_, previous_).next.get_targets();
                 }
                 // get value string
-                auto src_to_target = extract_string(current_line);
+                const std::string src_to_target = extract_string(current_line);
                 // push text and id map
                 current_targets.push_back({{"text", trim(src_to_target.substr(0, src_to_target.find("->")))},
                                            {"id",   ensure_not_null(
                                                    trim(src_to_target.substr(src_to_target.find("->") + 2)))}});
                 // update next
-                output_[section_][previous_].set_next("options", current_targets);
+                output_.get_dialogue(section_, previous_).set_next("options", current_targets);
             }
                 // Placeholder, no action needed for "label" tag
             else if (tag == "label")
             {
             } else
             {
-                terminated("Invalid tag " + tag);
+                terminated("Invalid tag " + tag, line_index);
             }
-        } else if (current_line.find(':') != std::string::npos)
+        } else if (current_line.ends_with(':'))
         {
             const std::string narrator = ensure_not_null(current_line.substr(0, current_line.size() - 1));
             current_data_.narrator = narrator;
@@ -321,7 +294,7 @@ void ScriptProcessor::convert(const int starting_index)
             {
                 narrator_possible_images = Naming::get_database()[narrator_lower_case];
             }
-            for (auto &character_image: current_data_.character_images)
+            for (std::string &character_image: current_data_.character_images)
             {
                 Naming name_data(character_image);
                 if (narrator_possible_images.contains(name_data.get_name()))
@@ -336,69 +309,155 @@ void ScriptProcessor::convert(const int starting_index)
 
             current_data_.contents.clear();
 
-            for (size_t sub_index = line_index_ + 1; sub_index < lines_.size(); ++sub_index)
+            for (size_t sub_index = line_index + 1; sub_index < lines_.size(); ++sub_index)
             {
-                if (lines_[sub_index].find("- ") == 0)
-                {
-                    current_data_.contents.push_back(trim(lines_[sub_index].substr(2)));
-                } else
+                if (!lines_[sub_index].starts_with('-'))
                 {
                     break;
                 }
+                current_data_.contents.push_back(trim(lines_[sub_index].substr(1)));
             }
 
             if (section_.empty())
             {
-                terminated("You have to specify section before script");
+                terminated("You have to specify section before script", line_index);
             }
-            if (!output_.contains(section_))
+            if (!output_.contains_section(section_))
             {
-                output_[section_] = {};
+                output_.set_current_section_dialogues({});
             }
 
             if (!previous_.empty())
             {
-                if (!blocked_)
+                if (blocked_)
                 {
-                    current_data_.previous = previous_;
+                    current_data_.previous.clear();
+                    blocked_ = false;
                 } else
                 {
-                    current_data_.previous = "";
-                    blocked_ = false;
+                    current_data_.previous = previous_;
                 }
 
-                if (output_[section_].contains(previous_))
+                if (output_.contains_dialogue(section_, previous_))
                 {
-                    if (output_[section_][previous_].has_next())
+                    if (output_.get_dialogue(section_, previous_).has_next())
                     {
-                        if (output_[section_][previous_].next.get_type() != "options")
+                        if (!output_.get_dialogue(section_, previous_).next.has_type("options"))
                         {
-                            output_[section_][previous_].set_next(output_[section_][previous_].next.get_type(),
-                                                                  dialog_associate_key_[line_index_]);
+                            output_.get_dialogue(section_, previous_).set_next(
+                                    output_.get_dialogue(section_, previous_).next.get_type(),
+                                    dialog_associate_key_[line_index]);
                         }
                     } else
                     {
-                        output_[section_][previous_].set_next(output_[section_][previous_].next.get_type(),
-                                                              dialog_associate_key_[line_index_]);
+                        output_.get_dialogue(section_, previous_).set_next(
+                                output_.get_dialogue(section_, previous_).next.get_type(),
+                                dialog_associate_key_[line_index]);
                     }
                 } else
                 {
-                    terminated("KeyError: " + previous_);
+                    terminated("KeyError: " + previous_, line_index);
                 }
             } else
             {
-                current_data_.previous = "";
+                current_data_.previous.clear();
             }
 
-            previous_ = dialog_associate_key_[line_index_];
-            line_index_ += current_data_.contents.size();
-            output_[section_][previous_] = Dialogue(current_data_.to_map(), previous_);
-            current_data_.comments.clear();
+            previous_ = dialog_associate_key_[line_index];
+            line_index += current_data_.contents.size();
+            output_.set_dialogue(section_, previous_, current_data_.to_map());
+            current_data_.notes.clear();
+            current_data_.events.clear();
+        } else if (const size_t eql_location = current_line.find('='); eql_location != std::string::npos)
+        {
+            // get the operation, set (a=1), add (a+=1), and so on, which is why eql_location matters
+            const std::string_view variable_action = operation::has(current_line[eql_location - 1]) ? operation::get(
+                    current_line[eql_location - 1]) : operation::set;
+            // get the name of the variable
+            const std::string variable_name = trim(
+                    current_line.substr(0, variable_action != operation::set ? eql_location - 1 : eql_location));
+            // get the value of the variable
+            const std::string variable_value = trim(current_line.substr(eql_location + 1));
+            // make sure variable_value is not empty
+            if (variable_value.empty())
+            {
+                throw std::runtime_error(variable_name + " has empty value!");
+            }
+            // create a variant for holding
+            event_data_t event_value;
+            // if variable value is true (boolean)
+            if (variable_value == "true")
+            {
+                if (variable_action != operation::set)
+                {
+                    terminated("You can only set a boolean variable!");
+                }
+                event_value = true;
+            }
+                // if variable value is false (boolean)
+            else if (variable_value == "false")
+            {
+                if (variable_action != operation::set)
+                {
+                    terminated("You can only set a boolean variable!");
+                }
+                event_value = false;
+            }
+                // if variable value is string
+            else if (variable_value.starts_with('"'))
+            {
+                if (!variable_value.ends_with('"'))
+                {
+                    terminated("Possible missing close quotation mark for string", line_index);
+                } else if (variable_action != operation::set)
+                {
+                    terminated("You can only set a string variable!");
+                }
+                event_value = variable_value;
+            } else
+            {
+                size_t pos;
+                // if variable value is float number
+                if (variable_value.find('.') != std::string::npos)
+                {
+                    try
+                    {
+                        event_value = std::stof(variable_value, &pos);
+                    } catch (std::invalid_argument &)
+                    {
+                        pos = 0;
+                    }
+                }
+                    // if variable value is int number?
+                else
+                {
+                    try
+                    {
+                        event_value = std::stoi(variable_value, &pos);
+                    } catch (std::invalid_argument &)
+                    {
+                        pos = 0;
+                    }
+                }
+                // If not all characters were processed, then assume it is a number / math expression
+                if (pos != variable_value.size())
+                {
+                    event_value = variable_value;
+                }
+            }
+            current_data_.events.emplace_back(variable_action, variable_name, event_value);
+        } else if (current_line.ends_with("++"))
+        {
+            current_data_.events.emplace_back(operation::add, trim(current_line.substr(0, current_line.size() - 2)), 1);
+        } else if (current_line.ends_with("--"))
+        {
+            current_data_.events.emplace_back(operation::subtract,
+                                              trim(current_line.substr(0, current_line.size() - 2)), 1);
         } else
         {
-            terminated("Invalid code or content!");
+            terminated("Invalid code or content!", line_index);
         }
         // Move to the next line
-        ++line_index_;
+        ++line_index;
     }
 }

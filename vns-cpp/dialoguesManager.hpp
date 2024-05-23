@@ -2,25 +2,20 @@
 #define CONTENT_MANAGER_HPP
 
 #include "dialogue.hpp"
+#include "number.hpp"
 #include <unordered_set>
 
 class DialoguesManager
 {
 public:
-    // Getters for previous dialogue
+    // Getter for previous dialogue of current dialogue
     Dialogue *get_previous();
 
-    // Getters for current dialogue
+    // Getter for current dialogue
     Dialogue *get_current();
-
-    // Getters for last dialogue
-    Dialogue *get_last();
 
     // load dialogue data from vns file
     void load(const std::filesystem::path &);
-
-    // Save modifications to the current dialogue interface
-    void save();
 
     // Check if data is empty
     [[nodiscard]] bool empty() const;
@@ -29,16 +24,40 @@ public:
     void clear();
 
     // Update data
-    void set_data(const DialogueSectionsDataType &);
+    void update(const dialogue_content_t &);
+
+    // Update data
+    void update(const nlohmann::json &);
+
+    // Go to next dialogue
+    void next();
+
+    // Contains variable
+    bool contains_variable(const std::string &) const;
+
+    // Get variable
+    event_data_t get_variable(const std::string &) const;
+
+    // Get variable with Type
+    template<typename T> T get_variable(const std::string &name) const
+    {
+        return std::get<T>(get_variable(name));
+    }
+
+    // Set variable
+    void set_variable(const std::string &, const event_data_t &);
 
     // Get data
-    [[nodiscard]] DialogueSectionsDataType get_data() const;
+    [[nodiscard]] dialogue_content_t to_map() const;
+
+    // Get data as json
+    [[nodiscard]] nlohmann::json to_json() const;
 
     // Get current dialogue id
-    [[nodiscard]] std::string get_id() const;
+    [[nodiscard]] std::string get_current_dialogue_id() const;
 
     // Set current dialogue id
-    void set_id(const std::string &);
+    void set_current_dialogue_id(const std::string &);
 
     // Get current section name
     [[nodiscard]] std::string get_section() const;
@@ -50,54 +69,60 @@ public:
     void set_section(const std::string &);
 
     // Does dialogue have given section name
-    bool contains_section(const std::string &);
+    bool contains_section(const std::string &) const;
 
     // Remove section
     void remove_section(const std::string &);
 
     // Get current section dialogue contents
-    [[nodiscard]] DialogueSectionDataType &get_current_section_dialogues();
+    [[nodiscard]] std::unordered_map<std::string, Dialogue> &get_current_section_dialogues();
 
     // Get section dialogue contents by section name
-    [[nodiscard]] DialogueSectionDataType &get_section_dialogues(const std::string &);
+    [[nodiscard]] std::unordered_map<std::string, Dialogue> &get_dialogues(const std::string &);
 
     // Set current section dialogue contents
-    void set_current_section_dialogues(const DialogueSectionDataType &);
+    void set_current_section_dialogues(const dialogue_section_t &);
 
     // Set section dialogue contents by section name
-    void set_section_dialogues(const std::string &, const DialogueSectionDataType &);
+    void set_dialogues(const std::string &, const dialogue_section_t &);
 
-    // Get current dialogue data
-    [[nodiscard]] DialogueDataType &get_current_dialogue();
+    // Set section dialogue contents by section name
+    void set_dialogues(const std::string &, const nlohmann::json &);
 
     // Get dialogue data
-    [[nodiscard]] DialogueDataType &get_dialogue(const std::string &, const std::string &);
+    [[nodiscard]] Dialogue &get_dialogue(const std::string &, const std::string &);
 
     // Set current dialogue data
-    void set_current_dialogue(DialogueDataType &);
+    void set_current_dialogue(dialogue_data_t &);
 
     // Set dialogue data
-    void set_dialogue(const std::string &, const std::string &, DialogueDataType &);
+    void set_dialogue(const std::string &, const std::string &, const dialogue_data_t &);
+
+    // Set dialogue data
+    void set_dialogue(const std::string &, const std::string &, const nlohmann::json &);
 
     // Does section contain given dialogue id
-    bool contains_dialogue(const std::string &, const std::string &);
+    bool contains_dialogue(const std::string &, const std::string &) const;
 
     // Remove current dialogue
     void remove_current_dialogue();
 
     // Remove dialogue
-    void remove_dialogue(const std::string &, const std::string &);
+    void remove_dialogue(const std::string &, std::string);
 
 private:
-    DialogueSectionsDataType dialog_data_;
+    std::unordered_map<std::string, std::unordered_map<std::string, Dialogue>> dialog_data_;
+    std::unordered_map<std::string, std::unordered_map<std::string, event_data_t>> local_variables_;
+    std::unordered_map<std::string, event_data_t> global_variables_;
+    std::unordered_map<std::string, event_data_t> persistent_variables_;
     std::string section_;
-    std::string id_ = "head";
-    Dialogue *current_ = nullptr;
-    Dialogue *last_ = nullptr;
-    Dialogue *previous_ = nullptr;
+    std::string current_dialog_id_ = "head";
 
-    // If the pointer to the current dialogue data does not exist, set_data the pointer
-    void refresh_current();
+    // Parse a string expression
+    Number parse_expression(const std::string &) const;
+
+    // Make sure dialogue exists
+    void ensure_dialogue_existence(const std::string &, const std::string &) const;
 };
 
 #endif

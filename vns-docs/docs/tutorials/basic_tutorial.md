@@ -44,7 +44,7 @@ Restult:
 ```json
 {
     "compiler": {...},
-    "dialogs": {
+    "dialogues": {
         "dialog_example": {
             "head": {
                 "background_image": "bg1.png",

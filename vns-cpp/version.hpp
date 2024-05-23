@@ -4,6 +4,6 @@
 // vns main version
 constexpr int VERSION = 2;
 // vns revision
-constexpr int REVISION = 1;
+constexpr int REVISION = 2;
 
 #endif

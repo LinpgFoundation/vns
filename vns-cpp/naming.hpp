@@ -30,15 +30,13 @@ public:
 
     [[nodiscard]] bool equal(const std::string &) const;
 
-    [[nodiscard]] bool equal(const std::string &, bool must_be_the_same) const;
+    [[nodiscard]] bool equal(const std::string &, bool) const;
 
     [[nodiscard]] bool equal(const Naming &) const;
 
-    [[nodiscard]] bool equal(const Naming &, bool must_be_the_same) const;
+    [[nodiscard]] bool equal(const Naming &, bool) const;
 
     static std::unordered_map<std::string, std::unordered_set<std::string>> &get_database();
-
-    static std::string get_database_as_json();
 
     static void clear_database();
 

@@ -1,7 +1,7 @@
 ﻿#include "naming.hpp"
 #include <ranges>
 #include <sstream>
-#include "libs/nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 
 // Constructor
 Naming::Naming(const std::string &the_name)
@@ -104,19 +104,9 @@ std::unordered_map<std::string, std::unordered_set<std::string>> &Naming::get_da
     return DATABASE_;
 }
 
-std::string Naming::get_database_as_json()
-{
-    nlohmann::json json_map;
-    for (const auto &[k, v]: DATABASE_)
-    {
-        json_map[k] = std::vector<std::string>(v.begin(), v.end());
-    }
-    return json_map.dump();
-}
-
 void Naming::clear_database()
 {
-    return DATABASE_.clear();
+    DATABASE_.clear();
 }
 
 // update database

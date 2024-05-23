@@ -1,10 +1,7 @@
 #ifndef PROCESSOR_HPP
 #define PROCESSOR_HPP
 
-#include <unordered_map>
-#include <unordered_set>
-#include <filesystem>
-#include "dialogue.hpp"
+#include "dialoguesManager.hpp"
 
 class ScriptProcessor
 {
@@ -16,10 +13,10 @@ public:
     static const std::unordered_set<std::string> inline RESERVED_WORDS = {"null", "none", "head"};
     static const std::string inline TAG_STARTS = "[";
     static const std::string inline TAG_ENDS = "]";
-    static const std::string inline NOTE_PREFIX = "#";
     static const std::string inline COMMENT_PREFIX = "//";
+    static const std::string inline NOTE_PREFIX = "#";
 
-    ScriptProcessor() : line_index_(0), current_data_({}, "head"), blocked_(false)
+    ScriptProcessor() : current_data_("head"), blocked_(false)
     {
     }
 
@@ -29,14 +26,11 @@ public:
 
     void process(const std::filesystem::path &);
 
-    [[nodiscard]] DialogueSectionsDataType get_output() const;
-
-    [[nodiscard]] nlohmann::json get_output_as_json() const;
+    [[nodiscard]] DialoguesManager get_output() const;
 
 private:
     std::filesystem::path path_;
-    size_t line_index_;
-    std::unordered_map<std::string, std::unordered_map<std::string, Dialogue>> output_;
+    DialoguesManager output_;
     Dialogue current_data_;
     std::string id_;
     std::string lang_;
@@ -57,11 +51,9 @@ private:
 
     [[noreturn]] void terminated(const std::string &) const;
 
-    [[noreturn]] void preprocess_terminated(const std::string &) const;
+    [[noreturn]] void terminated(const std::string &, const size_t &) const;
 
-    [[nodiscard]] std::string get_current_line() const;
-
-    void convert(int);
+    void convert(size_t);
 };
 
 #endif

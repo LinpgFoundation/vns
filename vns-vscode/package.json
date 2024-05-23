@@ -29,11 +29,12 @@
     "engines": {
         "vscode": "^1.82.0"
     },
+    "icon": "favicon.png",
     "name": "vns-syntax-highlight",
     "publisher": "LinpgFoundation",
     "repository": {
         "type": "git",
         "url": "https://github.com/LinpgFoundation/vns"
     },
-    "version": "2.0.0"
+    "version": "2.2.0"
 }

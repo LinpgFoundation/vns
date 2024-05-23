@@ -1,26 +1,27 @@
 ﻿#include <ctime>
 #include "version.hpp"
 #include "compiler.hpp"
-#include <fstream>
 #include <iostream>
+#include "functions.hpp"
 
 // get the info of compiler
-std::unordered_map<std::string, int> Compiler::get_compiler_info()
+std::unordered_map<std::string, size_t> Compiler::get_compiler_info()
 {
     return {{"version",    VERSION},
             {"reversion",  REVISION},
-            {"compiledAt", static_cast<int>(std::time(nullptr))}};
+            {"compiledAt", static_cast<size_t>(std::time(nullptr))}};
 }
 
 // load data from file directly
-DialogueFileDataType Compiler::load(const std::filesystem::path &path)
+std::unordered_map<std::string, std::variant<dialogue_content_t, std::unordered_map<std::string, size_t>, std::string>>
+Compiler::load(const std::filesystem::path &path)
 {
     ScriptProcessor processor;
     processor.process(path);
-    return {{"dialogs",  processor.get_output()},
-            {"compiler", get_compiler_info()},
-            {"id",       processor.get_id()},
-            {"language", processor.get_language()}};
+    return {{"dialogues", processor.get_output().to_map()},
+            {"compiler",  get_compiler_info()},
+            {"id",        processor.get_id()},
+            {"language",  processor.get_language()}};
 }
 
 // load data in the form of json string from file directly
@@ -35,7 +36,7 @@ nlohmann::json Compiler::load_as_json(const std::filesystem::path &path)
     ScriptProcessor processor;
     processor.process(path);
     nlohmann::json json_data;
-    json_data["dialogs"] = processor.get_output_as_json();
+    json_data["dialogues"] = processor.get_output().to_json();
     json_data["compiler"] = get_compiler_info();
     json_data["id"] = processor.get_id();
     json_data["language"] = processor.get_language();
@@ -69,21 +70,8 @@ void Compiler::compile(const std::filesystem::path &path, const std::filesystem:
 void Compiler::save(const nlohmann::json &json_data, const std::filesystem::path &dir_path)
 {
     std::stringstream file_name;
-    std::string id = json_data["id"];
-    std::string lang = json_data["language"];
+    std::string id = json_data.at("id");
+    std::string lang = json_data.at("language");
     file_name << "chapter" << id << "_dialogs_" << lang << ".json";
-    const std::filesystem::path file_path = dir_path / file_name.str();
-    std::ofstream outputFile(file_path);
-    // Check if the file is open
-    if (outputFile.is_open())
-    {
-        // Save the JSON object to the file
-        outputFile << std::setw(4) << json_data << "\n";
-        std::cout << "JSON data saved to file: " << file_path << "\n";
-        // Close the file stream
-        outputFile.close();
-    } else
-    {
-        std::cerr << "Error opening file: " << file_path << "\n";
-    }
+    save_json(dir_path / file_name.str(), json_data);
 }

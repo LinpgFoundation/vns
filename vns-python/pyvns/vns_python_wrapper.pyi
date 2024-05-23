@@ -6,7 +6,15 @@ from __future__ import annotations
 
 import typing
 
-__all__ = ["Compiler", "Dialogue", "DialogueNext", "DialoguesManager", "Naming"]
+__all__ = [
+    "Compiler",
+    "Dialogue",
+    "DialogueNext",
+    "DialoguesManager",
+    "Event",
+    "Naming",
+    "Validator",
+]
 
 class Compiler:
     """
@@ -21,7 +29,14 @@ class Compiler:
         dict[
             str,
             dict[
-                str, dict[str, str | list[str] | dict[str, str | list[dict[str, str]]]]
+                str,
+                dict[
+                    str,
+                    str
+                    | list[str]
+                    | dict[str, str | list[dict[str, str]]]
+                    | list[dict[str, bool | int | float | str]],
+                ],
             ],
         ]
         | dict[str, int]
@@ -39,20 +54,31 @@ class Dialogue:
     background_image: str
     background_music: str
     character_images: list[str]
-    comments: list[str]
     contents: list[str]
     id: str
     narrator: str
     next: DialogueNext
+    notes: list[str]
     previous: str
     def __init__(
         self,
-        arg0: dict[str, str | list[str] | dict[str, str | list[dict[str, str]]]],
-        arg1: str,
+        arg0: str,
+        arg1: dict[
+            str,
+            str
+            | list[str]
+            | dict[str, str | list[dict[str, str]]]
+            | list[dict[str, bool | int | float | str]],
+        ],
     ) -> None: ...
     def has_next(self) -> bool:
         """
         Check if the dialogue has next
+        """
+
+    def remove_next(self) -> None:
+        """
+        Remove dialogue next
         """
 
     @typing.overload
@@ -67,12 +93,21 @@ class Dialogue:
         Set dialogue next
         """
 
-    def to_map(
+    def to_dict(
         self,
-    ) -> dict[str, str | list[str] | dict[str, str | list[dict[str, str]]]]:
+    ) -> dict[
+        str,
+        str
+        | list[str]
+        | dict[str, str | list[dict[str, str]]]
+        | list[dict[str, bool | int | float | str]],
+    ]:
         """
-        Convert the dialogue object to a map
+        Convert the dialogue object to a dict
         """
+
+    @property
+    def events(self) -> list[Event]: ...
 
 class DialogueNext:
     """
@@ -84,7 +119,12 @@ class DialogueNext:
     @typing.overload
     def __init__(self, arg0: dict[str, str | list[dict[str, str]]]) -> None:
         """
-        Initialize a ContentNext object from a map
+        Initialize a ContentNext object from a dict
+        """
+
+    def contains_target(self, arg0: str) -> bool:
+        """
+        Check if the next is/contains given target
         """
 
     def get_target(self) -> str:
@@ -112,14 +152,19 @@ class DialogueNext:
         Check if the next has a single target
         """
 
+    def has_type(self, arg0: str) -> bool:
+        """
+        Whether the next has given type
+        """
+
     def is_null(self) -> bool:
         """
         Check if the next is null
         """
 
-    def to_map(self) -> dict[str, str | list[dict[str, str]]]:
+    def to_dict(self) -> dict[str, str | list[dict[str, str]]]:
         """
-        Convert the next object to a map
+        Convert the next object to a dict
         """
 
 class DialoguesManager:
@@ -143,9 +188,19 @@ class DialoguesManager:
         Check if dialogues have given section name
         """
 
+    def contains_variable(self, arg0: str) -> bool:
+        """
+        Contains variable
+        """
+
     def empty(self) -> bool:
         """
         Check if data is empty
+        """
+
+    def get_bool_variable(self, arg0: str) -> bool:
+        """
+        Get variable as bool
         """
 
     def get_current(self) -> Dialogue:
@@ -153,45 +208,34 @@ class DialoguesManager:
         Get current dialogue
         """
 
-    def get_current_dialogue(
-        self,
-    ) -> dict[str, str | list[str] | dict[str, str | list[dict[str, str]]]]:
-        """
-        Get current dialogue data
-        """
-
-    def get_current_section_dialogues(
-        self,
-    ) -> dict[str, dict[str, str | list[str] | dict[str, str | list[dict[str, str]]]]]:
-        """
-        Get current section dialogue contents
-        """
-
-    def get_data(
-        self,
-    ) -> dict[
-        str,
-        dict[str, dict[str, str | list[str] | dict[str, str | list[dict[str, str]]]]],
-    ]:
-        """
-        Get data
-        """
-
-    def get_dialogue(
-        self, arg0: str, arg1: str
-    ) -> dict[str, str | list[str] | dict[str, str | list[dict[str, str]]]]:
-        """
-        Get dialogue data by ID
-        """
-
-    def get_id(self) -> str:
+    def get_current_dialogue_id(self) -> str:
         """
         Get current dialogue ID
         """
 
-    def get_last(self) -> Dialogue:
+    def get_current_section_dialogues(self) -> dict[str, Dialogue]:
         """
-        Get last dialogue
+        Get current section dialogue contents
+        """
+
+    def get_dialogue(self, arg0: str, arg1: str) -> Dialogue:
+        """
+        Get dialogue data by ID
+        """
+
+    def get_dialogues(self, arg0: str) -> dict[str, Dialogue]:
+        """
+        Get current dialogue data
+        """
+
+    def get_float_variable(self, arg0: str) -> float:
+        """
+        Get variable as float
+        """
+
+    def get_int_variable(self, arg0: str) -> int:
+        """
+        Get variable as int
         """
 
     def get_previous(self) -> Dialogue:
@@ -204,21 +248,29 @@ class DialoguesManager:
         Get current section name
         """
 
-    def get_section_dialogues(
-        self, arg0: str
-    ) -> dict[str, dict[str, str | list[str] | dict[str, str | list[dict[str, str]]]]]:
-        """
-        Get section dialogue contents by section name
-        """
-
     def get_sections(self) -> set[str]:
         """
         Get the names of all sections
         """
 
+    def get_str_variable(self, arg0: str) -> str:
+        """
+        Get variable as str
+        """
+
+    def get_variable(self, arg0: str) -> bool | int | float | str:
+        """
+        Get variable
+        """
+
     def load(self, arg0: str) -> None:
         """
         load dialogue data from vns file
+        """
+
+    def next(self) -> None:
+        """
+        Go to next dialogue
         """
 
     def remove_current_dialogue(self) -> None:
@@ -236,54 +288,74 @@ class DialoguesManager:
         Remove section
         """
 
-    def save(self) -> None:
-        """
-        Save modifications to the current dialogue interface
-        """
-
     def set_current_dialogue(
-        self, arg0: dict[str, str | list[str] | dict[str, str | list[dict[str, str]]]]
+        self,
+        arg0: dict[
+            str,
+            str
+            | list[str]
+            | dict[str, str | list[dict[str, str]]]
+            | list[dict[str, bool | int | float | str]],
+        ],
     ) -> None:
         """
         Set current dialogue data
         """
 
+    def set_current_dialogue_id(self, arg0: str) -> None:
+        """
+        Set current dialogue ID
+        """
+
     def set_current_section_dialogues(
         self,
         arg0: dict[
-            str, dict[str, str | list[str] | dict[str, str | list[dict[str, str]]]]
+            str,
+            dict[
+                str,
+                str
+                | list[str]
+                | dict[str, str | list[dict[str, str]]]
+                | list[dict[str, bool | int | float | str]],
+            ],
         ],
     ) -> None:
         """
         Set current section dialogue contents
         """
 
-    def set_data(
-        self,
-        arg0: dict[
-            str,
-            dict[
-                str, dict[str, str | list[str] | dict[str, str | list[dict[str, str]]]]
-            ],
-        ],
-    ) -> None:
-        """
-        Update data
-        """
-
     def set_dialogue(
         self,
         arg0: str,
         arg1: str,
-        arg2: dict[str, str | list[str] | dict[str, str | list[dict[str, str]]]],
+        arg2: dict[
+            str,
+            str
+            | list[str]
+            | dict[str, str | list[dict[str, str]]]
+            | list[dict[str, bool | int | float | str]],
+        ],
     ) -> None:
         """
         Set current dialogue data by ID
         """
 
-    def set_id(self, arg0: str) -> None:
+    def set_dialogues(
+        self,
+        arg0: str,
+        arg1: dict[
+            str,
+            dict[
+                str,
+                str
+                | list[str]
+                | dict[str, str | list[dict[str, str]]]
+                | list[dict[str, bool | int | float | str]],
+            ],
+        ],
+    ) -> None:
         """
-        Set current dialogue ID
+        Set section dialogue contents by section name
         """
 
     def set_section(self, arg0: str) -> None:
@@ -291,16 +363,66 @@ class DialoguesManager:
         Set current section name
         """
 
-    def set_section_dialogues(
+    def set_variable(self, arg0: str, arg1: bool | int | float | str) -> None:
+        """
+        Set variable
+        """
+
+    def to_dict(
         self,
-        arg0: str,
-        arg1: dict[
-            str, dict[str, str | list[str] | dict[str, str | list[dict[str, str]]]]
+    ) -> dict[
+        str,
+        dict[
+            str,
+            dict[
+                str,
+                str
+                | list[str]
+                | dict[str, str | list[dict[str, str]]]
+                | list[dict[str, bool | int | float | str]],
+            ],
+        ],
+    ]:
+        """
+        Get data in dict
+        """
+
+    def update(
+        self,
+        arg0: dict[
+            str,
+            dict[
+                str,
+                dict[
+                    str,
+                    str
+                    | list[str]
+                    | dict[str, str | list[dict[str, str]]]
+                    | list[dict[str, bool | int | float | str]],
+                ],
+            ],
         ],
     ) -> None:
         """
-        Set section dialogue contents by section name
+        Update data
         """
+
+class Event:
+    """
+    Class for representing the event struct
+    """
+
+    @typing.overload
+    def __init__(
+        self, arg0: str, arg1: str, arg2: bool | int | float | str
+    ) -> None: ...
+    @typing.overload
+    def __init__(self, arg0: dict[str, bool | int | float | str]) -> None: ...
+    def to_dict(self) -> dict[str, bool | int | float | str]: ...
+    @property
+    def target(self) -> str: ...
+    @property
+    def type(self) -> str: ...
 
 class Naming:
     """
@@ -330,14 +452,14 @@ class Naming:
     @typing.overload
     def update_database(arg0: dict[str, set[str]]) -> None:
         """
-        Update the character naming database from a map of names and sets of tags
+        Update the character naming database from a dict of names and sets of tags
         """
 
     @staticmethod
     @typing.overload
     def update_database(arg0: dict[str, list[str]]) -> None:
         """
-        Update the character naming database from a map of names and vectors of tags
+        Update the character naming database from a dict of names and vectors of tags
         """
 
     def __init__(self, arg0: str) -> None: ...
@@ -393,4 +515,21 @@ class Naming:
     def to_string(self) -> str:
         """
         Retrieve naming as string
+        """
+
+class Validator:
+    """
+    Class for validating vns format json file
+    """
+
+    @staticmethod
+    def ensure(arg0: str) -> None:
+        """
+        Ensure a JSON file is valid VSN format, throw error if not
+        """
+
+    @staticmethod
+    def validate(arg0: str) -> bool:
+        """
+        Validate a JSON file against VSN format dialogues
         """

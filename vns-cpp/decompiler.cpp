@@ -1,5 +1,4 @@
 #include <fstream>
-#include <vector>
 #include "naming.hpp"
 #include "decompiler.hpp"
 
@@ -19,7 +18,7 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
     // Initialize visual novel data management module
     DialoguesManager content_manager;
     // Update data to the management module
-    content_manager.set_data(std::any_cast<DialogueSectionsDataType>(data.at("dialogs")));
+    content_manager.update(std::any_cast<dialogue_content_t>(data.at("dialogs")));
 
     // string stream to store results
     std::stringstream result_ss;
@@ -37,7 +36,7 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
     for (const std::string &k: data | std::views::keys)
     {
         // Update the current position of the visual novel data management module
-        content_manager.set_id("head");
+        content_manager.set_current_dialogue_id("head");
         content_manager.set_section(k);
 
         // create section line
@@ -45,13 +44,11 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
 
         while (true)
         {
-            const DialogueDataType &current_dialog = content_manager.get_current_dialogue();
             // Process comments
-            if (const auto &comments = std::get<std::vector<std::string>>(
-                        current_dialog.at("comments")); !comments.empty())
+            if (!content_manager.get_current()->notes.empty())
             {
                 result_ss << "\n";
-                for (const std::string &note: comments)
+                for (const std::string &note: content_manager.get_current()->notes)
                     result_ss << "// " << note << "\n";
             }
             // Write speaker's name
@@ -59,7 +56,7 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
                                                                           : content_manager.get_current()->narrator)
                       << ":\n";
             // Write dialogue
-            for (const auto &sentence: std::get<std::vector<std::string>>(current_dialog.at("contents")))
+            for (const auto &sentence: content_manager.get_current()->contents)
                 result_ss << "- " << sentence << "\n";
 
             // If the following content has changed, write it
@@ -68,7 +65,7 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
                 content_manager.get_current()->background_image != content_manager.get_previous()->background_image)
             {
                 if (content_manager.get_previous() == nullptr ||
-                    content_manager.get_previous()->next.get_type() != "scene")
+                    !content_manager.get_previous()->next.has_type("scene"))
                     result_ss << TAG_STARTS << "bgi" << TAG_ENDS
                               << to_str_in_case_null(content_manager.get_current()->background_image) << "\n";
                 else
@@ -102,7 +99,7 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
             {
                 if (content_manager.get_current()->next.has_single_target())
                 {
-                    content_manager.set_id(content_manager.get_current()->next.get_target());
+                    content_manager.set_current_dialogue_id(content_manager.get_current()->next.get_target());
                 } else
                 {
                     // branch is currently not supported
@@ -113,9 +110,6 @@ void Decompiler::decompile(const std::unordered_map<std::string, std::any> &data
             }
         }
     }
-
-    // Write the stop symbol
-    result_ss << "\n" << TAG_STARTS << "end" << TAG_ENDS << "\n";
 
     // Save the decompiled script
     std::ofstream out(out_path);
