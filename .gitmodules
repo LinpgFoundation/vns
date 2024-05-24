@@ -7,3 +7,6 @@
 [submodule "vns-python/pyvns/extern/pybind11"]
 	path = vns-python/pyvns/extern/pybind11
 	url = https://github.com/pybind/pybind11.git
+[submodule "vns-server/extern/cpp-httplib"]
+	path = vns-server/extern/cpp-httplib
+	url = https://github.com/yhirose/cpp-httplib.git
