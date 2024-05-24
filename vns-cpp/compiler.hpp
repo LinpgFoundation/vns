@@ -20,8 +20,14 @@ public:
 
     static std::string load_as_string(const std::filesystem::path &);
 
+    static std::string load_as_string(const std::string &);
+
 private:
     static nlohmann::json load_as_json(const std::filesystem::path &);
+
+    static nlohmann::json load_as_json(const std::string &);
+
+    static nlohmann::json output(const ScriptProcessor &);
 
     static void save(const nlohmann::json &, const std::filesystem::path &);
 };

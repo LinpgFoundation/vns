@@ -6,6 +6,7 @@
 #include "scriptProcessor.hpp"
 #include "compiler.hpp"
 #include "validator.hpp"
+#include "functions.hpp"
 
 void TestNameWithoutTag()
 {
@@ -69,6 +70,18 @@ void TestScriptProcessor()
 {
     ScriptProcessor test_processor;
     test_processor.process(EXAMPLE_VNS_TEST_FILE);
+    assert(test_processor.get_id() == "1");
+    assert(test_processor.get_language() == "English");
+    // test split and join to make sure they are working
+    const std::vector<std::string> vns_lines = load_file_as_lines(EXAMPLE_VNS_TEST_FILE);
+    const std::string vns_raw = join(vns_lines, "\n");
+    const std::vector<std::string> vns_lines2 = split(vns_raw, '\n');
+    assert(vns_lines.size() == vns_lines2.size());
+    assert(vns_lines == vns_lines2);
+    // reset test_processor
+    test_processor = ScriptProcessor();
+    // test processing raw vns string
+    test_processor.process(vns_raw);
     assert(test_processor.get_id() == "1");
     assert(test_processor.get_language() == "English");
 }

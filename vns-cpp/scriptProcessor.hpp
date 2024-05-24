@@ -26,6 +26,8 @@ public:
 
     void process(const std::filesystem::path &);
 
+    void process(const std::string &);
+
     [[nodiscard]] DialoguesManager get_output() const;
 
 private:
@@ -40,6 +42,8 @@ private:
     std::unordered_map<size_t, std::string> dialog_associate_key_;
 
     bool blocked_;
+
+    void continue_process();
 
     static std::string ensure_not_null(const std::string &);
 

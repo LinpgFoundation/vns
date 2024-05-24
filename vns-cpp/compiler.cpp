@@ -1,7 +1,7 @@
 ﻿#include <ctime>
+#include <iostream>
 #include "version.hpp"
 #include "compiler.hpp"
-#include <iostream>
 #include "functions.hpp"
 
 // get the info of compiler
@@ -30,11 +30,30 @@ std::string Compiler::load_as_string(const std::filesystem::path &path)
     return nlohmann::to_string(load_as_json(path));
 }
 
+// load data in the form of json string from raw vns string data directly
+std::string Compiler::load_as_string(const std::string &raw_data)
+{
+    return nlohmann::to_string(load_as_json(raw_data));
+}
+
 // load data in the form of json data from file directly
 nlohmann::json Compiler::load_as_json(const std::filesystem::path &path)
 {
     ScriptProcessor processor;
     processor.process(path);
+    return output(processor);
+}
+
+// load data in the form of json data from raw vns string data directly
+nlohmann::json Compiler::load_as_json(const std::string &raw_data)
+{
+    ScriptProcessor processor;
+    processor.process(raw_data);
+    return output(processor);
+}
+
+nlohmann::json Compiler::output(const ScriptProcessor &processor)
+{
     nlohmann::json json_data;
     json_data["dialogues"] = processor.get_output().to_json();
     json_data["compiler"] = get_compiler_info();

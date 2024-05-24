@@ -2,9 +2,10 @@
 #define TESTS_HPP
 
 #include <string>
+#include <filesystem>
 
-const std::string EXAMPLE_VNS_TEST_FILE = "C:/Users/yudon/Documents/GitHub/vns/examples/chapter_example.vns";
-const std::string EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR = "C:/Users/yudon/Documents/GitHub/vns/examples";
+const std::filesystem::path EXAMPLE_VNS_TEST_FILE = "C:/Users/yudon/Documents/GitHub/vns/examples/chapter_example.vns";
+const std::filesystem::path EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR = "C:/Users/yudon/Documents/GitHub/vns/examples";
 
 void TestNameWithoutTag();
 
