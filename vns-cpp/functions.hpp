@@ -27,6 +27,9 @@ std::vector<std::string> split(const std::string &, char);
 // split by space
 std::vector<std::string> split(const std::string &);
 
+// join strings with delimiter
+std::string join(const std::vector<std::string> &, const std::string &);
+
 // Remove all whitespaces
 std::string remove_whitespace(const std::string &);
 
@@ -35,5 +38,11 @@ nlohmann::json load_json(const std::filesystem::path &);
 
 // Save a json file
 void save_json(const std::filesystem::path &, const nlohmann::json &);
+
+// Load a plain text file and return contents as lines
+std::vector<std::string> load_file_as_lines(const std::filesystem::path &);
+
+// Load a plain text file and push the contents to out
+void load_file_as_lines(const std::filesystem::path &, std::vector<std::string> &);
 
 #endif
