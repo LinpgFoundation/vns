@@ -3,7 +3,7 @@
 #include "schema.hpp"
 
 // Initialize Validator's global VALIDATOR
-const nlohmann::json_schema::json_validator Validator::VALIDATOR(VNS_SCHEMA);
+const nlohmann::json_schema::json_validator Validator::VALIDATOR(VNS_SCHEMA_JSON);
 
 // validate whether given json object is valid vsn format dialogues
 bool Validator::validate(const nlohmann::json &jsonObj)

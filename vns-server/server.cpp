@@ -1,5 +1,6 @@
 #include "httplib.h"
 #include "extern/vns-cpp/compiler.hpp"
+#include "extern/vns-cpp/schema.hpp"
 
 // HTTP
 int main(const int argc, char **argv)
@@ -31,7 +32,7 @@ int main(const int argc, char **argv)
     // Create a server object
     httplib::Server svr;
 
-    // Define a route for POST requests. This example assumes the request body is plain text.
+    // Define a route for handling compile request
     svr.Post("/compile", [&DEBUG](const httplib::Request &req, httplib::Response &res) {
         // Output the request body
         if (DEBUG)
@@ -50,7 +51,12 @@ int main(const int argc, char **argv)
             std::cout << "result: " << compiled << std::endl;
 
         // Respond with compile json data
-        res.set_content(compiled, "text/plain");
+        res.set_content(compiled, "application/json");
+    });
+
+    // Define a route for handling get schema request
+    svr.Get("/get/schema", [](const httplib::Request &, httplib::Response &res) {
+        res.set_content(VNS_SCHEMA, "application/json");
     });
 
     // Start the server on localhost (at port 8181 by default)

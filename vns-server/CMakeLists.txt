@@ -6,11 +6,13 @@ project(vns_server)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Add vns-cpp
 add_subdirectory(extern/vns-cpp)
+
+# Add cpp-httplib
 add_subdirectory(extern/cpp-httplib)
 
 # Add the executable
-
 add_executable(vns_server server.cpp)
 
 # Link against libraries

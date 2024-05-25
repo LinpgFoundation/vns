@@ -3,7 +3,7 @@
 
 #include <nlohmann/json-schema.hpp>
 
-const nlohmann::json VNS_SCHEMA = R"(
+const std::string VNS_SCHEMA = R"(
     {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "properties": {
@@ -115,6 +115,8 @@ const nlohmann::json VNS_SCHEMA = R"(
         ],
         "type": "object"
     }
-)"_json;
+)";
+
+const nlohmann::json VNS_SCHEMA_JSON = nlohmann::json::parse(VNS_SCHEMA);
 
 #endif
