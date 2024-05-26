@@ -6,7 +6,7 @@
 int main(const int argc, char **argv)
 {
     // process arguments
-    const std::unordered_set<std::string> arguments_with_input = {"-p"};
+    const std::unordered_set<std::string> arguments_with_input = {"-p", "-a"};
     const std::unordered_set<std::string> arguments_without_input = {"-d"};
     std::unordered_map<std::string, std::string> arguments_map;
     for (size_t i = 1; i < argc; ++i)
@@ -22,6 +22,9 @@ int main(const int argc, char **argv)
             std::cout << "Unknown argument " << current_arg << ", ignored." << std::endl;
         }
     }
+
+    // address
+    const std::string ADDRESS = arguments_map.contains("-a") ? arguments_map.at("-a") : "0.0.0.0";
 
     // port
     const int PORT = arguments_map.contains("-p") ? stoi(arguments_map.at("-p")) : 8181;
@@ -59,10 +62,11 @@ int main(const int argc, char **argv)
         res.set_content(VNS_SCHEMA, "application/json");
     });
 
-    // Start the server on localhost (at port 8181 by default)
-    std::cout << "Starting server at http://localhost:" << PORT << std::endl;
+    // Start the server on given address (at localhost:8181 by default)
+    std::cout << "Starting server at http://" << ADDRESS << ':' << PORT << std::endl;
+
     // listen the port
-    svr.listen("localhost", PORT);
+    svr.listen(ADDRESS, PORT);
 
     return 0;
 }
