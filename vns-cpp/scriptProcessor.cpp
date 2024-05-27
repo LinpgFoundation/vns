@@ -39,14 +39,31 @@ std::string ScriptProcessor::extract_string(const std::string &text)
 
 [[noreturn]] void ScriptProcessor::terminated(const std::string &reason) const
 {
-    throw std::runtime_error("File \"" + path_.string() + "\", failed to compile due to: " + reason);
+    std::stringstream errMsg;
+    if (path_.empty())
+    {
+        errMsg << "Failed";
+    } else
+    {
+        errMsg << "File " << '"' << path_ << '"' << ", failed";
+    }
+    errMsg << " to compile due to: " << reason;
+    throw std::runtime_error(errMsg.str());
 }
 
 [[noreturn]] void ScriptProcessor::terminated(const std::string &reason, const size_t &line_index) const
 {
-    throw std::runtime_error(
-            "File \"" + path_.string() + "\", line " + std::to_string(line_index + 1) + "\n  " + lines_[line_index] +
-            "\nFail to compile due to: " + reason);
+    std::stringstream errMsg;
+    if (path_.empty())
+    {
+        errMsg << "Line";
+    } else
+    {
+        errMsg << "File " << '"' << path_ << '"' << ", line";
+    }
+    errMsg << ' ' << std::to_string(line_index + 1) << "\n  >>|" << lines_[line_index] << "|\nFail to compile due to: "
+           << reason;
+    throw std::runtime_error(errMsg.str());
 }
 
 DialoguesManager ScriptProcessor::get_output() const
@@ -54,10 +71,15 @@ DialoguesManager ScriptProcessor::get_output() const
     return output_;
 }
 
+void ScriptProcessor::process(const std::string &raw_data)
+{
+    lines_ = split(raw_data, '\n');
+    continue_process();
+}
+
 void ScriptProcessor::process(const std::filesystem::path &path)
 {
     path_ = path;
-    size_t current_index = 0;
 
     //make sure file exists
     if (!exists(path_))
@@ -68,19 +90,21 @@ void ScriptProcessor::process(const std::filesystem::path &path)
     // read file
     if (path_.extension() == SCRIPTS_FILE_EXTENSION)
     {
-        if (std::ifstream f(path_); f.is_open())
+        try
         {
-            std::string line;
-            while (std::getline(f, line))
-            {
-                lines_.push_back(line);
-            }
-            f.close();
-        } else
+            load_file_as_lines(path_, lines_);
+        }
+        catch (const std::exception &e)
         {
             terminated("File is occupied!");
         }
     }
+    continue_process();
+}
+
+void ScriptProcessor::continue_process()
+{
+
 
     // make sure file is not empty
     if (lines_.empty())
@@ -89,6 +113,8 @@ void ScriptProcessor::process(const std::filesystem::path &path)
     }
 
     std::string last_label;
+
+    size_t current_index;
 
     for (size_t i = 0; i < lines_.size(); ++i)
     {

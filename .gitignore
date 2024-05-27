@@ -163,3 +163,6 @@ vns-python/pyvns/extern/vns-cpp/
 vns-python/pyvns/cmake-build-debug/
 */.idea/
 vns-cpp/cmake-build-debug/
+vns-docs/site/
+vns-server/cmake-build-debug/
+vns-server/extern/vns-cpp/

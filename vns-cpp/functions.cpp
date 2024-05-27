@@ -59,10 +59,7 @@ std::vector<std::string> split(const std::string &str, const char c)
 
     while (getline(ss, s, c))
     {
-        if (!s.empty())
-        {
-            result.push_back(s);
-        }
+        result.push_back(s);
     }
 
     return result;
@@ -72,6 +69,21 @@ std::vector<std::string> split(const std::string &str, const char c)
 std::vector<std::string> split(const std::string &str)
 {
     return split(str, ' ');
+}
+
+// join strings with delimiter
+std::string join(const std::vector<std::string> &strings_vec, const std::string &delimiter)
+{
+    std::stringstream ss;
+    if (!strings_vec.empty())
+    {
+        // Use a lambda function with for_each to iterate and append
+        std::for_each(strings_vec.begin(), strings_vec.end() - 1, [&](const std::string &s) {
+            ss << s << delimiter;  // Append string and delimiter
+        });
+        ss << strings_vec.back().c_str();  // Append the last element without delimiter
+    }
+    return ss.str();
 }
 
 // Remove all whitespaces
@@ -124,6 +136,33 @@ void save_json(const std::filesystem::path &jsonPath, const nlohmann::json &json
     {
         std::stringstream errMsg;
         errMsg << "Cannot open json file at path: " << jsonPath;
+        throw std::runtime_error(errMsg.str());
+    }
+}
+
+// Load a plain text file and return contents as lines
+std::vector<std::string> load_file_as_lines(const std::filesystem::path &filePath)
+{
+    std::vector<std::string> lines;
+    load_file_as_lines(filePath, lines);
+    return lines;
+}
+
+// Load a plain text file and push the contents to out
+void load_file_as_lines(const std::filesystem::path &filePath, std::vector<std::string> &out)
+{
+    if (std::ifstream f(filePath); f.is_open())
+    {
+        std::string line;
+        while (std::getline(f, line))
+        {
+            out.push_back(line);
+        }
+        f.close();
+    } else
+    {
+        std::stringstream errMsg;
+        errMsg << "File " << filePath << " is occupied!";
         throw std::runtime_error(errMsg.str());
     }
 }
