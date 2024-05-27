@@ -36,7 +36,7 @@ int main(const int argc, char **argv)
     httplib::Server svr;
 
     // Define a route for handling compile request
-    svr.Post("/compile", [&DEBUG](const httplib::Request &req, httplib::Response &res) {
+    svr.Post("/post/compile", [&DEBUG](const httplib::Request &req, httplib::Response &res) {
         // Output the request body
         if (DEBUG)
             std::cout << "Received POST request with body: " << req.body << std::endl;
