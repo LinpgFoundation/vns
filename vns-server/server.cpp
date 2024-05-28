@@ -1,6 +1,7 @@
 #include "httplib.h"
 #include "extern/vns-cpp/compiler.hpp"
 #include "extern/vns-cpp/schema.hpp"
+#include "extern/vns-cpp/naming.hpp"
 
 // HTTP
 int main(const int argc, char **argv)
@@ -44,11 +45,12 @@ int main(const int argc, char **argv)
         // parse body to json
         nlohmann::json req_j = nlohmann::json::parse(req.body);
 
-        // retire raw vns data from json
-        const std::string data = req_j["data"];
+        // update naming database
+        if (req_j.contains("namings"))
+            Naming::update_database(req_j["namings"].get<std::unordered_map<std::string, std::vector<std::string>>>());
 
         // compile raw vns data
-        const std::string compiled = Compiler::load_as_string(data);
+        const std::string compiled = Compiler::load_as_string(req_j["data"].get<std::string>());
 
         if (DEBUG)
             std::cout << "result: " << compiled << std::endl;
