@@ -1,9 +1,13 @@
 import json
+from typing import Any
 
 import requests
 
+# url for the site to make api call
+api_site: str = "https://api.vns.wiki"
+
 # url for getting vns schema
-schema_url: str = "https://api.vns.wiki/get/schema"
+schema_url: str = f"{api_site}/get/schema"
 
 # send request
 schema_response: requests.Response = requests.get(schema_url)
@@ -78,13 +82,30 @@ Test Character 3:
 """
 
 # url for compiling raw vns script
-compiler_url: str = "https://api.vns.wiki/post/compile"
+compiler_url: str = f"{api_site}/post/compile"
 
 # send request
 compiler_response: requests.Response = requests.post(
     compiler_url, json={"data": raw_vns_content}
 )
 
+# the json data get from compiling the raw vns script
+json_compiled: dict[str, Any] = json.loads(compiler_response.text)
+
 # show result
 print("\nVNS online service responded compiler request with:")
-print(json.loads(compiler_response.text))
+print(json_compiled)
+
+# url for validating compiled vns json file
+validation_url: str = f"{api_site}/post/validate"
+
+# send request
+validation_response: requests.Response = requests.post(
+    validation_url, json=json_compiled
+)
+
+# obtain validation result
+validation_result: dict[str, bool] = json.loads(validation_response.text)
+
+# assert the result is True
+assert validation_result.get("result", False) is True

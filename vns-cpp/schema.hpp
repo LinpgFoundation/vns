@@ -53,6 +53,32 @@ const std::string VNS_SCHEMA = R"(
                             },
                             "type": "array"
                         },
+                        "events": {
+                            "items": {
+                                "properties": {
+                                    "target": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "value": {
+                                        "type": [
+                                            "string",
+                                            "number",
+                                            "boolean"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "target",
+                                    "type",
+                                    "value"
+                                ],
+                                "type": "object"
+                            },
+                            "type": "array"
+                        },
                         "narrator": {
                             "type": "string"
                         },

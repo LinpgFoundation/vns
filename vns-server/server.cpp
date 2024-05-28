@@ -2,6 +2,7 @@
 #include "extern/vns-cpp/compiler.hpp"
 #include "extern/vns-cpp/schema.hpp"
 #include "extern/vns-cpp/naming.hpp"
+#include "extern/vns-cpp/validator.hpp"
 
 // HTTP
 int main(const int argc, char **argv)
@@ -50,13 +51,24 @@ int main(const int argc, char **argv)
             Naming::update_database(req_j["namings"].get<std::unordered_map<std::string, std::vector<std::string>>>());
 
         // compile raw vns data
-        const std::string compiled = Compiler::load_as_string(req_j["data"].get<std::string>());
+        const std::string compiled = req_j.contains("data") ? Compiler::load_as_string(req_j["data"].get<std::string>())
+                                                            : std::string();
 
         if (DEBUG)
             std::cout << "result: " << compiled << std::endl;
 
         // Respond with compile json data
         res.set_content(compiled, "application/json");
+    });
+
+    // Define a route for handling vns format json validation request
+    svr.Post("/post/validate", [](const httplib::Request &req, httplib::Response &res) {
+        // Respond with result
+        const nlohmann::json response = {
+                {"result", !req.body.empty() && Validator::validate(nlohmann::json::parse(req.body))}};
+
+        // return result
+        res.set_content(response.dump(), "application/json");
     });
 
     // Define a route for handling get schema request
