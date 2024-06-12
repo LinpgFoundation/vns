@@ -62,26 +62,76 @@ nlohmann::json Compiler::output(const ScriptProcessor &processor)
     return json_data;
 }
 
-// compile the file
+// compile the file/files
 void Compiler::compile(const std::filesystem::path &path)
 {
-    compile(path, path.root_directory());
+    compile(path, is_directory(path) ? path : path.parent_path());
 }
 
 void Compiler::compile(const std::filesystem::path &path, const std::filesystem::path &out_dir)
 {
-    if (!is_directory(path))
-    {
-        save(load_as_json(path), out_dir);
-    } else
+    if (is_directory(path))
     {
         for (const auto &entry: std::filesystem::directory_iterator(path))
         {
             if (entry.path().extension() == ScriptProcessor::SCRIPTS_FILE_EXTENSION)
             {
-                compile(entry.path());
+                compile_script(entry.path(), out_dir);
+            } else if (entry.is_directory())
+            {
+                compile(entry.path(), out_dir / entry.path().filename());
             }
         }
+    } else if (path.extension() == ScriptProcessor::SCRIPTS_FILE_EXTENSION)
+    {
+        compile_script(path, out_dir);
+    }
+}
+
+// compile a script file and save it to given output dir
+void Compiler::compile_script(const std::filesystem::path &path, const std::filesystem::path &out_dir)
+{
+    save(load_as_json(path), out_dir);
+}
+
+// compile the file/files using multithreading
+void Compiler::parallel_compile(const std::filesystem::path &path)
+{
+    parallel_compile(path, is_directory(path) ? path : path.parent_path());
+}
+
+void Compiler::parallel_compile(const std::filesystem::path &path, const std::filesystem::path &out_dir)
+{
+    std::vector<std::thread> tasks;
+    add_tasks(path, out_dir, tasks);
+    for (std::thread &task: tasks)
+        task.join();
+}
+
+// create thread(s) that start compiling script(s)
+void Compiler::add_tasks(
+        const std::filesystem::path &path, const std::filesystem::path &out_dir, std::vector<std::thread> &tasks)
+{
+    if (is_directory(path))
+    {
+        for (const auto &entry: std::filesystem::directory_iterator(path))
+        {
+            const std::filesystem::path &entryPath = entry.path();
+            if (entryPath.extension() == ScriptProcessor::SCRIPTS_FILE_EXTENSION)
+            {
+                tasks.emplace_back([entryPath, out_dir]() {
+                    Compiler::compile_script(entryPath, out_dir);
+                });
+            } else if (entry.is_directory())
+            {
+                add_tasks(entryPath, out_dir / entryPath.filename(), tasks);
+            }
+        }
+    } else if (path.extension() == ScriptProcessor::SCRIPTS_FILE_EXTENSION)
+    {
+        tasks.emplace_back([path, out_dir]() {
+            Compiler::compile_script(path, out_dir);
+        });
     }
 }
 
@@ -92,5 +142,9 @@ void Compiler::save(const nlohmann::json &json_data, const std::filesystem::path
     std::string id = json_data.at("id");
     std::string lang = json_data.at("language");
     file_name << "chapter" << id << "_dialogs_" << lang << ".json";
+    // check output dir if it does not exist
+    if (!exists(dir_path))
+        create_directories(dir_path);
+    // save data
     save_json(dir_path / file_name.str(), json_data);
 }

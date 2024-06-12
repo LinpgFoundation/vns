@@ -4,8 +4,9 @@
 #include <string>
 #include <filesystem>
 
-const std::filesystem::path EXAMPLE_VNS_TEST_FILE = "C:/Users/yudon/Documents/GitHub/vns/examples/chapter_example.vns";
 const std::filesystem::path EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR = "C:/Users/yudon/Documents/GitHub/vns/examples";
+const std::filesystem::path EXAMPLE_VNS_TEST_FILE = EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR / "chapter_example.vns";
+const std::filesystem::path EXAMPLE_DUMMY_TEST_FILE = EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR / "dummy.txt";
 
 void TestNameWithoutTag();
 

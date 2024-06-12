@@ -110,6 +110,66 @@ void TestCompiler()
     assert(test_dialogues_manager.get_current()->next.get_target() == "~01");
     // remove output json file as it is no longer needed
     std::filesystem::remove(jsonPath);
+
+    // test folder compile
+    const std::filesystem::path testFolderPath = EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR / "test_folder";
+    const std::filesystem::path testChildFolderPath = testFolderPath / "child_folder";
+    const std::filesystem::path testAnotherOutFolderPath = EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR / "test_out";
+    // remove possible caches due to error
+    if (exists(testFolderPath))
+        std::filesystem::remove_all(testFolderPath);
+    if (exists(testAnotherOutFolderPath))
+        std::filesystem::remove_all(testAnotherOutFolderPath);
+    // create a new folder
+    std::filesystem::create_directories(testChildFolderPath);
+    // copy vns files
+    std::filesystem::copy_file(EXAMPLE_VNS_TEST_FILE, testFolderPath / EXAMPLE_VNS_TEST_FILE.filename());
+    std::filesystem::copy_file(EXAMPLE_VNS_TEST_FILE, testChildFolderPath / EXAMPLE_VNS_TEST_FILE.filename());
+    // copy dummy files
+    std::filesystem::copy_file(EXAMPLE_DUMMY_TEST_FILE, testFolderPath / EXAMPLE_DUMMY_TEST_FILE.filename());
+    std::filesystem::copy_file(EXAMPLE_DUMMY_TEST_FILE, testChildFolderPath / EXAMPLE_DUMMY_TEST_FILE.filename());
+    // try to compile the folder recursively
+    Compiler::compile(testFolderPath);
+    // make sure all vns files were compiled
+    Validator::ensure(testFolderPath / "chapter1_dialogs_English.json");
+    Validator::ensure(testChildFolderPath / "chapter1_dialogs_English.json");
+    // once files existence check pass, remove the files before next test
+    std::filesystem::remove(testFolderPath / "chapter1_dialogs_English.json");
+    std::filesystem::remove(testChildFolderPath / "chapter1_dialogs_English.json");
+
+    // try to compile the scripts and save the result to another folder
+    Compiler::compile(testFolderPath, testAnotherOutFolderPath);
+    // make sure all vns files were compiled
+    Validator::ensure(testAnotherOutFolderPath / "chapter1_dialogs_English.json");
+    Validator::ensure(testAnotherOutFolderPath / testChildFolderPath.filename() / "chapter1_dialogs_English.json");
+    // make sure output are not saved to where it is not supposed to be saved
+    assert(!exists(testFolderPath / "chapter1_dialogs_English.json"));
+    assert(!exists(testChildFolderPath / "chapter1_dialogs_English.json"));
+    // once files existence check pass, remove the files before next test
+    std::filesystem::remove_all(testAnotherOutFolderPath);
+
+    // try to compile the folder recursively, with multi-threading
+    Compiler::parallel_compile(testFolderPath);
+    // make sure all vns files were compiled
+    Validator::ensure(testFolderPath / "chapter1_dialogs_English.json");
+    Validator::ensure(testChildFolderPath / "chapter1_dialogs_English.json");
+    // once files existence check pass, remove the files before next test
+    std::filesystem::remove(testFolderPath / "chapter1_dialogs_English.json");
+    std::filesystem::remove(testChildFolderPath / "chapter1_dialogs_English.json");
+
+    // try to compile the scripts with multi-threading and save the result to another folder
+    Compiler::parallel_compile(testFolderPath, testAnotherOutFolderPath);
+    // make sure all vns files were compiled
+    Validator::ensure(testAnotherOutFolderPath / "chapter1_dialogs_English.json");
+    Validator::ensure(testAnotherOutFolderPath / testChildFolderPath.filename() / "chapter1_dialogs_English.json");
+    // make sure output are not saved to where it is not supposed to be saved
+    assert(!exists(testFolderPath / "chapter1_dialogs_English.json"));
+    assert(!exists(testChildFolderPath / "chapter1_dialogs_English.json"));
+    // once files existence check pass, remove the files before next test
+    std::filesystem::remove_all(testAnotherOutFolderPath);
+
+    // remove test folder after finish testing
+    std::filesystem::remove_all(testFolderPath);
 }
 
 void TestDialoguesManager()
