@@ -108,6 +108,18 @@ void TestCompiler()
     assert(test_dialogues_manager.get_current()->next.has_single_target());
     // test_dialogues_manager's head should have ~01 as the next
     assert(test_dialogues_manager.get_current()->next.get_target() == "~01");
+    // assume branches are compiled correctly
+    test_dialogues_manager.set_current_dialogue_id("branch_choices");
+    assert(test_dialogues_manager.get_current()->has_next());
+    assert(test_dialogues_manager.get_current()->next.has_multi_targets());
+    assert(test_dialogues_manager.get_current()->next.get_targets().size() == 2);
+    test_dialogues_manager.set_current_dialogue_id("last_one");
+    assert(test_dialogues_manager.get_current()->previous == "branch_choices");
+    test_dialogues_manager.set_current_dialogue_id("jumping_point1");
+    assert(test_dialogues_manager.get_current()->previous == "branch_choices");
+    test_dialogues_manager.next();
+    assert(test_dialogues_manager.get_current()->previous == "jumping_point1");
+    assert(!test_dialogues_manager.get_current()->has_next());
     // remove output json file as it is no longer needed
     std::filesystem::remove(jsonPath);
 
@@ -207,7 +219,7 @@ void TestDialoguesManager()
     assert(test_dialogues_manager.get_current()->has_next() &&
            test_dialogues_manager.get_current()->next.has_single_target());
     assert(test_dialogues_manager.get_current()->next.has_single_target());
-    assert(test_dialogues_manager.get_current()->next.get_target() == "~04");
+    assert(test_dialogues_manager.get_current()->next.get_target() == "branch_choices");
     // test remove section
     test_dialogues_manager.set_dialogues("test_remove_section", dialogue_section_t({{"head", {}}}));
     test_dialogues_manager.set_section("test_remove_section");
@@ -245,14 +257,14 @@ void TestDialoguesManager()
     assert(test_dialogues_manager.get_current()->id == "~03");
     assert(test_dialogues_manager.get_current()->previous == "head");
     assert(test_dialogues_manager.get_current()->next.has_single_target());
-    assert(test_dialogues_manager.get_current()->next.get_target() == "~04");
-    // remove jumping_point1 and see if ~04 got updated correctly
+    assert(test_dialogues_manager.get_current()->next.get_target() == "branch_choices");
+    // remove jumping_point1 and see if branch_choices got updated correctly
     test_dialogues_manager.remove_dialogue(test_dialogues_manager.get_section(), "jumping_point1");
     assert(!test_dialogues_manager.contains_dialogue(test_dialogues_manager.get_section(), "jumping_point1"));
     assert(test_dialogues_manager.get_current()->id == "~03");
     assert(test_dialogues_manager.get_current()->previous == "head");
     assert(test_dialogues_manager.get_current()->next.has_single_target());
-    assert(test_dialogues_manager.get_current()->next.get_target() == "~04");
+    assert(test_dialogues_manager.get_current()->next.get_target() == "branch_choices");
     test_dialogues_manager.next();
     assert(test_dialogues_manager.get_current()->next.has_multi_targets());
     assert(!test_dialogues_manager.get_current()->next.contains_target("jumping_point1"));

@@ -40,6 +40,7 @@ private:
     std::string previous_;
     std::vector<std::string> lines_;
     std::unordered_map<size_t, std::string> dialog_associate_key_;
+    std::unordered_map<std::string, std::string> branches_;
 
     bool blocked_;
 

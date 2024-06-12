@@ -1,11 +1,40 @@
 {
     "compiler": {
-        "compiledAt": 1716322057,
+        "compiledAt": 1718234112,
         "reversion": 2,
         "version": 2
     },
     "dialogues": {
         "dialog_example": {
+            "branch_choices": {
+                "background_image": "bg2.png",
+                "background_music": "bgm2.ogg",
+                "character_images": [
+                    "test_character1.png&silent",
+                    "test_character2.png&silent"
+                ],
+                "contents": [
+                    "Hello I am test character 2."
+                ],
+                "narrator": "Test Character 2",
+                "next": {
+                    "target": [
+                        {
+                            "id": "jumping_point1",
+                            "text": "click here to go to jump point 1"
+                        },
+                        {
+                            "id": "last_one",
+                            "text": "click here to go to the end"
+                        }
+                    ],
+                    "type": "options"
+                },
+                "notes": [
+                    "this the second dialogue of section 2"
+                ],
+                "previous": "~03"
+            },
             "head": {
                 "background_image": "bg1.png",
                 "background_music": "bgm1.ogg",
@@ -41,7 +70,8 @@
                 "next": {
                     "target": "~07",
                     "type": "default"
-                }
+                },
+                "previous": "branch_choices"
             },
             "last_one": {
                 "background_image": "bg2.png",
@@ -54,7 +84,7 @@
                     "Ok this is the end"
                 ],
                 "narrator": "Test Character 2",
-                "previous": "~04"
+                "previous": "branch_choices"
             },
             "~01": {
                 "background_image": "bg1.png",
@@ -143,41 +173,13 @@
                 ],
                 "narrator": "Test Character 1",
                 "next": {
-                    "target": "~04",
+                    "target": "branch_choices",
                     "type": "default"
                 },
                 "notes": [
-                    "this the first dialogue of section 2"
+                    "this the first dialogue of section 2,",
+                    "and there are more than one note"
                 ]
-            },
-            "~04": {
-                "background_image": "bg2.png",
-                "background_music": "bgm2.ogg",
-                "character_images": [
-                    "test_character1.png&silent",
-                    "test_character2.png&silent"
-                ],
-                "contents": [
-                    "Hello I am test character 2."
-                ],
-                "narrator": "Test Character 2",
-                "next": {
-                    "target": [
-                        {
-                            "id": "jumping_point1",
-                            "text": "click here to go to jump point 1"
-                        },
-                        {
-                            "id": "last_one",
-                            "text": "click here to go to the end"
-                        }
-                    ],
-                    "type": "options"
-                },
-                "notes": [
-                    "this the second dialogue of section 2"
-                ],
-                "previous": "~03"
             },
             "~07": {
                 "background_image": "bg2.png",

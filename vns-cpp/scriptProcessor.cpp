@@ -1,5 +1,4 @@
 #include <vector>
-#include <cassert>
 #include <stdexcept>
 #include <fstream>
 #include "functions.hpp"
@@ -116,10 +115,18 @@ void ScriptProcessor::continue_process()
 
     size_t current_index;
 
+    // lines clean up
+    for (auto &line: lines_)
+        line = trim(line.substr(0, line.find(COMMENT_PREFIX)));
+
+    // remove all empty lines or lines starting with # (comments)
+    lines_.erase(std::remove_if(lines_.begin(), lines_.end(), [](const std::string &line) {
+        return line.empty() || line.starts_with(COMMENT_PREFIX);
+    }), lines_.end());
+
+    // process all the lines
     for (size_t i = 0; i < lines_.size(); ++i)
     {
-        lines_[i] = trim(lines_[i].substr(0, lines_[i].find(COMMENT_PREFIX)));
-
         if (lines_[i].starts_with(TAG_STARTS))
         {
             if (const std::string tag = extract_tag(lines_[i]); tag == "label")
@@ -178,11 +185,7 @@ void ScriptProcessor::convert(const size_t starting_index)
     {
         // obtain current line as a pointer
         const std::string &current_line = lines_[line_index];
-        // Skip empty lines or lines starting with #
-        if (current_line.empty() || lines_[line_index].starts_with(COMMENT_PREFIX))
-        {
-            // Do nothing
-        } else if (current_line.starts_with(NOTE_PREFIX))
+        if (current_line.starts_with(NOTE_PREFIX))
         {
             // Accumulate notes
             current_data_.notes.push_back(current_line.substr(NOTE_PREFIX.length() + 1));
@@ -265,15 +268,17 @@ void ScriptProcessor::convert(const size_t starting_index)
                 }
             } else if (tag == "scene")
             {
-                assert(!previous_.empty());
-                if (output_.get_dialogue(section_, previous_).next.has_multi_targets())
+                if (previous_.empty())
                 {
-                    output_.get_dialogue(section_, previous_).set_next("scene", output_.get_dialogue(section_,
-                                                                                                     previous_).next.get_targets());
+                    terminated("Cannot use scene tag when there is not previous dialogue.", line_index);
+                }
+                Dialogue &previous_dialogue = output_.get_dialogue(section_, previous_);
+                if (previous_dialogue.next.has_multi_targets())
+                {
+                    previous_dialogue.set_next("scene", previous_dialogue.next.get_targets());
                 } else
                 {
-                    output_.get_dialogue(section_, previous_).set_next("scene", output_.get_dialogue(section_,
-                                                                                                     previous_).next.get_target());
+                    previous_dialogue.set_next("scene", previous_dialogue.next.get_target());
                 }
                 current_data_.background_image = extract_parameter(current_line);
                 blocked_ = true;
@@ -295,9 +300,11 @@ void ScriptProcessor::convert(const size_t starting_index)
                 // get value string
                 const std::string src_to_target = extract_string(current_line);
                 // push text and id map
+                const std::string option_points_to = ensure_not_null(
+                        trim(src_to_target.substr(src_to_target.find("->") + 2)));
                 current_targets.push_back({{"text", trim(src_to_target.substr(0, src_to_target.find("->")))},
-                                           {"id",   ensure_not_null(
-                                                   trim(src_to_target.substr(src_to_target.find("->") + 2)))}});
+                                           {"id",   option_points_to}});
+                branches_[option_points_to] = previous_;
                 // update next
                 output_.get_dialogue(section_, previous_).set_next("options", current_targets);
             }
@@ -353,7 +360,17 @@ void ScriptProcessor::convert(const size_t starting_index)
                 output_.set_current_section_dialogues({});
             }
 
-            if (!previous_.empty())
+            // update previous_ if it is supposed to be part of the branching operation
+            if (branches_.contains(dialog_associate_key_[line_index]))
+            {
+                previous_ = branches_.at(dialog_associate_key_[line_index]);
+            }
+
+            // update current_data_ accordingly
+            if (previous_.empty())
+            {
+                current_data_.previous.clear();
+            } else
             {
                 if (blocked_)
                 {
@@ -384,9 +401,6 @@ void ScriptProcessor::convert(const size_t starting_index)
                 {
                     terminated("KeyError: " + previous_, line_index);
                 }
-            } else
-            {
-                current_data_.previous.clear();
             }
 
             previous_ = dialog_associate_key_[line_index];
