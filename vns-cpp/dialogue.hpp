@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 #include "dialogueNext.hpp"
-#include "Event.hpp"
+#include "event.hpp"
 
 using dialogue_data_t = std::unordered_map<std::string, std::variant<std::string, std::vector<std::string>, dialogue_next_t, std::vector<event_t>>>;
 

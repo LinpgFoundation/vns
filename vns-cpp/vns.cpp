@@ -15,24 +15,20 @@ int main(const int argc, char **argv)
     std::unordered_map<std::string, std::string> arguments_map;
     for (size_t i = 1; i < argc; ++i)
     {
-        if (std::string current_arg = argv[i]; arguments_with_input.contains(current_arg))
+        if (arguments_with_input.contains(argv[i]))
         {
-            arguments_map[current_arg] = argv[++i];
-        } else if (arguments_without_input.contains(current_arg))
+            arguments_map[argv[i]] = argv[++i];
+        } else if (arguments_without_input.contains(argv[i]))
         {
-            arguments_map[current_arg].clear();
+            arguments_map[argv[i]].clear();
         }
     }
     // update naming database
     if (arguments_map.contains("-n"))
-    {
         Naming::update_database(arguments_map.at("-n"));
-    }
     // run tests
     if (arguments_map.contains("-t"))
-    {
         TestAll();
-    }
     // compile file and save as json
     if (arguments_map.contains("-i"))
     {

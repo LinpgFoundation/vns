@@ -7,7 +7,7 @@
 #include <cmath>
 #include <utility>
 #include <functional>
-#include "Event.hpp"
+#include "event.hpp"
 #include "number.hpp"
 #include "functions.hpp"
 
