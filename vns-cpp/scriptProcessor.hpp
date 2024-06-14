@@ -9,7 +9,8 @@ public:
     static const std::string inline SCRIPTS_FILE_EXTENSION = ".vns";
     static const std::unordered_map<std::string, std::string> inline ALTERNATIVES = {{"lang", "language"},
                                                                                      {"opt",  "option"},
-                                                                                     {"disp", "display"}};
+                                                                                     {"disp", "display"},
+                                                                                     {"jmp",  "jump"}};
     static const std::unordered_set<std::string> inline RESERVED_WORDS = {"null", "none", "head"};
     static const std::string inline TAG_STARTS = "[";
     static const std::string inline TAG_ENDS = "]";

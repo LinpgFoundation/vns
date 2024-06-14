@@ -307,6 +307,25 @@ void ScriptProcessor::convert(const size_t starting_index)
                 branches_[option_points_to] = previous_;
                 // update next
                 output_.get_dialogue(section_, previous_).set_next("options", current_targets);
+            } else if (tag == "jump")
+            {
+                // cannot jump when previous dialogue does not exist
+                if (previous_.empty())
+                {
+                    terminated("Cannot use jump tag when there is not previous dialogue.", line_index);
+                }
+                    // cannot jump when previous dialogue has multiple targets
+                else if (output_.get_dialogue(section_, previous_).next.has_multi_targets())
+                {
+                    terminated("Cannot use jump tag when previous dialogue has multiple targets.", line_index);
+                }
+                // update previous dialogue's next
+                output_.get_dialogue(section_, previous_).set_next(
+                        output_.get_dialogue(section_, previous_).next.get_type(), extract_parameter(current_line));
+                // write branch info into lookup table
+                branches_[extract_parameter(current_line)] = previous_;
+                // remove prev
+                previous_.clear();
             }
                 // Placeholder, no action needed for "label" tag
             else if (tag == "label")
