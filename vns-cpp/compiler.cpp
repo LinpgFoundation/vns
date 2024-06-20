@@ -9,6 +9,7 @@ std::unordered_map<std::string, size_t> Compiler::get_compiler_info()
 {
     return {{"version",    VERSION},
             {"reversion",  REVISION},
+            {"patch",      PATCH},
             {"compiledAt", static_cast<size_t>(std::time(nullptr))}};
 }
 
