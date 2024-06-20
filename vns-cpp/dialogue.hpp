@@ -38,6 +38,8 @@ public:
     {
     }
 
+    [[nodiscard]] bool has_previous() const;
+
     [[nodiscard]] bool has_next() const;
 
     void set_next(const std::string &, const dialogue_next_target_t &);

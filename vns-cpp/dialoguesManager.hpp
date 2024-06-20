@@ -29,6 +29,9 @@ public:
     // Update data
     void update(const nlohmann::json &);
 
+    // Go to previous dialogue
+    void previous();
+
     // Go to next dialogue
     void next();
 

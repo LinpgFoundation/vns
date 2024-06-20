@@ -94,6 +94,13 @@ void DialoguesManager::update(const nlohmann::json &data)
     set_current_dialogue_id("head");
 }
 
+// Go to previous dialogue
+void DialoguesManager::previous()
+{
+    if (get_current()->has_previous())
+        set_current_dialogue_id(get_current()->previous);
+}
+
 // Go to next dialogue
 void DialoguesManager::next()
 {
