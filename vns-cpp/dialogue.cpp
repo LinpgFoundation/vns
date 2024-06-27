@@ -38,6 +38,12 @@ Dialogue::Dialogue(const std::string &content_id, const nlohmann::json &data)
     }
 }
 
+bool Dialogue::has_previous() const
+{
+    return !previous.empty();
+}
+
+
 bool Dialogue::has_next() const
 {
     return !next.is_null();

@@ -12,6 +12,9 @@ const std::string VNS_SCHEMA = R"(
                     "compiledAt": {
                         "type": "integer"
                     },
+                    "patch": {
+                        "type": "integer"
+                    },
                     "reversion": {
                         "type": "integer"
                     },

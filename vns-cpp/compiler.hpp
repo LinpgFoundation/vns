@@ -1,6 +1,7 @@
 #ifndef COMPILER_HPP
 #define COMPILER_HPP
 
+#include <thread>
 #include <filesystem>
 #include <unordered_map>
 #include <nlohmann/json.hpp>
@@ -18,6 +19,10 @@ public:
 
     static void compile(const std::filesystem::path &, const std::filesystem::path &);
 
+    static void parallel_compile(const std::filesystem::path &);
+
+    static void parallel_compile(const std::filesystem::path &, const std::filesystem::path &);
+
     static std::string load_as_string(const std::filesystem::path &);
 
     static std::string load_as_string(const std::string &);
@@ -30,6 +35,10 @@ private:
     static nlohmann::json output(const ScriptProcessor &);
 
     static void save(const nlohmann::json &, const std::filesystem::path &);
+
+    static void compile_script(const std::filesystem::path &, const std::filesystem::path &);
+
+    static void add_tasks(const std::filesystem::path &, const std::filesystem::path &, std::vector<std::thread> &);
 };
 
 #endif

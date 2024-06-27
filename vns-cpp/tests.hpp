@@ -4,25 +4,35 @@
 #include <string>
 #include <filesystem>
 
-const std::filesystem::path EXAMPLE_VNS_TEST_FILE = "C:/Users/yudon/Documents/GitHub/vns/examples/chapter_example.vns";
-const std::filesystem::path EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR = "C:/Users/yudon/Documents/GitHub/vns/examples";
+class Tests
+{
+    static std::filesystem::path inline EXAMPLE_VNS_TEST_FILES_DIR;
+    static std::filesystem::path inline EXAMPLE_VNS_TEST_FILE;
+    static std::filesystem::path inline EXAMPLE_VNS_BRANCHES_TESTS_FILE;
+    static std::filesystem::path inline EXAMPLE_DUMMY_TEST_FILE;
 
-void TestNameWithoutTag();
+    static void TestNameWithoutTag();
 
-void TestNameWithTags();
+    static void TestNameWithTags();
 
-void TestNullNext();
+    static void TestNullNext();
 
-void TestSingleTargetNext();
+    static void TestSingleTargetNext();
 
-void TestMultiTargetsNext();
+    static void TestMultiTargetsNext();
 
-void TestAll();
+    static void TestScriptProcessor();
 
-void TestScriptProcessor();
+    static void TestCompiler();
 
-void TestCompiler();
+    static void TestDialoguesManager();
 
-void TestDialoguesManager();
+    static void TestBranching();
+
+public:
+    static void SetTestFolderPath(const std::filesystem::path &);
+
+    static void TestAll();
+};
 
 #endif
