@@ -8,7 +8,15 @@
 #include "validator.hpp"
 #include "functions.hpp"
 
-void TestNameWithoutTag()
+void Tests::SetTestFolderPath(const std::filesystem::path &dir)
+{
+    EXAMPLE_VNS_TEST_FILES_DIR = dir;
+    EXAMPLE_VNS_TEST_FILE = EXAMPLE_VNS_TEST_FILES_DIR / "chapter_example.vns";
+    EXAMPLE_VNS_BRANCHES_TESTS_FILE = EXAMPLE_VNS_TEST_FILES_DIR / "chapter_branches_tests.vns";
+    EXAMPLE_DUMMY_TEST_FILE = EXAMPLE_VNS_TEST_FILES_DIR / "dummy.txt";
+}
+
+void Tests::TestNameWithoutTag()
 {
     const std::string test_name_str = "maria.png";
     const Naming test_name(test_name_str);
@@ -18,7 +26,7 @@ void TestNameWithoutTag()
     assert(test_name.to_string() == test_name_str);
 }
 
-void TestNameWithTags()
+void Tests::TestNameWithTags()
 {
     const std::string test_name_str = "maria.png&silent&hide";
     const std::string test_name_img = "maria.png";
@@ -34,7 +42,7 @@ void TestNameWithTags()
     assert(test_name.contains_tag("silent"));
 }
 
-void TestNullNext()
+void Tests::TestNullNext()
 {
     const DialogueNext test_null_next;
     assert(test_null_next.is_null());
@@ -43,7 +51,7 @@ void TestNullNext()
     assert(test_null_next.get_target().empty());
 }
 
-void TestSingleTargetNext()
+void Tests::TestSingleTargetNext()
 {
     const DialogueNext single_target_next(dialogue_next_t({{"type",   "default"},
                                                            {"target", "~1"}}));
@@ -53,7 +61,7 @@ void TestSingleTargetNext()
     assert(single_target_next.get_target() == "~1");
 }
 
-void TestMultiTargetsNext()
+void Tests::TestMultiTargetsNext()
 {
     const std::unordered_map<std::string, std::string> t1 = {{"hello1", "world1"}};
     const std::unordered_map<std::string, std::string> t2 = {{"hello2", "world2"}};
@@ -66,7 +74,7 @@ void TestMultiTargetsNext()
     assert(multi_targets_next.get_targets().size() == 2);
 }
 
-void TestScriptProcessor()
+void Tests::TestScriptProcessor()
 {
     ScriptProcessor test_processor;
     test_processor.process(EXAMPLE_VNS_TEST_FILE);
@@ -86,13 +94,13 @@ void TestScriptProcessor()
     assert(test_processor.get_language() == "English");
 }
 
-void TestCompiler()
+void Tests::TestCompiler()
 {
     // compile file
-    Compiler::compile(EXAMPLE_VNS_TEST_FILE, EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR);
+    Compiler::compile(EXAMPLE_VNS_TEST_FILE, EXAMPLE_VNS_TEST_FILES_DIR);
     // make sure output file exists
     std::filesystem::path outFileName = "chapter1_dialogs_English.json";
-    std::filesystem::path jsonPath = EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR / outFileName;
+    std::filesystem::path jsonPath = EXAMPLE_VNS_TEST_FILES_DIR / outFileName;
     assert(std::filesystem::exists(jsonPath));
     // make sure file is in correct format
     Validator::ensure(jsonPath);
@@ -107,6 +115,18 @@ void TestCompiler()
     assert(test_dialogues_manager.get_current()->has_next());
     assert(test_dialogues_manager.get_current()->next.has_single_target());
     // test_dialogues_manager's head should have ~01 as the next
+    assert(test_dialogues_manager.get_current()->next.get_target() == "~01");
+    // test next method
+    test_dialogues_manager.next();
+    assert(test_dialogues_manager.get_current()->id == "~01");
+    assert(test_dialogues_manager.get_current()->has_previous());
+    assert(test_dialogues_manager.get_current()->previous == "head");
+    // test previous method
+    test_dialogues_manager.previous();
+    assert(test_dialogues_manager.get_current()->id == "head");
+    assert(!test_dialogues_manager.get_current()->has_previous());
+    assert(test_dialogues_manager.get_current()->has_next());
+    assert(test_dialogues_manager.get_current()->next.has_single_target());
     assert(test_dialogues_manager.get_current()->next.get_target() == "~01");
     // assume branches are compiled correctly
     test_dialogues_manager.set_current_dialogue_id("branch_choices");
@@ -124,9 +144,9 @@ void TestCompiler()
     std::filesystem::remove(jsonPath);
 
     // test folder compile
-    const std::filesystem::path testFolderPath = EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR / "test_folder";
+    const std::filesystem::path testFolderPath = EXAMPLE_VNS_TEST_FILES_DIR / "test_folder";
     const std::filesystem::path testChildFolderPath = testFolderPath / "child_folder";
-    const std::filesystem::path testAnotherOutFolderPath = EXAMPLE_VNS_TEST_FILE_OUTPUT_DIR / "test_out";
+    const std::filesystem::path testAnotherOutFolderPath = EXAMPLE_VNS_TEST_FILES_DIR / "test_out";
     // remove possible caches due to error
     if (exists(testFolderPath))
         std::filesystem::remove_all(testFolderPath);
@@ -184,7 +204,7 @@ void TestCompiler()
     std::filesystem::remove_all(testFolderPath);
 }
 
-void TestDialoguesManager()
+void Tests::TestDialoguesManager()
 {
     DialoguesManager test_dialogues_manager;
     // make sure section has been init as empty string
@@ -233,7 +253,7 @@ void TestDialoguesManager()
     test_dialogues_manager.remove_current_dialogue();
     assert(!test_dialogues_manager.contains_dialogue(test_dialogues_manager.get_section(), "~01"));
     assert(test_dialogues_manager.get_current()->id == "head");
-    assert(test_dialogues_manager.get_current()->previous.empty());
+    assert(!test_dialogues_manager.get_current()->has_previous());
     assert(test_dialogues_manager.get_current()->has_next());
     assert(test_dialogues_manager.get_current()->next.has_single_target());
     assert(test_dialogues_manager.get_current()->next.get_target() == "~02");
@@ -248,7 +268,7 @@ void TestDialoguesManager()
     assert(!test_dialogues_manager.contains_dialogue(test_dialogues_manager.get_section(), "~02"));
     // not that current dialogue will be reset back to head
     assert(test_dialogues_manager.get_current()->id == "head");
-    assert(test_dialogues_manager.get_current()->previous.empty());
+    assert(!test_dialogues_manager.get_current()->has_previous());
     assert(test_dialogues_manager.get_current()->has_next());
     assert(test_dialogues_manager.get_current()->next.has_single_target());
     assert(test_dialogues_manager.get_current()->next.get_target() == "~03");
@@ -270,7 +290,66 @@ void TestDialoguesManager()
     assert(!test_dialogues_manager.get_current()->next.contains_target("jumping_point1"));
 }
 
-void TestAll()
+void Tests::TestBranching()
+{
+    // try to compile the script
+    // Compiler::compile(EXAMPLE_VNS_BRANCHES_TESTS_FILE);
+    // init a manage for loading the script
+    DialoguesManager test_dialogues_manager;
+    // make sure section has been init as empty string
+    assert(test_dialogues_manager.get_section().empty());
+    // load test file
+    test_dialogues_manager.load(EXAMPLE_VNS_BRANCHES_TESTS_FILE);
+    // test_dialogues_manager's default section will be set to dialog_example
+    assert(test_dialogues_manager.get_section() == "dialog_example");
+    // test_dialogues_manager's default current dialogue will be set to head
+    assert(test_dialogues_manager.get_current()->id == "head");
+    // assert next is ~01
+    assert(test_dialogues_manager.get_current()->has_next());
+    assert(test_dialogues_manager.get_current()->next.has_single_target());
+    assert(test_dialogues_manager.get_current()->next.get_target() == "~01");
+    // go to next
+    test_dialogues_manager.next();
+    assert(test_dialogues_manager.get_current()->id == "~01");
+    // make sure next is first_jump
+    assert(test_dialogues_manager.get_current()->has_next());
+    assert(test_dialogues_manager.get_current()->next.has_single_target());
+    assert(test_dialogues_manager.get_current()->next.get_target() == "first_jump");
+    // go to next - first_jump
+    test_dialogues_manager.next();
+    assert(test_dialogues_manager.get_current()->id == "first_jump");
+    assert(test_dialogues_manager.get_current()->previous == "~01");
+    // continue
+    assert(test_dialogues_manager.get_current()->has_next());
+    assert(test_dialogues_manager.get_current()->next.has_single_target());
+    test_dialogues_manager.next();
+    assert(test_dialogues_manager.get_current()->has_previous());
+    assert(test_dialogues_manager.get_current()->previous == "first_jump");
+    assert(test_dialogues_manager.get_current()->has_next());
+    assert(test_dialogues_manager.get_current()->next.has_single_target());
+    test_dialogues_manager.next();
+    // make sure next is no_prev_jump
+    assert(test_dialogues_manager.get_current()->has_next());
+    assert(test_dialogues_manager.get_current()->next.has_single_target());
+    assert(test_dialogues_manager.get_current()->next.get_target() == "no_prev_jump");
+    // now we are at no_prev_jump
+    test_dialogues_manager.next();
+    assert(test_dialogues_manager.get_current()->id == "no_prev_jump");
+    assert(!test_dialogues_manager.get_current()->has_previous());
+    assert(!test_dialogues_manager.get_current()->has_next());
+    // check ~02, which is a void
+    test_dialogues_manager.set_current_dialogue_id("~02");
+    assert(test_dialogues_manager.get_current()->id == "~02");
+    assert(!test_dialogues_manager.get_current()->has_previous());
+    assert(!test_dialogues_manager.get_current()->has_next());
+    // check ~06, which is another void
+    test_dialogues_manager.set_current_dialogue_id("~06");
+    assert(test_dialogues_manager.get_current()->id == "~06");
+    assert(!test_dialogues_manager.get_current()->has_previous());
+    assert(!test_dialogues_manager.get_current()->has_next());
+}
+
+void Tests::TestAll()
 {
     std::cout << "- Test naming and tags\n";
     TestNameWithoutTag();
@@ -285,6 +364,8 @@ void TestAll()
     TestScriptProcessor();
     std::cout << "- Test compiler\n";
     TestCompiler();
+    std::cout << "- Test branching\n";
+    TestBranching();
     std::cout << "- Test Dialogues Manager\n";
     TestDialoguesManager();
     std::cout << "> Done\n";

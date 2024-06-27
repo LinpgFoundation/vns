@@ -389,6 +389,7 @@ void ScriptProcessor::convert(const size_t starting_index)
             if (previous_.empty())
             {
                 current_data_.previous.clear();
+                blocked_ = false;
             } else
             {
                 if (blocked_)

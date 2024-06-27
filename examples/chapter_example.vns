@@ -45,7 +45,7 @@ Test Character 1:
 [label]branch_choices
 Test Character 2:
 - Hello I am test character 2.
-[option]click here to go to jump point 1 -> jumping_point1
+[option] click here to go to jump point 1 -> jumping_point1
 [option]click here to go to the end -> last_one
 
 [label]last_one
