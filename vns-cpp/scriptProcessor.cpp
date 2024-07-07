@@ -5,6 +5,7 @@
 #include "scriptProcessor.hpp"
 #include "naming.hpp"
 #include "operation.hpp"
+#include "tags.hpp"
 
 std::string ScriptProcessor::get_id() const
 {
@@ -62,6 +63,22 @@ std::string ScriptProcessor::extract_string(const std::string &text)
     }
     errMsg << ' ' << std::to_string(line_index + 1) << "\n  >>|" << lines_[line_index] << "|\nFail to compile due to: "
            << reason;
+    throw std::runtime_error(errMsg.str());
+}
+
+[[noreturn]] void
+ScriptProcessor::terminated(const std::string &reason, const size_t &line_index, const std::string &tag) const
+{
+    std::stringstream errMsg;
+    if (path_.empty())
+    {
+        errMsg << "Line";
+    } else
+    {
+        errMsg << "File " << '"' << path_ << '"' << ", line";
+    }
+    errMsg << ' ' << std::to_string(line_index + 1) << "\n  >>|" << lines_[line_index] << "|\nFail to compile due to "
+           << reason << ':' << ' ' << tag;
     throw std::runtime_error(errMsg.str());
 }
 
@@ -129,7 +146,7 @@ void ScriptProcessor::continue_process()
     {
         if (lines_[i].starts_with(TAG_STARTS))
         {
-            if (const std::string tag = extract_tag(lines_[i]); tag == "label")
+            if (const std::string tag = extract_tag(lines_[i]); tag == tags::label)
             {
                 if (!last_label.empty())
                 {
@@ -141,7 +158,7 @@ void ScriptProcessor::continue_process()
                 {
                     terminated("You cannot use reserved word '" + last_label + "' as a label", i);
                 }
-            } else if (tag == "section")
+            } else if (tag == tags::section)
             {
                 current_index = 0;
             }
@@ -194,24 +211,22 @@ void ScriptProcessor::convert(const size_t starting_index)
             std::string tag = extract_tag(current_line);
 
             // check if the tag is an alternative of another tag
-            if (ALTERNATIVES.contains(tag))
-            {
-                tag = ALTERNATIVES.at(tag);
-            }
+            if (tags::alternatives.contains(tag))
+                tag = tags::alternatives.at(tag);
 
-            if (tag == "bgi")
+            if (tag == tags::background_image)
             {
                 current_data_.background_image = extract_parameter(current_line);
-            } else if (tag == "bgm")
+            } else if (tag == tags::background_music)
             {
                 current_data_.background_music = extract_parameter(current_line);
-            } else if (tag == "show")
+            } else if (tag == tags::show)
             {
                 for (const std::string &name: split(extract_string(current_line)))
                 {
                     current_data_.character_images.push_back(name);
                 }
-            } else if (tag == "hide")
+            } else if (tag == tags::hide)
             {
                 for (const std::string &name: split(extract_string(current_line)))
                 {
@@ -224,24 +239,24 @@ void ScriptProcessor::convert(const size_t starting_index)
                         return Naming(n).equal(name);
                     });
                 }
-            } else if (tag == "display")
+            } else if (tag == tags::display)
             {
                 current_data_.character_images.clear();
                 for (const std::string &name: split(extract_string(current_line)))
                 {
                     current_data_.character_images.push_back(name);
                 }
-            } else if (tag == "id")
+            } else if (tag == tags::id)
             {
                 id_ = extract_parameter(current_line);
                 if (id_.empty())
                 {
                     terminated("Chapter id cannot be None!", line_index);
                 }
-            } else if (tag == "language")
+            } else if (tag == tags::language)
             {
                 lang_ = extract_string(current_line);
-            } else if (tag == "section")
+            } else if (tag == tags::section)
             {
                 if (!previous_.empty())
                 {
@@ -259,14 +274,14 @@ void ScriptProcessor::convert(const size_t starting_index)
                 output_.set_dialogue(section_, "head", dialogue_data);
                 current_data_ = Dialogue("head");
                 previous_.clear();
-            } else if (tag == "end")
+            } else if (tag == tags::end)
             {
                 if (!previous_.empty())
                 {
                     output_.get_dialogue(section_, previous_).remove_next();
                     previous_.clear();
                 }
-            } else if (tag == "scene")
+            } else if (tag == tags::scene)
             {
                 if (previous_.empty())
                 {
@@ -282,10 +297,10 @@ void ScriptProcessor::convert(const size_t starting_index)
                 }
                 current_data_.background_image = extract_parameter(current_line);
                 blocked_ = true;
-            } else if (tag == "block")
+            } else if (tag == tags::block)
             {
                 blocked_ = true;
-            } else if (tag == "option")
+            } else if (tag == tags::option)
             {
                 if (current_data_.contents.empty())
                 {
@@ -307,7 +322,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                 branches_[option_points_to] = previous_;
                 // update next
                 output_.get_dialogue(section_, previous_).set_next("options", current_targets);
-            } else if (tag == "jump")
+            } else if (tag == tags::jump || tag == tags::jump_)
             {
                 // cannot jump when previous dialogue does not exist
                 if (previous_.empty())
@@ -323,16 +338,17 @@ void ScriptProcessor::convert(const size_t starting_index)
                 output_.get_dialogue(section_, previous_).set_next(
                         output_.get_dialogue(section_, previous_).next.get_type(), extract_parameter(current_line));
                 // write branch info into lookup table
-                branches_[extract_parameter(current_line)] = previous_;
+                if (tag == tags::jump)
+                    branches_[extract_parameter(current_line)] = previous_;
                 // remove prev
                 previous_.clear();
             }
                 // Placeholder, no action needed for "label" tag
-            else if (tag == "label")
+            else if (tag == tags::label)
             {
             } else
             {
-                terminated("Invalid tag " + tag, line_index);
+                terminated("invalid tag", line_index, tag);
             }
         } else if (current_line.ends_with(':'))
         {

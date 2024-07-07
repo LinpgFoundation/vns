@@ -7,11 +7,9 @@ class ScriptProcessor
 {
 public:
     static const std::string inline SCRIPTS_FILE_EXTENSION = ".vns";
-    static const std::unordered_map<std::string, std::string> inline ALTERNATIVES = {{"lang", "language"},
-                                                                                     {"opt",  "option"},
-                                                                                     {"disp", "display"},
-                                                                                     {"jmp",  "jump"}};
-    static const std::unordered_set<std::string> inline RESERVED_WORDS = {"null", "none", "head"};
+    static const std::unordered_set<std::string> inline RESERVED_WORDS = {"null",
+                                                                          "none",
+                                                                          "head"};
     static const std::string inline TAG_STARTS = "[";
     static const std::string inline TAG_ENDS = "]";
     static const std::string inline COMMENT_PREFIX = "//";
@@ -58,6 +56,8 @@ private:
     [[noreturn]] void terminated(const std::string &) const;
 
     [[noreturn]] void terminated(const std::string &, const size_t &) const;
+
+    [[noreturn]] void terminated(const std::string &, const size_t &, const std::string &) const;
 
     void convert(size_t);
 };

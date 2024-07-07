@@ -23,7 +23,7 @@ add_executable(vns ${SOURCES} vns.cpp vns.hpp scriptProcessor.cpp naming.cpp nam
         version.hpp dialoguesManager.hpp dialoguesManager.cpp decompiler.cpp decompiler.hpp event.cpp event.hpp
         expressionParser.cpp expressionParser.hpp number.cpp number.hpp operation.hpp validator.hpp validator.cpp
         tests.hpp tests.cpp
-        schema.hpp)
+        schema.hpp tags.hpp)
 
 target_link_libraries(vns PRIVATE nlohmann_json::nlohmann_json nlohmann_json_schema_validator)
 
@@ -33,7 +33,7 @@ add_library(vns_lib STATIC ${SOURCES} scriptProcessor.cpp naming.cpp naming.hpp 
         dialogueNext.hpp dialogueNext.cpp scriptProcessor.hpp functions.hpp functions.cpp
         compiler.hpp compiler.cpp version.hpp dialoguesManager.hpp dialoguesManager.cpp decompiler.cpp decompiler.hpp
         event.cpp event.hpp expressionParser.cpp expressionParser.hpp number.cpp number.hpp operation.hpp
-        validator.hpp validator.cpp schema.hpp)
+        validator.hpp validator.cpp schema.hpp tags.hpp)
 
 target_link_libraries(vns_lib PRIVATE nlohmann_json::nlohmann_json nlohmann_json_schema_validator)
 
