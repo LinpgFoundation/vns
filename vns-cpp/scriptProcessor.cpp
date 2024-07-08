@@ -27,9 +27,11 @@ std::string ScriptProcessor::extract_parameter(const std::string &text)
     return ensure_not_null(extract_string(text));
 }
 
-std::string ScriptProcessor::extract_tag(const std::string &text)
+std::string_view ScriptProcessor::extract_tag(const std::string &text)
 {
-    return text.substr(text.find(TAG_STARTS) + 1, text.find(TAG_ENDS) - 1);
+    const std::string_view tag = {RANGE(text, text.find(TAG_STARTS) + 1, text.find(TAG_ENDS))};
+    // check if the tag is an alternative of another tag
+    return tags::alternatives.contains(tag) ? tags::alternatives.at(tag) : tag;
 }
 
 std::string ScriptProcessor::extract_string(const std::string &text)
@@ -67,7 +69,7 @@ std::string ScriptProcessor::extract_string(const std::string &text)
 }
 
 [[noreturn]] void
-ScriptProcessor::terminated(const std::string &reason, const size_t &line_index, const std::string &tag) const
+ScriptProcessor::terminated(const std::string &reason, const size_t &line_index, const std::string_view &tag) const
 {
     std::stringstream errMsg;
     if (path_.empty())
@@ -146,7 +148,8 @@ void ScriptProcessor::continue_process()
     {
         if (lines_[i].starts_with(TAG_STARTS))
         {
-            if (const std::string tag = extract_tag(lines_[i]); tag == tags::label)
+            const std::string_view tag = extract_tag(lines_[i]);
+            if (tag == tags::label)
             {
                 if (!last_label.empty())
                 {
@@ -208,11 +211,7 @@ void ScriptProcessor::convert(const size_t starting_index)
             current_data_.notes.push_back(current_line.substr(NOTE_PREFIX.length() + 1));
         } else if (current_line.starts_with(TAG_STARTS))
         {
-            std::string tag = extract_tag(current_line);
-
-            // check if the tag is an alternative of another tag
-            if (tags::alternatives.contains(tag))
-                tag = tags::alternatives.at(tag);
+            const std::string_view tag = extract_tag(current_line);
 
             if (tag == tags::background_image)
             {
@@ -332,14 +331,26 @@ void ScriptProcessor::convert(const size_t starting_index)
                     // cannot jump when previous dialogue has multiple targets
                 else if (output_.get_dialogue(section_, previous_).next.has_multi_targets())
                 {
-                    terminated("Cannot use jump tag when previous dialogue has multiple targets.", line_index);
+                    terminated("Cannot use jump tag when previous dialogue already has multiple targets.", line_index);
                 }
                 // update previous dialogue's next
+                const std::string jump_target = extract_parameter(current_line);
                 output_.get_dialogue(section_, previous_).set_next(
-                        output_.get_dialogue(section_, previous_).next.get_type(), extract_parameter(current_line));
-                // write branch info into lookup table
+                        output_.get_dialogue(section_, previous_).next.get_type(), jump_target);
+                // if tag is jump not jump_, then we need to overwrite jump_target's previous
                 if (tag == tags::jump)
-                    branches_[extract_parameter(current_line)] = previous_;
+                {
+                    // if jump_target already exist, then update jump_target's previous
+                    if (output_.contains_dialogue(section_, jump_target))
+                    {
+                        output_.get_dialogue(section_, jump_target).previous = previous_;
+                    }
+                        // write branch info into lookup table for future reference
+                    else
+                    {
+                        branches_[jump_target] = previous_;
+                    }
+                }
                 // remove prev
                 previous_.clear();
             }

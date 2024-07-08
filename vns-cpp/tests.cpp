@@ -336,15 +336,20 @@ void Tests::TestBranching()
     test_dialogues_manager.next();
     assert(test_dialogues_manager.get_current()->id == "no_prev_jump");
     assert(!test_dialogues_manager.get_current()->has_previous());
+    assert(test_dialogues_manager.get_current()->has_next());
+    // jump into jump_prev
+    test_dialogues_manager.next();
+    assert(test_dialogues_manager.get_current()->id == "jump_prev");
+    assert(test_dialogues_manager.get_current()->has_previous());
+    assert(test_dialogues_manager.get_current()->has_next());
+    // jump into the_end
+    test_dialogues_manager.next();
+    assert(test_dialogues_manager.get_current()->id == "the_end");
+    assert(!test_dialogues_manager.get_current()->has_previous());
     assert(!test_dialogues_manager.get_current()->has_next());
     // check ~02, which is a void
     test_dialogues_manager.set_current_dialogue_id("~02");
     assert(test_dialogues_manager.get_current()->id == "~02");
-    assert(!test_dialogues_manager.get_current()->has_previous());
-    assert(!test_dialogues_manager.get_current()->has_next());
-    // check ~06, which is another void
-    test_dialogues_manager.set_current_dialogue_id("~06");
-    assert(test_dialogues_manager.get_current()->id == "~06");
     assert(!test_dialogues_manager.get_current()->has_previous());
     assert(!test_dialogues_manager.get_current()->has_next());
 }

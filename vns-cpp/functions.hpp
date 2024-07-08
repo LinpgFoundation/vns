@@ -46,3 +46,7 @@ std::vector<std::string> load_file_as_lines(const std::filesystem::path &);
 void load_file_as_lines(const std::filesystem::path &, std::vector<std::string> &);
 
 #endif
+
+#ifndef RANGE
+#define RANGE(_container, _start, _end) _container.begin() + _start, _container.begin() + _end
+#endif

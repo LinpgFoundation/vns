@@ -49,7 +49,7 @@ private:
 
     static std::string extract_parameter(const std::string &);
 
-    static std::string extract_tag(const std::string &);
+    static std::string_view extract_tag(const std::string &);
 
     static std::string extract_string(const std::string &);
 
@@ -57,7 +57,7 @@ private:
 
     [[noreturn]] void terminated(const std::string &, const size_t &) const;
 
-    [[noreturn]] void terminated(const std::string &, const size_t &, const std::string &) const;
+    [[noreturn]] void terminated(const std::string &, const size_t &, const std::string_view &) const;
 
     void convert(size_t);
 };
