@@ -12,7 +12,7 @@ struct tags
     constexpr static const std::string_view display = "disp";
     constexpr static const std::string_view id = "id";
     constexpr static const std::string_view language = "lang";
-    constexpr static const std::string_view section = "section";
+    constexpr static const std::string_view section = "sect";
     constexpr static const std::string_view end = "end";
     constexpr static const std::string_view scene = "scene";
     constexpr static const std::string_view block = "block";
@@ -24,7 +24,8 @@ struct tags
                                                                                                {"option",   option},
                                                                                                {"display",  display},
                                                                                                {"jump",     jump},
-                                                                                               {"jump_",    jump_}};
+                                                                                               {"jump_",    jump_},
+                                                                                               {"section",  section}};
 };
 
 #endif
