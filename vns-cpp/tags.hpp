@@ -5,6 +5,7 @@
 
 struct tags
 {
+    constexpr static const std::string_view vns = "vns";
     constexpr static const std::string_view background_image = "bgi";
     constexpr static const std::string_view background_music = "bgm";
     constexpr static const std::string_view show = "show";

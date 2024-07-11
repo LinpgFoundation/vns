@@ -1,4 +1,5 @@
 # Fundamental parameters
+[vns]>=2.3
 [id]2
 [language]English
 

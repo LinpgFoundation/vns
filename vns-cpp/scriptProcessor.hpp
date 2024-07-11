@@ -1,7 +1,9 @@
 #ifndef PROCESSOR_HPP
 #define PROCESSOR_HPP
 
+#include <regex>
 #include "dialoguesManager.hpp"
+#include "tags.hpp"
 
 class ScriptProcessor
 {
@@ -34,7 +36,7 @@ private:
     DialoguesManager output_;
     Dialogue current_data_;
     std::string id_;
-    std::string lang_;
+    std::string language_;
     std::string section_;
     std::string previous_;
     std::vector<std::string> lines_;
@@ -42,6 +44,10 @@ private:
     std::unordered_map<std::string, std::string> branches_;
 
     bool blocked_;
+
+    const static std::regex inline vns_version_pattern{R"((>=|<=|!<=|!>=|)\s*(\d+)\.(\d+))"};
+    const static std::unordered_set<std::string_view> inline preprocessed_tags{tags::label, tags::vns, tags::language,
+                                                                               tags::id};
 
     void continue_process();
 

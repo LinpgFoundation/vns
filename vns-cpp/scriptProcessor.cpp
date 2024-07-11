@@ -1,11 +1,12 @@
 #include <vector>
 #include <stdexcept>
 #include <fstream>
+#include <iostream>
 #include "functions.hpp"
 #include "scriptProcessor.hpp"
 #include "naming.hpp"
 #include "operation.hpp"
-#include "tags.hpp"
+#include "version.hpp"
 
 std::string ScriptProcessor::get_id() const
 {
@@ -14,7 +15,7 @@ std::string ScriptProcessor::get_id() const
 
 std::string ScriptProcessor::get_language() const
 {
-    return lang_;
+    return language_;
 }
 
 std::string ScriptProcessor::ensure_not_null(const std::string &text)
@@ -143,7 +144,7 @@ void ScriptProcessor::continue_process()
         return line.empty() || line.starts_with(COMMENT_PREFIX);
     }), lines_.end());
 
-    // process all the lines
+    // pre-process all the lines
     for (size_t i = 0; i < lines_.size(); ++i)
     {
         if (lines_[i].starts_with(TAG_STARTS))
@@ -164,6 +165,53 @@ void ScriptProcessor::continue_process()
             } else if (tag == tags::section)
             {
                 current_index = 0;
+            } else if (tag == tags::vns)
+            {
+                // make sure a match exist, if not, then the given value are invalid
+                std::smatch match;
+                const std::string version_info = extract_parameter(lines_[i]);
+                if (!std::regex_match(version_info, match, vns_version_pattern))
+                    terminated("Invalid tag value", i, tag);
+
+                // (optional) comparator, such as >= or <=
+                const std::string comparator = match[1].str();
+                // the version
+                const size_t version_spec = std::stoul(match[2].str());
+                // the re revision
+                const size_t revision_spec = std::stoul(match[3].str());
+
+                if (comparator.empty())
+                {
+                    if (version_spec != VERSION or revision_spec != REVISION)
+                        terminated("Version incompatible", i);
+                } else if (comparator == ">=")
+                {
+                    if (version_spec != VERSION or revision_spec < REVISION)
+                        terminated("Version incompatible", i);
+                } else if (comparator == "<=")
+                {
+                    if (version_spec != VERSION or revision_spec > REVISION)
+                        terminated("Version incompatible", i);
+                } else if (comparator == "!>=")
+                {
+                    if (version_spec < VERSION or (version_spec == VERSION and revision_spec < REVISION))
+                        terminated("Version incompatible", i);
+                } else if (comparator == "!<=")
+                {
+                    if (version_spec > VERSION or (version_spec == VERSION and revision_spec > REVISION))
+                        terminated("Version incompatible", i);
+                } else
+                {
+                    terminated("Invalid comparator", i, tag);
+                }
+            } else if (tag == tags::id)
+            {
+                id_ = extract_parameter(lines_[i]);
+                if (id_.empty())
+                    terminated("Chapter id cannot be None!", i);
+            } else if (tag == tags::language)
+            {
+                language_ = extract_string(lines_[i]);
             }
         } else if (lines_[i].ends_with(':'))
         {
@@ -179,18 +227,20 @@ void ScriptProcessor::continue_process()
         }
     }
 
-    convert(0);
-    lines_.clear();
-
     // making sure essential instances are init correctly
     if (id_.empty())
     {
         terminated("You have to set a id!");
     }
-    if (lang_.empty())
+    if (language_.empty())
     {
-        terminated("You have to set lang!");
+        terminated("You have to set the language!");
     }
+
+    convert(0);
+    lines_.clear();
+
+    // making sure section_ is not empty, or the dialogue can be empty
     if (section_.empty())
     {
         terminated("You have to set section!");
@@ -245,16 +295,6 @@ void ScriptProcessor::convert(const size_t starting_index)
                 {
                     current_data_.character_images.push_back(name);
                 }
-            } else if (tag == tags::id)
-            {
-                id_ = extract_parameter(current_line);
-                if (id_.empty())
-                {
-                    terminated("Chapter id cannot be None!", line_index);
-                }
-            } else if (tag == tags::language)
-            {
-                lang_ = extract_string(current_line);
             } else if (tag == tags::section)
             {
                 if (!previous_.empty())
@@ -353,11 +393,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                 }
                 // remove prev
                 previous_.clear();
-            }
-                // Placeholder, no action needed for "label" tag
-            else if (tag == tags::label)
-            {
-            } else
+            } else if (!preprocessed_tags.contains(tag))
             {
                 terminated("invalid tag", line_index, tag);
             }
