@@ -172,37 +172,22 @@ void ScriptProcessor::continue_process()
                 const std::string version_info = extract_parameter(lines_[i]);
                 if (!std::regex_match(version_info, match, vns_version_pattern))
                     terminated("Invalid tag value", i, tag);
-
-                // (optional) comparator, such as >= or <=
-                const std::string comparator = match[1].str();
-                // the version
-                const size_t version_spec = std::stoul(match[2].str());
-                // the re revision
-                const size_t revision_spec = std::stoul(match[3].str());
-
-                if (comparator.empty())
+                // check if given script version is compatible with the compiler
+                bool is_script_compatible;
+                try
                 {
-                    if (version_spec != VERSION or revision_spec != REVISION)
-                        terminated("Version incompatible", i);
-                } else if (comparator == ">=")
+                    is_script_compatible = is_version_compatible(match[1].str(), std::stoul(match[2].str()),
+                                                                 std::stoul(match[3].str()));
+                }
+                    // if there is an error, likely due to invalid comparator, then throw it with line index
+                catch (const std::runtime_error &e)
                 {
-                    if (version_spec != VERSION or revision_spec < REVISION)
-                        terminated("Version incompatible", i);
-                } else if (comparator == "<=")
+                    terminated(e.what(), i, tag);
+                }
+                // throw error if it is not compatible
+                if (!is_script_compatible)
                 {
-                    if (version_spec != VERSION or revision_spec > REVISION)
-                        terminated("Version incompatible", i);
-                } else if (comparator == "!>=")
-                {
-                    if (version_spec < VERSION or (version_spec == VERSION and revision_spec < REVISION))
-                        terminated("Version incompatible", i);
-                } else if (comparator == "!<=")
-                {
-                    if (version_spec > VERSION or (version_spec == VERSION and revision_spec > REVISION))
-                        terminated("Version incompatible", i);
-                } else
-                {
-                    terminated("Invalid comparator", i, tag);
+                    terminated("Version incompatible", i);
                 }
             } else if (tag == tags::id)
             {

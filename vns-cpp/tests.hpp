@@ -11,6 +11,8 @@ class Tests
     static std::filesystem::path inline EXAMPLE_VNS_BRANCHES_TESTS_FILE;
     static std::filesystem::path inline EXAMPLE_DUMMY_TEST_FILE;
 
+    static void TestBasicFunctions();
+
     static void TestNameWithoutTag();
 
     static void TestNameWithTags();

@@ -7,6 +7,7 @@
 #include "compiler.hpp"
 #include "validator.hpp"
 #include "functions.hpp"
+#include "version.hpp"
 
 void Tests::SetTestFolderPath(const std::filesystem::path &dir)
 {
@@ -14,6 +15,21 @@ void Tests::SetTestFolderPath(const std::filesystem::path &dir)
     EXAMPLE_VNS_TEST_FILE = EXAMPLE_VNS_TEST_FILES_DIR / "chapter_example.vns";
     EXAMPLE_VNS_BRANCHES_TESTS_FILE = EXAMPLE_VNS_TEST_FILES_DIR / "chapter_branches_tests.vns";
     EXAMPLE_DUMMY_TEST_FILE = EXAMPLE_VNS_TEST_FILES_DIR / "dummy.txt";
+}
+
+void Tests::TestBasicFunctions()
+{
+    // test version compatible feature
+    assert(is_version_compatible("", VERSION, REVISION));
+    assert(is_version_compatible("<=", VERSION, REVISION));
+    assert(is_version_compatible(">=", VERSION, REVISION));
+    assert(is_version_compatible(">=", VERSION, REVISION + 1));
+    assert(!is_version_compatible("<=", VERSION - 1, REVISION));
+    assert(!is_version_compatible(">=", VERSION + 1, REVISION));
+    assert(is_version_compatible("!<=", VERSION, REVISION));
+    assert(is_version_compatible("!>=", VERSION, REVISION));
+    assert(is_version_compatible("!<=", VERSION - 1, REVISION + 1));
+    assert(is_version_compatible("!>=", VERSION + 1, REVISION));
 }
 
 void Tests::TestNameWithoutTag()
@@ -356,6 +372,8 @@ void Tests::TestBranching()
 
 void Tests::TestAll()
 {
+    std::cout << "- Test basic functions\n";
+    TestBasicFunctions();
     std::cout << "- Test naming and tags\n";
     TestNameWithoutTag();
     TestNameWithTags();
