@@ -92,7 +92,12 @@ DialoguesManager ScriptProcessor::get_output() const
 
 void ScriptProcessor::process(const std::string &raw_data)
 {
-    lines_ = split(raw_data, '\n');
+    process(split(raw_data, '\n'));
+}
+
+void ScriptProcessor::process(const std::vector<std::string> &lines)
+{
+    lines_ = lines;
     continue_process();
 }
 
@@ -147,9 +152,11 @@ void ScriptProcessor::continue_process()
     // pre-process all the lines
     for (size_t i = 0; i < lines_.size(); ++i)
     {
-        if (lines_[i].starts_with(TAG_STARTS))
+        // obtain current line as a pointer
+        const std::string &current_line = lines_[i];
+        if (current_line.starts_with(TAG_STARTS))
         {
-            const std::string_view tag = extract_tag(lines_[i]);
+            const std::string_view tag = extract_tag(current_line);
             if (tag == tags::label)
             {
                 if (!last_label.empty())
@@ -157,7 +164,7 @@ void ScriptProcessor::continue_process()
                     terminated("This label is overwriting the previous one", i);
                 }
 
-                last_label = extract_parameter(lines_[i]);
+                last_label = extract_parameter(current_line);
                 if (RESERVED_WORDS.contains(last_label))
                 {
                     terminated("You cannot use reserved word '" + last_label + "' as a label", i);
@@ -169,7 +176,7 @@ void ScriptProcessor::continue_process()
             {
                 // make sure a match exist, if not, then the given value are invalid
                 std::smatch match;
-                const std::string version_info = extract_parameter(lines_[i]);
+                const std::string version_info = extract_parameter(current_line);
                 if (!std::regex_match(version_info, match, vns_version_pattern))
                     terminated("Invalid tag value", i, tag);
                 // check if given script version is compatible with the compiler
@@ -191,14 +198,14 @@ void ScriptProcessor::continue_process()
                 }
             } else if (tag == tags::id)
             {
-                id_ = extract_parameter(lines_[i]);
+                id_ = extract_parameter(current_line);
                 if (id_.empty())
                     terminated("Chapter id cannot be None!", i);
             } else if (tag == tags::language)
             {
-                language_ = extract_string(lines_[i]);
+                language_ = extract_string(current_line);
             }
-        } else if (lines_[i].ends_with(':'))
+        } else if (current_line.ends_with(':'))
         {
             dialog_associate_key_[i] = current_index == 0 ? "head" : last_label.empty() ? (current_index < 10 ? "~0" +
                                                                                                                 std::to_string(

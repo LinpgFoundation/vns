@@ -25,9 +25,11 @@ public:
 
     [[nodiscard]] std::string get_language() const;
 
-    void process(const std::filesystem::path &);
-
     void process(const std::string &);
+
+    void process(const std::vector<std::string> &);
+
+    void process(const std::filesystem::path &);
 
     [[nodiscard]] DialoguesManager get_output() const;
 

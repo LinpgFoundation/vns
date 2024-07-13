@@ -140,8 +140,8 @@ void Compiler::add_tasks(
 void Compiler::save(const nlohmann::json &json_data, const std::filesystem::path &dir_path)
 {
     std::stringstream file_name;
-    std::string id = json_data.at("id");
-    std::string lang = json_data.at("language");
+    const std::string id = json_data.at("id");
+    const std::string lang = json_data.at("language");
     file_name << "chapter" << id << "_dialogs_" << lang << ".json";
     // check output dir if it does not exist
     if (!exists(dir_path))
