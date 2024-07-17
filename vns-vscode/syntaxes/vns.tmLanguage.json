@@ -3,13 +3,13 @@
     "name": "Visual Novel Script",
     "patterns": [
         {
+            "include": "#contents"
+        },
+        {
             "include": "#strings"
         },
         {
-            "include": "#double_quotation"
-        },
-        {
-            "include": "#single_quotation"
+            "include": "#option_prompt"
         },
         {
             "include": "#double-slash"
@@ -28,12 +28,21 @@
         },
         {
             "include": "#numbers"
-        },
-        {
-            "include": "#variables"
         }
     ],
     "repository": {
+        "boolean": {
+            "match": "\\b(true|false)\\b",
+            "name": "constant.language.boolean"
+        },
+        "contents": {
+            "captures": {
+                "1": {
+                    "name": "string.unquoted.vns"
+                }
+            },
+            "match": "^\\s*\\-\\s+\\s*(.*?)\n"
+        },
         "double-slash": {
             "begin": "\\/\\/",
             "end": "\n",
@@ -60,28 +69,37 @@
             "end": "\n",
             "name": "comment.line.number-sign"
         },
-        "strings": {
-            "begin": "- ",
-            "end": "\n",
-            "name": "string.unquoted.vns"
-        },
-        "double_quotation": {
-            "begin": "\"",
-            "end": "\"",
-            "name": "string.unquoted.vns"
-        },
-        "single_quotation": {
-            "begin": "'",
-            "end": "'",
-            "name": "string.unquoted.vns"
-        },
-        "boolean": {
-            "match": "\\b(true|false)\\b",
-            "name": "constant.language.boolean"
-        },
         "numbers": {
             "match": "\\b\\d+\\b",
             "name": "constant.numeric.integer"
+        },
+        "option_prompt": {
+            "captures": {
+                "1": {
+                    "name": "keyword.control.vns"
+                },
+                "2": {
+                    "name": "string.unquoted.vns"
+                },
+                "3": {
+                    "name": "keyword.operator.math"
+                }
+            },
+            "match": "\\[(\\w+)\\](.*?)(->)"
+        },
+        "strings": {
+            "patterns": [
+                {
+                    "begin": "\"",
+                    "end": "\"",
+                    "name": "string.unquoted.vns"
+                },
+                {
+                    "begin": "'",
+                    "end": "'",
+                    "name": "string.unquoted.vns"
+                }
+            ]
         }
     },
     "scopeName": "source.vns"
