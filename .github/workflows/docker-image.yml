@@ -1,0 +1,22 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup submodules
+      run: git submodule update --init --recursive
+    - name: Prepare build context
+      run: cp -r ./vns-cpp ./vns-server/extern/vns-cpp
+    - name: Build the Docker image
+      run: docker build ./vns-server --tag vns-server:$(date +%s)
