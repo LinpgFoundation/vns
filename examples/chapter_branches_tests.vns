@@ -1,0 +1,63 @@
+# Fundamental parameters
+[vns]>=2.3
+[id]2
+[language]English
+
+[section]dialog_example
+
+
+[bgi]bg1.png
+[bgm]bgm1.ogg
+
+The dev:
+- This is a file use for testing branch
+- such as jump and option
+
+The dev:
+- And I really hope everything works.
+
+[jump]first_jump
+
+[block]
+
+The dev:
+- This is a void
+- You should not be here
+
+[end]
+
+[label] first_jump
+
+The dev:
+- And if they do, you will be here
+- And you should be able to go back
+
+The dev:
+- Then cheers, we did!
+
+The dev:
+- What about a jump where we cannot go back?
+
+[jump] no_prev_jump
+
+[label] jump_prev
+
+The dev:
+- This is a void
+- You should not be here
+
+[jump_]the_end
+
+[block]
+
+[label] no_prev_jump
+
+The dev:
+- In this case, you should not be able to go back
+
+[jump]jump_prev
+
+[label]the_end
+
+The dev:
+- This is the end

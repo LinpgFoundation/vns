@@ -1,11 +1,12 @@
 #include <vector>
-#include <cassert>
 #include <stdexcept>
 #include <fstream>
+#include <iostream>
 #include "functions.hpp"
 #include "scriptProcessor.hpp"
 #include "naming.hpp"
 #include "operation.hpp"
+#include "version.hpp"
 
 std::string ScriptProcessor::get_id() const
 {
@@ -14,7 +15,7 @@ std::string ScriptProcessor::get_id() const
 
 std::string ScriptProcessor::get_language() const
 {
-    return lang_;
+    return language_;
 }
 
 std::string ScriptProcessor::ensure_not_null(const std::string &text)
@@ -27,9 +28,11 @@ std::string ScriptProcessor::extract_parameter(const std::string &text)
     return ensure_not_null(extract_string(text));
 }
 
-std::string ScriptProcessor::extract_tag(const std::string &text)
+std::string_view ScriptProcessor::extract_tag(const std::string &text)
 {
-    return text.substr(text.find(TAG_STARTS) + 1, text.find(TAG_ENDS) - 1);
+    const std::string_view tag = {RANGE(text, text.find(TAG_STARTS) + 1, text.find(TAG_ENDS))};
+    // check if the tag is an alternative of another tag
+    return tags::alternatives.contains(tag) ? tags::alternatives.at(tag) : tag;
 }
 
 std::string ScriptProcessor::extract_string(const std::string &text)
@@ -66,6 +69,22 @@ std::string ScriptProcessor::extract_string(const std::string &text)
     throw std::runtime_error(errMsg.str());
 }
 
+[[noreturn]] void
+ScriptProcessor::terminated(const std::string &reason, const size_t &line_index, const std::string_view &tag) const
+{
+    std::stringstream errMsg;
+    if (path_.empty())
+    {
+        errMsg << "Line";
+    } else
+    {
+        errMsg << "File " << '"' << path_ << '"' << ", line";
+    }
+    errMsg << ' ' << std::to_string(line_index + 1) << "\n  >>|" << lines_[line_index] << "|\nFail to compile due to "
+           << reason << ':' << ' ' << tag;
+    throw std::runtime_error(errMsg.str());
+}
+
 DialoguesManager ScriptProcessor::get_output() const
 {
     return output_;
@@ -73,7 +92,12 @@ DialoguesManager ScriptProcessor::get_output() const
 
 void ScriptProcessor::process(const std::string &raw_data)
 {
-    lines_ = split(raw_data, '\n');
+    process(split(raw_data, '\n'));
+}
+
+void ScriptProcessor::process(const std::vector<std::string> &lines)
+{
+    lines_ = lines;
     continue_process();
 }
 
@@ -116,29 +140,72 @@ void ScriptProcessor::continue_process()
 
     size_t current_index;
 
+    // lines clean up
+    for (auto &line: lines_)
+        line = trim(line.substr(0, line.find(COMMENT_PREFIX)));
+
+    // remove all empty lines or lines starting with # (comments)
+    lines_.erase(std::remove_if(lines_.begin(), lines_.end(), [](const std::string &line) {
+        return line.empty() || line.starts_with(COMMENT_PREFIX);
+    }), lines_.end());
+
+    // pre-process all the lines
     for (size_t i = 0; i < lines_.size(); ++i)
     {
-        lines_[i] = trim(lines_[i].substr(0, lines_[i].find(COMMENT_PREFIX)));
-
-        if (lines_[i].starts_with(TAG_STARTS))
+        // obtain current line as a pointer
+        const std::string &current_line = lines_[i];
+        if (current_line.starts_with(TAG_STARTS))
         {
-            if (const std::string tag = extract_tag(lines_[i]); tag == "label")
+            const std::string_view tag = extract_tag(current_line);
+            if (tag == tags::label)
             {
                 if (!last_label.empty())
                 {
                     terminated("This label is overwriting the previous one", i);
                 }
 
-                last_label = extract_parameter(lines_[i]);
+                last_label = extract_parameter(current_line);
                 if (RESERVED_WORDS.contains(last_label))
                 {
                     terminated("You cannot use reserved word '" + last_label + "' as a label", i);
                 }
-            } else if (tag == "section")
+            } else if (tag == tags::section)
             {
                 current_index = 0;
+            } else if (tag == tags::vns)
+            {
+                // make sure a match exist, if not, then the given value are invalid
+                std::smatch match;
+                const std::string version_info = extract_parameter(current_line);
+                if (!std::regex_match(version_info, match, vns_version_pattern))
+                    terminated("Invalid tag value", i, tag);
+                // check if given script version is compatible with the compiler
+                bool is_script_compatible;
+                try
+                {
+                    is_script_compatible = is_version_compatible(match[1].str(), std::stoul(match[2].str()),
+                                                                 std::stoul(match[3].str()));
+                }
+                    // if there is an error, likely due to invalid comparator, then throw it with line index
+                catch (const std::runtime_error &e)
+                {
+                    terminated(e.what(), i, tag);
+                }
+                // throw error if it is not compatible
+                if (!is_script_compatible)
+                {
+                    terminated("Version incompatible", i);
+                }
+            } else if (tag == tags::id)
+            {
+                id_ = extract_parameter(current_line);
+                if (id_.empty())
+                    terminated("Chapter id cannot be None!", i);
+            } else if (tag == tags::language)
+            {
+                language_ = extract_string(current_line);
             }
-        } else if (lines_[i].ends_with(':'))
+        } else if (current_line.ends_with(':'))
         {
             dialog_associate_key_[i] = current_index == 0 ? "head" : last_label.empty() ? (current_index < 10 ? "~0" +
                                                                                                                 std::to_string(
@@ -152,18 +219,20 @@ void ScriptProcessor::continue_process()
         }
     }
 
-    convert(0);
-    lines_.clear();
-
     // making sure essential instances are init correctly
     if (id_.empty())
     {
         terminated("You have to set a id!");
     }
-    if (lang_.empty())
+    if (language_.empty())
     {
-        terminated("You have to set lang!");
+        terminated("You have to set the language!");
     }
+
+    convert(0);
+    lines_.clear();
+
+    // making sure section_ is not empty, or the dialogue can be empty
     if (section_.empty())
     {
         terminated("You have to set section!");
@@ -178,37 +247,27 @@ void ScriptProcessor::convert(const size_t starting_index)
     {
         // obtain current line as a pointer
         const std::string &current_line = lines_[line_index];
-        // Skip empty lines or lines starting with #
-        if (current_line.empty() || lines_[line_index].starts_with(COMMENT_PREFIX))
-        {
-            // Do nothing
-        } else if (current_line.starts_with(NOTE_PREFIX))
+        if (current_line.starts_with(NOTE_PREFIX))
         {
             // Accumulate notes
             current_data_.notes.push_back(current_line.substr(NOTE_PREFIX.length() + 1));
         } else if (current_line.starts_with(TAG_STARTS))
         {
-            std::string tag = extract_tag(current_line);
+            const std::string_view tag = extract_tag(current_line);
 
-            // check if the tag is an alternative of another tag
-            if (ALTERNATIVES.contains(tag))
-            {
-                tag = ALTERNATIVES.at(tag);
-            }
-
-            if (tag == "bgi")
+            if (tag == tags::background_image)
             {
                 current_data_.background_image = extract_parameter(current_line);
-            } else if (tag == "bgm")
+            } else if (tag == tags::background_music)
             {
                 current_data_.background_music = extract_parameter(current_line);
-            } else if (tag == "show")
+            } else if (tag == tags::show)
             {
                 for (const std::string &name: split(extract_string(current_line)))
                 {
                     current_data_.character_images.push_back(name);
                 }
-            } else if (tag == "hide")
+            } else if (tag == tags::hide)
             {
                 for (const std::string &name: split(extract_string(current_line)))
                 {
@@ -221,24 +280,14 @@ void ScriptProcessor::convert(const size_t starting_index)
                         return Naming(n).equal(name);
                     });
                 }
-            } else if (tag == "display")
+            } else if (tag == tags::display)
             {
                 current_data_.character_images.clear();
                 for (const std::string &name: split(extract_string(current_line)))
                 {
                     current_data_.character_images.push_back(name);
                 }
-            } else if (tag == "id")
-            {
-                id_ = extract_parameter(current_line);
-                if (id_.empty())
-                {
-                    terminated("Chapter id cannot be None!", line_index);
-                }
-            } else if (tag == "language")
-            {
-                lang_ = extract_string(current_line);
-            } else if (tag == "section")
+            } else if (tag == tags::section)
             {
                 if (!previous_.empty())
                 {
@@ -256,31 +305,33 @@ void ScriptProcessor::convert(const size_t starting_index)
                 output_.set_dialogue(section_, "head", dialogue_data);
                 current_data_ = Dialogue("head");
                 previous_.clear();
-            } else if (tag == "end")
+            } else if (tag == tags::end)
             {
                 if (!previous_.empty())
                 {
                     output_.get_dialogue(section_, previous_).remove_next();
                     previous_.clear();
                 }
-            } else if (tag == "scene")
+            } else if (tag == tags::scene)
             {
-                assert(!previous_.empty());
-                if (output_.get_dialogue(section_, previous_).next.has_multi_targets())
+                if (previous_.empty())
                 {
-                    output_.get_dialogue(section_, previous_).set_next("scene", output_.get_dialogue(section_,
-                                                                                                     previous_).next.get_targets());
+                    terminated("Cannot use scene tag when there is not previous dialogue.", line_index);
+                }
+                Dialogue &previous_dialogue = output_.get_dialogue(section_, previous_);
+                if (previous_dialogue.next.has_multi_targets())
+                {
+                    previous_dialogue.set_next("scene", previous_dialogue.next.get_targets());
                 } else
                 {
-                    output_.get_dialogue(section_, previous_).set_next("scene", output_.get_dialogue(section_,
-                                                                                                     previous_).next.get_target());
+                    previous_dialogue.set_next("scene", previous_dialogue.next.get_target());
                 }
                 current_data_.background_image = extract_parameter(current_line);
                 blocked_ = true;
-            } else if (tag == "block")
+            } else if (tag == tags::block)
             {
                 blocked_ = true;
-            } else if (tag == "option")
+            } else if (tag == tags::option)
             {
                 if (current_data_.contents.empty())
                 {
@@ -295,18 +346,48 @@ void ScriptProcessor::convert(const size_t starting_index)
                 // get value string
                 const std::string src_to_target = extract_string(current_line);
                 // push text and id map
+                const std::string option_points_to = ensure_not_null(
+                        trim(src_to_target.substr(src_to_target.find("->") + 2)));
                 current_targets.push_back({{"text", trim(src_to_target.substr(0, src_to_target.find("->")))},
-                                           {"id",   ensure_not_null(
-                                                   trim(src_to_target.substr(src_to_target.find("->") + 2)))}});
+                                           {"id",   option_points_to}});
+                branches_[option_points_to] = previous_;
                 // update next
                 output_.get_dialogue(section_, previous_).set_next("options", current_targets);
-            }
-                // Placeholder, no action needed for "label" tag
-            else if (tag == "label")
+            } else if (tag == tags::jump || tag == tags::jump_)
             {
-            } else
+                // cannot jump when previous dialogue does not exist
+                if (previous_.empty())
+                {
+                    terminated("Cannot use jump tag when there is not previous dialogue.", line_index);
+                }
+                    // cannot jump when previous dialogue has multiple targets
+                else if (output_.get_dialogue(section_, previous_).next.has_multi_targets())
+                {
+                    terminated("Cannot use jump tag when previous dialogue already has multiple targets.", line_index);
+                }
+                // update previous dialogue's next
+                const std::string jump_target = extract_parameter(current_line);
+                output_.get_dialogue(section_, previous_).set_next(
+                        output_.get_dialogue(section_, previous_).next.get_type(), jump_target);
+                // if tag is jump not jump_, then we need to overwrite jump_target's previous
+                if (tag == tags::jump)
+                {
+                    // if jump_target already exist, then update jump_target's previous
+                    if (output_.contains_dialogue(section_, jump_target))
+                    {
+                        output_.get_dialogue(section_, jump_target).previous = previous_;
+                    }
+                        // write branch info into lookup table for future reference
+                    else
+                    {
+                        branches_[jump_target] = previous_;
+                    }
+                }
+                // remove prev
+                previous_.clear();
+            } else if (!preprocessed_tags.contains(tag))
             {
-                terminated("Invalid tag " + tag, line_index);
+                terminated("invalid tag", line_index, tag);
             }
         } else if (current_line.ends_with(':'))
         {
@@ -353,7 +434,18 @@ void ScriptProcessor::convert(const size_t starting_index)
                 output_.set_current_section_dialogues({});
             }
 
-            if (!previous_.empty())
+            // update previous_ if it is supposed to be part of the branching operation
+            if (branches_.contains(dialog_associate_key_[line_index]))
+            {
+                previous_ = branches_.at(dialog_associate_key_[line_index]);
+            }
+
+            // update current_data_ accordingly
+            if (previous_.empty())
+            {
+                current_data_.previous.clear();
+                blocked_ = false;
+            } else
             {
                 if (blocked_)
                 {
@@ -384,9 +476,6 @@ void ScriptProcessor::convert(const size_t starting_index)
                 {
                     terminated("KeyError: " + previous_, line_index);
                 }
-            } else
-            {
-                current_data_.previous.clear();
             }
 
             previous_ = dialog_associate_key_[line_index];

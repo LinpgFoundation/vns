@@ -8,9 +8,13 @@ Character name:
 - Additional dialogue text
 ```
 
-Each dialogue begins with the name of the character speaking, followed by a colon. Subsequently, the dialogue lines are presented with a hyphen and a space at the beginning of each line.
+Each section starts with the character's name followed by a colon. The dialogue lines are then listed with a hyphen and a space before each line. This clear structure helps maintain readability and ensures it’s easy to track the speaker throughout the script.
 
-This format ensures clarity and consistency in representing conversations within the script. By adhering to this structure, it becomes easier for readers to follow the flow of dialogue and understand who is speaking at any given moment. Additionally, the use of consistent formatting aids in maintaining the script's readability and comprehensibility.
+## Key Points:
+
+- **Character Name**: Placed at the start of the dialogue block, followed by a colon.
+- **Dialogue Line(s)**: Begin with a hyphen and space before each line of dialogue.
+- **Consistency**: Using this consistent structure enhances the script’s flow and makes conversations easy to follow.
 
 ### Example:
 
@@ -19,3 +23,5 @@ Mabel:
 - Hello, my name is Mabel!
 - How are you doing today?
 ```
+
+By adhering to this format, the script remains organized, making it simpler for readers to navigate through conversations and understand the speaker at all times.

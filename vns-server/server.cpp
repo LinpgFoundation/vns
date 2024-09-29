@@ -3,6 +3,7 @@
 #include "extern/vns-cpp/schema.hpp"
 #include "extern/vns-cpp/naming.hpp"
 #include "extern/vns-cpp/validator.hpp"
+#include "extern/vns-cpp/version.hpp"
 
 // HTTP
 int main(const int argc, char **argv)
@@ -37,14 +38,14 @@ int main(const int argc, char **argv)
     // Create a server object
     httplib::Server svr;
 
-    // Define a route for handling compile request
+    //Handling compile request
     svr.Post("/post/compile", [&DEBUG](const httplib::Request &req, httplib::Response &res) {
         // Output the request body
         if (DEBUG)
             std::cout << "Received POST request with body: " << req.body << std::endl;
 
         // parse body to json
-        nlohmann::json req_j = nlohmann::json::parse(req.body);
+        const nlohmann::json req_j = nlohmann::json::parse(req.body);
 
         // update naming database
         if (req_j.contains("namings"))
@@ -61,7 +62,7 @@ int main(const int argc, char **argv)
         res.set_content(compiled, "application/json");
     });
 
-    // Define a route for handling vns format json validation request
+    // Handling vns format json validation request
     svr.Post("/post/validate", [](const httplib::Request &req, httplib::Response &res) {
         // Respond with result
         const nlohmann::json response = {
@@ -71,9 +72,17 @@ int main(const int argc, char **argv)
         res.set_content(response.dump(), "application/json");
     });
 
-    // Define a route for handling get schema request
+    // Get schema request
     svr.Get("/get/schema", [](const httplib::Request &, httplib::Response &res) {
         res.set_content(VNS_SCHEMA, "application/json");
+    });
+
+    // Get compiler version
+    svr.Get("/get/version", [](const httplib::Request &, httplib::Response &res) {
+        const nlohmann::json response = {{"version",   VERSION},
+                                         {"reversion", REVISION},
+                                         {"patch",     PATCH}};
+        res.set_content(response.dump(), "application/json");
     });
 
     // Start the server on given address (at localhost:8181 by default)

@@ -19,10 +19,11 @@ add_subdirectory(extern/json-schema-validator)
 
 # Add source to this project's executable.
 add_executable(vns ${SOURCES} vns.cpp vns.hpp scriptProcessor.cpp naming.cpp naming.hpp dialogue.hpp dialogue.cpp
-        dialogueNext.hpp dialogueNext.cpp scriptProcessor.hpp functions.hpp tests.hpp tests.cpp functions.cpp
-        compiler.hpp compiler.cpp version.hpp dialoguesManager.hpp dialoguesManager.cpp decompiler.cpp decompiler.hpp
-        Event.cpp Event.hpp expressionParser.cpp expressionParser.hpp number.cpp number.hpp operation.hpp
-        validator.hpp validator.cpp schema.hpp)
+        dialogueNext.hpp dialogueNext.cpp scriptProcessor.hpp functions.hpp functions.cpp compiler.hpp compiler.cpp
+        version.hpp dialoguesManager.hpp dialoguesManager.cpp decompiler.cpp decompiler.hpp event.cpp event.hpp
+        expressionParser.cpp expressionParser.hpp number.cpp number.hpp operation.hpp validator.hpp validator.cpp
+        tests.hpp tests.cpp
+        schema.hpp tags.hpp version.cpp)
 
 target_link_libraries(vns PRIVATE nlohmann_json::nlohmann_json nlohmann_json_schema_validator)
 
@@ -30,9 +31,9 @@ set_property(TARGET vns PROPERTY CXX_STANDARD 20)
 
 add_library(vns_lib STATIC ${SOURCES} scriptProcessor.cpp naming.cpp naming.hpp dialogue.hpp dialogue.cpp
         dialogueNext.hpp dialogueNext.cpp scriptProcessor.hpp functions.hpp functions.cpp
-        compiler.hpp compiler.cpp version.hpp dialoguesManager.hpp dialoguesManager.cpp decompiler.cpp decompiler.hpp
-        Event.cpp Event.hpp expressionParser.cpp expressionParser.hpp number.cpp number.hpp operation.hpp
-        validator.hpp validator.cpp schema.hpp)
+        compiler.hpp compiler.cpp version.hpp version.cpp dialoguesManager.hpp dialoguesManager.cpp decompiler.hpp
+        decompiler.cpp event.cpp event.hpp expressionParser.cpp expressionParser.hpp number.cpp number.hpp operation.hpp
+        validator.hpp validator.cpp schema.hpp tags.hpp)
 
 target_link_libraries(vns_lib PRIVATE nlohmann_json::nlohmann_json nlohmann_json_schema_validator)
 

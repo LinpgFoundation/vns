@@ -22,3 +22,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Added
 - Added syntax highlight for variables and operations.
+
+## [2.3.0] - 2024-9-29
+
+### Changed
+- Improve highlighting clarification and string pattern matching for specific conditions.

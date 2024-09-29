@@ -3,13 +3,13 @@
     "name": "Visual Novel Script",
     "patterns": [
         {
+            "include": "#contents"
+        },
+        {
             "include": "#strings"
         },
         {
-            "include": "#double_quotation"
-        },
-        {
-            "include": "#single_quotation"
+            "include": "#option_prompt"
         },
         {
             "include": "#double-slash"
@@ -28,19 +28,27 @@
         },
         {
             "include": "#numbers"
-        },
-        {
-            "include": "#variables"
         }
     ],
     "repository": {
+        "boolean": {
+            "match": "\\b(true|false)\\b",
+            "name": "constant.language.boolean"
+        },
+        "contents": {
+            "captures": {
+                "1": {
+                    "name": "string.unquoted.vns"
+                }
+            },
+            "match": "^\\s*\\-\\s+\\s*(.*?)\n"
+        },
         "double-slash": {
-            "begin": "\\/\\/",
-            "end": "\n",
-            "name": "comment.line.double-slash"
+            "match": "//.*$",
+            "name": "comment.line.double-slash.vns"
         },
         "heading": {
-            "match": "(.*?):",
+            "match": "^\\s*(.+?):\\s*$",
             "name": "markup.heading.vns"
         },
         "keywords": {
@@ -56,32 +64,80 @@
             ]
         },
         "number-sign": {
-            "begin": "\\#",
-            "end": "\n",
-            "name": "comment.line.number-sign"
-        },
-        "strings": {
-            "begin": "- ",
-            "end": "\n",
-            "name": "string.unquoted.vns"
-        },
-        "double_quotation": {
-            "begin": "\"",
-            "end": "\"",
-            "name": "string.unquoted.vns"
-        },
-        "single_quotation": {
-            "begin": "'",
-            "end": "'",
-            "name": "string.unquoted.vns"
-        },
-        "boolean": {
-            "match": "\\b(true|false)\\b",
-            "name": "constant.language.boolean"
+            "match": "#.*$",
+            "name": "comment.line.number-sign.vns"
         },
         "numbers": {
-            "match": "\\b\\d+\\b",
-            "name": "constant.numeric.integer"
+            "patterns": [
+                {
+                    "match": "\\b\\d+\\.\\d+\\b",
+                    "name": "constant.numeric.float.vns"
+                },
+                {
+                    "match": "\\b\\d+\\b",
+                    "name": "constant.numeric.integer.vns"
+                }
+            ]
+        },
+        "option_prompt": {
+            "captures": {
+                "1": {
+                    "name": "keyword.control.vns"
+                },
+                "2": {
+                    "name": "string.unquoted.vns"
+                },
+                "3": {
+                    "name": "keyword.operator.vns"
+                }
+            },
+            "match": "\\[(.+?)\\]\\s*(.*?)\\s*(->)"
+        },
+        "strings": {
+            "patterns": [
+                {
+                    "begin": "\"",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "punctuation.definition.string.begin.vns"
+                        }
+                    },
+                    "end": "\"",
+                    "endCaptures": {
+                        "0": {
+                            "name": "punctuation.definition.string.end.vns"
+                        }
+                    },
+                    "name": "string.quoted.double.vns",
+                    "patterns": [
+                        {
+                            "match": "\\\\.",
+                            "name": "constant.character.escape.vns"
+                        }
+                    ]
+                },
+                {
+                    "begin": "'",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "punctuation.definition.string.begin.vns"
+                        }
+                    },
+                    "end": "'",
+                    "endCaptures": {
+                        "0": {
+                            "name": "punctuation.definition.string.end.vns"
+                        }
+                    },
+                    "name": "string.quoted.single.vns",
+                    "patterns": [
+                        {
+                            "match": "\\\\.",
+                            "name": "constant.character.escape.vns"
+                        }
+                    ]
+                }
+            ]
         }
     },
     "scopeName": "source.vns"
