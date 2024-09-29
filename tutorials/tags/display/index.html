@@ -403,6 +403,17 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    [display]/[disp]
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -412,6 +423,43 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      Syntax
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -591,6 +639,111 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Visual Novel Script Enhancement Proposals
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Visual Novel Script Enhancement Proposals
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../vep/1-Variables/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VEP 1 - Variables
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../vep/2-Language%20Standard%20and%20Compiler%20Version%20Management/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VEP 2 - Language Standard and Compiler Version Management
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../vep/3-Introducing%20%5Bjump%5D%20Tag/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VEP 3 - Introducing [jump] Tag
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -611,6 +764,32 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      Syntax
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -625,8 +804,15 @@
 
 
 <h1 id="display-characters">Display character(s):</h1>
-<p><code>[display]*strings</code>, ex: <code>[display]character1.png character2.png</code></p>
-<p>Displays character images corresponding to the ongoing and forthcoming dialogues. Unlike the [show] tag, which introduces new character images in addition to existing character images, this tag will first clear any existing character images before introducing the designated character image(s).</p>
+<p>This command is used to display character images for current or upcoming dialogues. Unlike the <code>[show]</code> tag, which adds new character images while retaining existing ones, the <code>[display]</code> tag first clears any previously shown images before displaying the specified character image(s). This ensures that only the designated character images appear on the screen.</p>
+<h3 id="syntax">Syntax</h3>
+<pre><code>[display]image1 image2 ...
+</code></pre>
+<p><em>image1</em>, <em>image2</em>, etc., represent the filenames of the character images to be displayed.</p>
+<h3 id="example">Example</h3>
+<pre><code class="language-vns">[display]character1.png character2.png
+</code></pre>
+<p>In this example, any previously displayed images will be cleared, and the images <code>character1.png</code> and <code>character2.png</code> will be shown.</p>
 
 
 

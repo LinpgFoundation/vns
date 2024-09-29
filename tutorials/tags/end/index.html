@@ -62,7 +62,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#current-dialogue-branch-ends-here" class="md-skip">
+        <a href="#end-of-current-dialogue-branch" class="md-skip">
           Skip to content
         </a>
       
@@ -508,6 +508,17 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    [end]
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -517,6 +528,34 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      Syntax
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -591,6 +630,111 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Visual Novel Script Enhancement Proposals
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Visual Novel Script Enhancement Proposals
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../vep/1-Variables/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VEP 1 - Variables
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../vep/2-Language%20Standard%20and%20Compiler%20Version%20Management/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VEP 2 - Language Standard and Compiler Version Management
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../vep/3-Introducing%20%5Bjump%5D%20Tag/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VEP 3 - Introducing [jump] Tag
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -611,6 +755,23 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      Syntax
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -624,9 +785,15 @@
                   
 
 
-<h1 id="current-dialogue-branch-ends-here">Current dialogue branch ends here:</h1>
-<p><code>[end]</code></p>
-<p>Marks the end of current dialogue branch.</p>
+<h1 id="end-of-current-dialogue-branch">End of Current Dialogue Branch</h1>
+<p>The <code>[end]</code> tag is used to mark the conclusion of the current dialogue branch. Once this tag is encountered, the program will recognize that the dialogue or narrative path has finished.</p>
+<h3 id="syntax">Syntax</h3>
+<pre><code>Me:
+- I guess this is the end of the story.
+
+[end]
+</code></pre>
+<p>By using <code>[end]</code>, you signal that no further dialogue or choices will follow in this particular branch, and the story can transition or conclude as necessary.</p>
 
 
 
