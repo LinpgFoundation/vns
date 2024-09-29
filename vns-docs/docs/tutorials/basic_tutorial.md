@@ -1,31 +1,47 @@
 # Basic Tutorials:
 
-### The Basics of VNS
+## The Basics of VNS
 
-VNS are written in a plain text file with the `.vns` extension. Imagine a script filled with descriptions, dialogues, and choices. VNS uses special tags to turn this script into an immersive experience, complete with characters, backgrounds, music, and branching narratives.
+VNS (Visual Novel Script) is a scripting language used to create interactive visual novels. These scripts are written in plain text files with the `.vns` extension. Imagine crafting a story filled with descriptions, dialogues, choices, and multimedia elements like images and music. VNS uses special tags to transform your script into an immersive experience featuring characters, backgrounds, music, and branching narratives.
 
-### **Let's dive into the building blocks:**
+## Let's dive into the building blocks:
 
-**1. The tag party:**
+### 1. Tags:
+Tags are the core elements of VNS. They instruct the program on how to display content. Enclosed in square brackets, tags help define scenes, characters, backgrounds, and more.
 
-Tags are the secret sauce of VNS. They tell the engine what to display.
+### 2. Essential tags:
 
+Here are some of the most commonly used tags in VNS:
 
+- **ID:** `[id]string`
 
-**2. Essential tags:**
+  Defines the unique identifier of the script.
 
-- **ID:** `[id]string` defines the ID of the script
-- **Language:** `[language]string` specifies the language of the script.
-- **Section:** `[section]string` specifies the section of all the following dialogues.
-- **Background Image:** `[bgi]string` specifies the background image for the current and following dialogues.
-- **Background Music:** `[bgm]string` specifies the background music for the current and following dialogues.
-- **Show Character(s):** `[show]*string(s)` introduce the character to the current and following dialogues.
+- **Language:** `[language]string`
 
+  Specifies the language of the script.
 
+- **Section:** `[section]string`
 
-**3. A glimpse into storytelling:**
+  Denotes a new section in the script.
 
-Imagine this simple scene:
+- **Background Image:** `[bgi]string`
+
+  Sets the background image for the current and subsequent dialogues.
+
+- **Background Music:** `[bgm]string`
+
+  Sets the background music for the current and subsequent dialogues.
+
+- **Show Character(s):** `[show]string(s)` 
+
+  Introduces (new) character image(s) to the scene.
+
+### 3. A glimpse into storytelling:
+
+Let's put these tags into action with a simple example.
+
+#### Example Script
 
 ```vns
 [id]1
@@ -34,13 +50,27 @@ Imagine this simple scene:
 
 [bgm]music1.ogg
 [bgi]bg1.png
-[show]example.png
+[show]character.png
 
-Example:
+Alex:
 - Hellow world!
 ```
 
-Restult:
+#### Explanation
+
+- `[id]1`: Sets the script ID to "1".
+- `[language]English`: Specifies that the script is in English.
+- `[section]dialog_example`: Begins a new section called "dialog_example".
+- `[bgm]music1.ogg`: Plays "music1.ogg" as background music.
+- `[bgi]bg1.png`: Displays "bg1.png" as the background image.
+- `[show]character.png`: Shows "character.png" on the screen.
+- `Alex:`: Indicates that the following dialogue is spoken by "Alex".
+- `- Hello, world!`: The dialogue line spoken by the character.
+
+#### Expected Output
+
+When compiled, the script should produce a JSON representation like this:
+
 ```json
 {
     "compiler": {...},
@@ -50,12 +80,12 @@ Restult:
                 "background_image": "bg1.png",
                 "background_music": "music1.ogg",
                 "character_images": [
-                    "example.png"
+                    "character.png"
                 ],
                 "contents": [
                     "Hellow world!"
                 ],
-                "narrator": "Example"
+                "narrator": "Alex"
             }
         }
     },
@@ -63,13 +93,13 @@ Restult:
     "language": "English"
 }
 ```
-See how tags build a scene, introduce characters?
+This JSON structure represents how the script is interpreted, showing the background, music, characters, and dialogue content.
 
 
 
-**Ready to explore more?**
+## Ready to explore more?
 
-This is just the beginning! Check out the VNS documentation for in-depth details. Remember, practice makes perfect. Start simple, experiment, and most importantly, have fun creating your unique stories!
+This is just the beginning! Check out the documentation for in-depth details. Remember, practice makes perfect. Start simple, experiment, and most importantly, have fun creating your unique stories!
 
 
 

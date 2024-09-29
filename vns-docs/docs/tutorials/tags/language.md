@@ -1,5 +1,19 @@
-# Language:
+# Language
 
-`[language]string`, ex: `[language]English`
+The `[language]` tag defines the language used in the current dialogue script. Each script file must specify its language to ensure proper localization and presentation.
 
-Specifies the language of the current dialogue. Every script file must specifies a language.
+### Syntax
+
+```
+[language]language_name
+```
+
+*language_name* represents the name of the language being used in the script (e.g., English, Japanese, etc.).
+
+### Example
+
+```vns
+[language]English
+```
+
+In this example, the language for the script is set to English.
