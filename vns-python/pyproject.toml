@@ -7,17 +7,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyvns"
-version = "2.3"
+version = "2.3.1"
 authors = [
     { name = "Linpg Foundation", email = "yudong9912@gmail.com" },
 ]
 description = "VNS (Visual Novel Script), a universal scripting language for creating scripts for visual novel games."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 classifiers = [
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: Implementation :: CPython",
     "Operating System :: OS Independent",
 ]
@@ -31,7 +30,7 @@ dependencies = ["mypy"]
 hook-dirs = "pyvns.__pyinstaller:get_hook_dirs"
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.13"
 disallow_any_generics = true
 disallow_untyped_defs = true
 disallow_untyped_calls = true
@@ -40,10 +39,21 @@ warn_redundant_casts = true
 warn_unreachable = true
 
 [tool.black]
-target-version = ['py312']
+target-version = ['py313']
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
 "*" = ["*"]
+
+[tool.linpgtoolbox.options]
+include_pyinstaller = true
+auto_cmake = true
+
+[tool.linpgtoolbox]
+ignores = [".*extern$"]
+includes = [
+    "../LICENSE",
+    "../README.md"
+]
