@@ -4,6 +4,7 @@
 #include <regex>
 #include "dialoguesManager.hpp"
 #include "tags.hpp"
+#include <sstream>
 
 class ScriptProcessor
 {
