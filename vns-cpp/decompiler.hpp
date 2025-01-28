@@ -2,7 +2,6 @@
 #define DECOMPILER_HPP
 
 #include "dialoguesManager.hpp"
-#include <sstream>
 
 class Decompiler
 {

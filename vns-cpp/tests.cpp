@@ -115,8 +115,8 @@ void Tests::TestCompiler()
     // compile file
     Compiler::compile(EXAMPLE_VNS_TEST_FILE, EXAMPLE_VNS_TEST_FILES_DIR);
     // make sure output file exists
-    std::filesystem::path outFileName = "chapter1_dialogs_English.json";
-    std::filesystem::path jsonPath = EXAMPLE_VNS_TEST_FILES_DIR / outFileName;
+    const std::filesystem::path outFileName = "chapter1_dialogs_English.json";
+    const std::filesystem::path jsonPath = EXAMPLE_VNS_TEST_FILES_DIR / outFileName;
     assert(std::filesystem::exists(jsonPath));
     // make sure file is in correct format
     Validator::ensure(jsonPath);

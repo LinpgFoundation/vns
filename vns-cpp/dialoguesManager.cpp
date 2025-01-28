@@ -114,13 +114,11 @@ bool DialoguesManager::contains_variable(const std::string &name) const
     if (name.starts_with('@'))
     {
         return global_variables_.contains(name);
-    } else if (name.starts_with('&'))
-    {
-        return persistent_variables_.contains(name);
-    } else
-    {
-        return local_variables_.contains(section_) && local_variables_.at(section_).contains(name);
     }
+    if (name.starts_with('&')) {
+        return persistent_variables_.contains(name);
+    }
+    return local_variables_.contains(section_) && local_variables_.at(section_).contains(name);
 }
 
 // Get variable
@@ -129,13 +127,11 @@ event_data_t DialoguesManager::get_variable(const std::string &name) const
     if (name.starts_with('@'))
     {
         return global_variables_.at(name);
-    } else if (name.starts_with('&'))
-    {
-        return persistent_variables_.at(name);
-    } else
-    {
-        return local_variables_.at(section_).at(name);
     }
+    if (name.starts_with('&')) {
+        return persistent_variables_.at(name);
+    }
+    return local_variables_.at(section_).at(name);
 }
 
 // Set variable
@@ -218,9 +214,8 @@ void DialoguesManager::set_current_dialogue_id(const std::string &id)
                 set_variable(e.target, std::get<float>(e.value));
             } else
             {
-                const std::string value_str = std::get<std::string>(e.value);
-                if (value_str.starts_with('"') && value_str.ends_with('"'))
-                {
+                if (const std::string value_str = std::get<std::string>(e.value);
+                    value_str.starts_with('"') && value_str.ends_with('"')) {
                     set_variable(e.target, value_str.substr(1, value_str.size() - 2));
                 } else
                 {
@@ -239,8 +234,8 @@ void DialoguesManager::set_current_dialogue_id(const std::string &id)
             if (std::holds_alternative<bool>(current_value))
             {
                 throw std::runtime_error("Unable to add to " + e.target + " because it is not a bool");
-            } else if (std::holds_alternative<std::string>(current_value))
-            {
+            }
+            if (std::holds_alternative<std::string>(current_value)) {
                 throw std::runtime_error("Unable to add to " + e.target + " because it is not a string");
             }
             // cast source variable as number
@@ -250,18 +245,19 @@ void DialoguesManager::set_current_dialogue_id(const std::string &id)
             if (std::holds_alternative<bool>(e.value))
             {
                 throw std::runtime_error("Unable to add a bool to " + e.target);
-            } else if (std::holds_alternative<std::string>(e.value))
-            {
+            }
+            if (std::holds_alternative<std::string>(e.value)) {
                 if (const std::string value_str = std::get<std::string>(e.value); value_str.starts_with('"') ||
-                                                                                  value_str.ends_with('"'))
-                {
+                    value_str.ends_with('"')) {
                     throw std::runtime_error("Unable to add a string to " + e.target);
                 }
             }
             // cast destination variable as number
             const Number n2 = std::holds_alternative<int>(e.value) ? Number(std::get<int>(e.value))
-                                                                   : (std::holds_alternative<float>(e.value) ? Number(
-                            std::get<float>(e.value)) : Number(parse_expression(std::get<std::string>(e.value))));
+                                  : std::holds_alternative<float>(e.value)
+                                        ? Number(
+                                            std::get<float>(e.value))
+                                        : Number(parse_expression(std::get<std::string>(e.value)));
             // get the result
             n1.operate(e.type, n2);
             // set the variable accordingly
@@ -344,9 +340,8 @@ void DialoguesManager::set_dialogues(const std::string &section, const dialogue_
         dialog_data_[section] = {};
     }
     // loop through the data and init data as dialogue object(s)
-    for (const auto &pair: data)
-    {
-        set_dialogue(section, pair.first, pair.second);
+    for (const auto &[fst, snd]: data) {
+        set_dialogue(section, fst, snd);
     }
     // if current_dialog_id_ no longer exists, then reset it to head
     if (section == section_ && !contains_dialogue(section_, current_dialog_id_))
@@ -383,8 +378,7 @@ Dialogue &DialoguesManager::get_dialogue(const std::string &section, const std::
 }
 
 // Set current dialogue data
-void DialoguesManager::set_current_dialogue(dialogue_data_t &data)
-{
+void DialoguesManager::set_current_dialogue(const dialogue_data_t &data) {
     set_dialogue(section_, current_dialog_id_, data);
 }
 
@@ -436,8 +430,8 @@ void DialoguesManager::remove_dialogue(const std::string &section, const std::st
         if (!theOneToRemove.has_next())
         {
             throw std::runtime_error("Cannot remove head when there is no next");
-        } else if (theOneToRemove.next.has_multi_targets())
-        {
+        }
+        if (theOneToRemove.next.has_multi_targets()) {
             throw std::runtime_error("Cannot remove head when head.next has multiple targets.");
         }
         dialogue_data_t theNextDialogueData = get_dialogue(section, theOneToRemove.next.get_target()).to_map();
@@ -475,28 +469,24 @@ void DialoguesManager::remove_dialogue(const std::string &section, const std::st
     if (theOneToRemove.next.has_single_target())
     {
         const std::string currNextTarget = theOneToRemove.next.get_target();
-        for (auto &e: theDialogues)
-        {
+        for (auto &val: theDialogues | std::views::values) {
             // if dialogue does not have target, then do nothing
-            if (!e.second.next.contains_target(id))
-            {
+            if (!val.next.contains_target(id)) {
                 continue;
             }
             // if next has only one target, then simple replace it
-            if (e.second.next.has_single_target())
-            {
-                e.second.next = DialogueNext(e.second.next.get_type(), currNextTarget);
+            if (val.next.has_single_target()) {
+                val.next = DialogueNext(val.next.get_type(), currNextTarget);
                 continue;
             }
             // if next has target as (more than) one of the targets, then need to find all and replace it/them
-            auto theDialogTargets = e.second.next.get_targets();
-            std::for_each(theDialogTargets.begin(), theDialogTargets.end(), [&id, currNextTarget](auto &p) {
-                if (p.at("id") == id)
-                {
+            auto theDialogTargets = val.next.get_targets();
+            std::ranges::for_each(theDialogTargets, [&id, currNextTarget](auto &p) {
+                if (p.at("id") == id) {
                     p["id"] = currNextTarget;
                 }
             });
-            e.second.next = DialogueNext(e.second.next.get_type(), theDialogTargets);
+            val.next = DialogueNext(val.next.get_type(), theDialogTargets);
         }
         // if next is not empty, then also need to update next.prev
         if (!currNextTarget.empty())

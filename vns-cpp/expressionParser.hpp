@@ -1,11 +1,7 @@
 #ifndef EXPRESSION_PARSER_HPP
 #define EXPRESSION_PARSER_HPP
 
-#include <iostream>
 #include <string>
-#include <cctype>
-#include <cmath>
-#include <utility>
 #include <functional>
 #include "event.hpp"
 #include "number.hpp"

@@ -90,21 +90,18 @@ std::string join(const std::vector<std::string> &strings_vec, const std::string 
 std::string remove_whitespace(const std::string &input)
 {
     std::string result = input; // Make a copy of the input string
-    result.erase(std::remove_if(result.begin(), result.end(), [](unsigned char x) {
+    result.erase(std::ranges::remove_if(result, [](const unsigned char x) {
         return std::isspace(x);
-    }), result.end());
+    }).begin(), result.end());
     return result;
 }
 
 // Load a json file
 nlohmann::json load_json(const std::filesystem::path &jsonPath)
 {
-    std::ifstream json_file(jsonPath);
-    nlohmann::json j;
-    if (json_file.is_open())
-    {
-        try
-        {
+    if (std::ifstream json_file(jsonPath); json_file.is_open()) {
+        try {
+            nlohmann::json j;
             json_file >> j;  // Deserializing JSON file to the json object
             return j;
         } catch (nlohmann::json::parse_error &e)
@@ -113,21 +110,18 @@ nlohmann::json load_json(const std::filesystem::path &jsonPath)
             errMsg << "Cannot read json file at path: " << jsonPath << "\nReason: " << e.what();
             throw std::runtime_error(errMsg.str());
         }
-    } else
-    {
-        std::stringstream errMsg;
-        errMsg << "Cannot open json file at path: " << jsonPath;
-        throw std::runtime_error(errMsg.str());
     }
+    // throw cannot open file error
+    std::stringstream errMsg;
+    errMsg << "Cannot open json file at path: " << jsonPath;
+    throw std::runtime_error(errMsg.str());
 }
 
 // Save a json file
 void save_json(const std::filesystem::path &jsonPath, const nlohmann::json &jsonData)
 {
-    std::ofstream outputFile(jsonPath);
     // Check if the file is open
-    if (outputFile.is_open())
-    {
+    if (std::ofstream outputFile(jsonPath); outputFile.is_open()) {
         // Save the JSON object to the file
         outputFile << std::setw(4) << jsonData << "\n";
         // Close the file stream

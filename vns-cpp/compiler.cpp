@@ -1,5 +1,4 @@
 ﻿#include <ctime>
-#include <iostream>
 #include "version.hpp"
 #include "compiler.hpp"
 #include "functions.hpp"
@@ -117,11 +116,10 @@ void Compiler::add_tasks(
     {
         for (const auto &entry: std::filesystem::directory_iterator(path))
         {
-            const std::filesystem::path &entryPath = entry.path();
-            if (entryPath.extension() == ScriptProcessor::SCRIPTS_FILE_EXTENSION)
-            {
-                tasks.emplace_back([entryPath, out_dir]() {
-                    Compiler::compile_script(entryPath, out_dir);
+            if (const std::filesystem::path &entryPath = entry.path();
+                entryPath.extension() == ScriptProcessor::SCRIPTS_FILE_EXTENSION) {
+                tasks.emplace_back([entryPath, out_dir] {
+                    compile_script(entryPath, out_dir);
                 });
             } else if (entry.is_directory())
             {
@@ -130,8 +128,8 @@ void Compiler::add_tasks(
         }
     } else if (path.extension() == ScriptProcessor::SCRIPTS_FILE_EXTENSION)
     {
-        tasks.emplace_back([path, out_dir]() {
-            Compiler::compile_script(path, out_dir);
+        tasks.emplace_back([path, out_dir] {
+            compile_script(path, out_dir);
         });
     }
 }
