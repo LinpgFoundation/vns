@@ -13,6 +13,8 @@ nav:
   - '[scene]': tutorials/tags/scene.md
   - '[option]/[opt]': tutorials/tags/option.md
   - '[label]': tutorials/tags/label.md
+  - '[jump/jmp]': tutorials/tags/jump.md
+  - '[jump_/jmp_]': tutorials/tags/jump_.md
   - '[end]': tutorials/tags/end.md
   - '[block]': tutorials/tags/block.md
 - Comments and Notes: tutorials/comments_and_notes.md
