@@ -1,49 +1,73 @@
 [build-system]
+build-backend = "setuptools.build_meta"
 requires = [
     "setuptools>=64",
     "wheel"
 ]
-build-backend = "setuptools.build_meta"
 
 [project]
-name = "pyvns"
-version = "2.3"
 authors = [
-    { name = "Linpg Foundation", email = "yudong9912@gmail.com" },
+    {email = "yudong9912@gmail.com", name = "Linpg Foundation"}
 ]
-description = "VNS (Visual Novel Script), a universal scripting language for creating scripts for visual novel games."
-readme = "README.md"
-requires-python = ">=3.10"
 classifiers = [
-    "Programming Language :: Python :: 3.10",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython"
 ]
 dependencies = ["mypy"]
-
-[project.urls]
-"Homepage" = "https://github.com/LinpgFoundation/vns"
-"Bug Tracker" = "https://github.com/LinpgFoundation/vns/issues"
+description = "VNS (Visual Novel Script), a universal scripting language for creating scripts for visual novel games."
+name = "pyvns"
+readme = "README.md"
+requires-python = ">=3.11"
+version = "2.3.1"
 
 [project.entry-points.pyinstaller40]
 hook-dirs = "pyvns.__pyinstaller:get_hook_dirs"
 
-[tool.mypy]
-python_version = "3.12"
-disallow_any_generics = true
-disallow_untyped_defs = true
-disallow_untyped_calls = true
-warn_return_any = true
-warn_redundant_casts = true
-warn_unreachable = true
+[project.urls]
+"Bug Tracker" = "https://github.com/LinpgFoundation/vns/issues"
+"Homepage" = "https://github.com/LinpgFoundation/vns"
 
 [tool.black]
-target-version = ['py312']
+target-version = ['py313']
+
+[tool.linpgtoolbox]
+cache_needs_removal = [
+    "cmake-build-debug",
+    "extern",
+    "wrapper.cpp"
+]
+ignores = [".*extern$"]
+includes = [
+    "../LICENSE",
+    "../README.md"
+]
+requires = [
+    "../vns-cpp -> extern/vns-cpp"
+]
+
+[tool.linpgtoolbox.options]
+auto_cmake = true
+include_pyinstaller = true
+
+[tool.mypy]
+disallow_any_generics = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+python_version = "3.13"
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+
+[tool.setuptools.package-data]
+"*" = ["*"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.setuptools.package-data]
-"*" = ["*"]
+[tool.tomlsort]
+all = true
+in_place = true
+spaces_indent_inline_array = 4

@@ -62,10 +62,8 @@ void Number::divide(const Number &o)
     } else
     {
         // Check if the division results in a non-integer value when both are ints
-        int dividend = std::get<int>(value);
-        int divisor = std::get<int>(o.value);
-        if (dividend % divisor == 0)
-        {
+        const int dividend = std::get<int>(value);
+        if (const int divisor = std::get<int>(o.value); dividend % divisor == 0) {
             // Division results in an integer value
             value = dividend / divisor;
         } else

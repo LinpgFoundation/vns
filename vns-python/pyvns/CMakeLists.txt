@@ -9,7 +9,7 @@ project(vns_python_wrapper)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # set python version
-# set(PYBIND11_PYTHON_VERSION "3.10")
+# set(PYBIND11_PYTHON_VERSION "3.13")
 
 # find python
 find_package(Python COMPONENTS Interpreter Development)

@@ -44,6 +44,15 @@ public:
     const std::string type;
     const std::string target;
     const event_data_t value;
+
+    // Custom assignment operator
+    Event &operator=(const Event &other) {
+        if (this == &other) return *this;
+        // Const member cannot be assigned, so create a new instance
+        this->~Event();
+        new (this) Event(other);  // Placement new for reconstruction
+        return *this;
+    }
 };
 
 

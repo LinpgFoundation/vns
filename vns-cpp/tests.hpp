@@ -1,7 +1,6 @@
 #ifndef TESTS_HPP
 #define TESTS_HPP
 
-#include <string>
 #include <filesystem>
 
 class Tests

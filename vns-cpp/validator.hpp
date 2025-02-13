@@ -2,7 +2,6 @@
 #define VALIDATOR_HPP
 
 #include <nlohmann/json-schema.hpp>
-#include <iostream>
 
 class Validator
 {

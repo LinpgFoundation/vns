@@ -5,15 +5,14 @@
 
 struct operation
 {
-    constexpr static const std::string_view add = "add";
-    constexpr static const std::string_view subtract = "subtract";
-    constexpr static const std::string_view multiply = "multiply";
-    constexpr static const std::string_view divide = "divide";
-    constexpr static const std::string_view mod = "mod";
-    constexpr static const std::string_view set = "set";
+    constexpr static std::string_view add = "add";
+    constexpr static std::string_view subtract = "subtract";
+    constexpr static std::string_view multiply = "multiply";
+    constexpr static std::string_view divide = "divide";
+    constexpr static std::string_view mod = "mod";
+    constexpr static std::string_view set = "set";
 
-    static std::string_view get(char symbol)
-    {
+    static std::string_view get(const char symbol) {
         switch (symbol)
         {
             case '+':
@@ -31,8 +30,7 @@ struct operation
         }
     }
 
-    static bool has(char symbol)
-    {
+    static bool has(const char symbol) {
         return symbol == '+' || symbol == '-' || symbol == '*' || symbol == '/' || symbol == '%';
     }
 };

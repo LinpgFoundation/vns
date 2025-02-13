@@ -117,9 +117,7 @@ void ScriptProcessor::process(const std::filesystem::path &path)
         try
         {
             load_file_as_lines(path_, lines_);
-        }
-        catch (const std::exception &e)
-        {
+        } catch ([[maybe_unused]] const std::exception &e) {
             terminated("File is occupied!");
         }
     }
@@ -138,27 +136,23 @@ void ScriptProcessor::continue_process()
 
     std::string last_label;
 
-    size_t current_index;
+    size_t current_index = 0;
 
     // lines clean up
     for (auto &line: lines_)
         line = trim(line.substr(0, line.find(COMMENT_PREFIX)));
 
     // remove all empty lines or lines starting with # (comments)
-    lines_.erase(std::remove_if(lines_.begin(), lines_.end(), [](const std::string &line) {
+    lines_.erase(std::ranges::remove_if(lines_, [](const std::string &line) {
         return line.empty() || line.starts_with(COMMENT_PREFIX);
-    }), lines_.end());
+    }).begin(), lines_.end());
 
     // pre-process all the lines
     for (size_t i = 0; i < lines_.size(); ++i)
     {
         // obtain current line as a pointer
-        const std::string &current_line = lines_[i];
-        if (current_line.starts_with(TAG_STARTS))
-        {
-            const std::string_view tag = extract_tag(current_line);
-            if (tag == tags::label)
-            {
+        if (const std::string &current_line = lines_[i]; current_line.starts_with(TAG_STARTS)) {
+            if (const std::string_view tag = extract_tag(current_line); tag == tags::label) {
                 if (!last_label.empty())
                 {
                     terminated("This label is overwriting the previous one", i);
@@ -176,8 +170,8 @@ void ScriptProcessor::continue_process()
             {
                 // make sure a match exist, if not, then the given value are invalid
                 std::smatch match;
-                const std::string version_info = extract_parameter(current_line);
-                if (!std::regex_match(version_info, match, vns_version_pattern))
+                if (const std::string version_info = extract_parameter(current_line); !std::regex_match(
+                    version_info, match, vns_version_pattern))
                     terminated("Invalid tag value", i, tag);
                 // check if given script version is compatible with the compiler
                 bool is_script_compatible;
@@ -246,17 +240,12 @@ void ScriptProcessor::convert(const size_t starting_index)
     while (line_index < lines_.size())
     {
         // obtain current line as a pointer
-        const std::string &current_line = lines_[line_index];
-        if (current_line.starts_with(NOTE_PREFIX))
-        {
+        if (const std::string &current_line = lines_[line_index]; current_line.starts_with(NOTE_PREFIX)) {
             // Accumulate notes
             current_data_.notes.push_back(current_line.substr(NOTE_PREFIX.length() + 1));
         } else if (current_line.starts_with(TAG_STARTS))
         {
-            const std::string_view tag = extract_tag(current_line);
-
-            if (tag == tags::background_image)
-            {
+            if (const std::string_view tag = extract_tag(current_line); tag == tags::background_image) {
                 current_data_.background_image = extract_parameter(current_line);
             } else if (tag == tags::background_music)
             {
@@ -318,9 +307,8 @@ void ScriptProcessor::convert(const size_t starting_index)
                 {
                     terminated("Cannot use scene tag when there is not previous dialogue.", line_index);
                 }
-                Dialogue &previous_dialogue = output_.get_dialogue(section_, previous_);
-                if (previous_dialogue.next.has_multi_targets())
-                {
+                if (Dialogue &previous_dialogue = output_.get_dialogue(section_, previous_); previous_dialogue.next.
+                    has_multi_targets()) {
                     previous_dialogue.set_next("scene", previous_dialogue.next.get_targets());
                 } else
                 {
@@ -360,9 +348,8 @@ void ScriptProcessor::convert(const size_t starting_index)
                 {
                     terminated("Cannot use jump tag when there is not previous dialogue.", line_index);
                 }
-                    // cannot jump when previous dialogue has multiple targets
-                else if (output_.get_dialogue(section_, previous_).next.has_multi_targets())
-                {
+                // cannot jump when previous dialogue has multiple targets
+                if (output_.get_dialogue(section_, previous_).next.has_multi_targets()) {
                     terminated("Cannot use jump tag when previous dialogue already has multiple targets.", line_index);
                 }
                 // update previous dialogue's next
@@ -524,8 +511,8 @@ void ScriptProcessor::convert(const size_t starting_index)
                 if (!variable_value.ends_with('"'))
                 {
                     terminated("Possible missing close quotation mark for string", line_index);
-                } else if (variable_action != operation::set)
-                {
+                }
+                if (variable_action != operation::set) {
                     terminated("You can only set a string variable!");
                 }
                 event_value = variable_value;

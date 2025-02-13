@@ -12,8 +12,7 @@ bool Validator::validate(const nlohmann::json &jsonObj)
     {
         VALIDATOR.validate(jsonObj); // validate the document - uses the default throwing error-handler
         return true;
-    } catch (const std::exception &e)
-    {
+    } catch ([[maybe_unused]] const std::exception &e) {
         return false;
     }
 }

@@ -1,7 +1,5 @@
 # Block:
 
-`[block]`
-
 Prevents the player from returning to the previous conversation.
 
 ### Syntax

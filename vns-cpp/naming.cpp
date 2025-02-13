@@ -128,6 +128,6 @@ void Naming::update_database(const std::unordered_map<std::string, std::vector<s
 {
     for (const auto &[k, v]: database)
     {
-        DATABASE_[k] = std::unordered_set<std::string>(v.begin(), v.end());
+        DATABASE_[k] = std::unordered_set(v.begin(), v.end());
     }
 }

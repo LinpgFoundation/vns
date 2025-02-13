@@ -4,6 +4,7 @@
 #include "dialogue.hpp"
 #include "number.hpp"
 #include <unordered_set>
+#include <sstream>
 
 class DialoguesManager
 {
@@ -96,7 +97,7 @@ public:
     [[nodiscard]] Dialogue &get_dialogue(const std::string &, const std::string &);
 
     // Set current dialogue data
-    void set_current_dialogue(dialogue_data_t &);
+    void set_current_dialogue(const dialogue_data_t &);
 
     // Set dialogue data
     void set_dialogue(const std::string &, const std::string &, const dialogue_data_t &);

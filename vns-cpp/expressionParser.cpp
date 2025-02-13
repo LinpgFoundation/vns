@@ -62,23 +62,21 @@ Number ExpressionParser::parseFactor()
     if (buffer[index] == '(')
     {
         ++index; // Consume '('
-        Number result = parseExpression();
+        const Number result = parseExpression();
         if (buffer[index] != ')')
         {
             throw std::runtime_error("Expected ')'.");
         }
         ++index; // Consume ')'
         return result;
-    } else
-    {
-        return parseNumber();
     }
+    return parseNumber();
 }
 
 // Parse a number
 Number ExpressionParser::parseNumber()
 {
-    size_t start = index;
+    const size_t start = index;
     // check the tag for global or persistent variable
     if (buffer[index] == '@' || buffer[index] == '&')
     {
@@ -89,21 +87,15 @@ Number ExpressionParser::parseNumber()
     {
         ++index;
     }
-    const std::string data_s = buffer.substr(start, index - start);
     // if the number extracted is the name of a variable
-    if (contains_variable_(data_s))
-    {
-        event_data_t value = get_variable_(data_s);
-        if (std::holds_alternative<int>(value))
-        {
+    if (const std::string data_s = buffer.substr(start, index - start); contains_variable_(data_s)) {
+        if (event_data_t value = get_variable_(data_s); std::holds_alternative<int>(value)) {
             return Number(std::get<int>(value));
         } else if (std::holds_alternative<float>(value))
         {
             return Number(std::get<float>(value));
-        } else
-        {
-            throw std::runtime_error("Cannot add " + data_s + " because it is not a number");
         }
+        throw std::runtime_error("Cannot add " + data_s + " because it is not a number");
     } else
     {
         number_t number_tmp;

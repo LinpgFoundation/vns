@@ -166,3 +166,5 @@ vns-cpp/cmake-build-debug/
 vns-docs/site/
 vns-server/cmake-build-debug/
 vns-server/extern/vns-cpp/
+.DS_Store
+/.idea
