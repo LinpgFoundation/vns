@@ -25,5 +25,6 @@ RUN cmake --build . --config Release
 # Run server
 CMD ["./vns_server"]
 
+# cp -r ../vns-cpp/ extern/
 # docker build -t vns-server .
 # docker run --name vns-server -d -p 8181:8181 vns-server
