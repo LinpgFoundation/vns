@@ -21,12 +21,12 @@ struct tags
     constexpr static std::string_view jump = "jmp";
     constexpr static std::string_view jump_ = "jmp_";
     constexpr static std::string_view label = "label";
-    static const std::unordered_map<std::string_view, std::string_view> inline alternatives = {{"language", language},
-                                                                                               {"option",   option},
-                                                                                               {"display",  display},
-                                                                                               {"jump",     jump},
-                                                                                               {"jump_",    jump_},
-                                                                                               {"section",  section}};
+    constexpr static std::string_view sound_effect = "sfx";
+    static const std::unordered_map<std::string_view, std::string_view> inline alternatives = {
+        {"language", language}, {"option", option}, {"display", display}, {"jump", jump}, {"jump_", jump_},
+        {"section", section}, {"background-image", background_image}, {"background-music", background_music},
+        {"sound-effect", sound_effect}
+    };
 };
 
 #endif

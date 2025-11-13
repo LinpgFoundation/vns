@@ -1,28 +1,30 @@
 #include "dialogue.hpp"
 
-Dialogue::Dialogue(const std::string &content_id, const dialogue_data_t &data)
+Dialogue::Dialogue(const std::string& content_id, const dialogue_data_t& data)
 {
     id = content_id;
     background_image = cast<std::string>(data, "background_image");
     background_music = cast<std::string>(data, "background_music");
     character_images = cast<std::vector<std::string>>(data, "character_images");
+    sound_effects = cast<std::vector<std::string>>(data, "sound_effects");
     contents = cast<std::vector<std::string>>(data, "contents");
     narrator = cast<std::string>(data, "narrator");
     previous = cast<std::string>(data, "previous");
     next = DialogueNext(cast<dialogue_next_t>(data, "next"));
     notes = cast<std::vector<std::string>>(data, "notes");
-    for (const event_t &e: cast<std::vector<event_t>>(data, "events"))
+    for (const event_t& e : cast<std::vector<event_t>>(data, "events"))
     {
         events.emplace_back(e);
     }
 }
 
-Dialogue::Dialogue(const std::string &content_id, const nlohmann::json &data)
+Dialogue::Dialogue(const std::string& content_id, const nlohmann::json& data)
 {
     id = content_id;
     background_image = cast<std::string>(data, "background_image");
     background_music = cast<std::string>(data, "background_music");
     character_images = cast<std::vector<std::string>>(data, "character_images");
+    sound_effects = cast<std::vector<std::string>>(data, "sound_effects");
     contents = cast<std::vector<std::string>>(data, "contents");
     narrator = cast<std::string>(data, "narrator");
     previous = cast<std::string>(data, "previous");
@@ -31,7 +33,7 @@ Dialogue::Dialogue(const std::string &content_id, const nlohmann::json &data)
     notes = cast<std::vector<std::string>>(data, "notes");
     if (data.contains("events"))
     {
-        for (const nlohmann::json &e: data.at("events"))
+        for (const nlohmann::json& e : data.at("events"))
         {
             events.emplace_back(e);
         }
@@ -49,12 +51,12 @@ bool Dialogue::has_next() const
     return !next.is_null();
 }
 
-void Dialogue::set_next(const std::string &type, const dialogue_next_target_t &target)
+void Dialogue::set_next(const std::string& type, const dialogue_next_target_t& target)
 {
     next = DialogueNext(type, target);
 }
 
-void Dialogue::set_next(const dialogue_next_t &data)
+void Dialogue::set_next(const dialogue_next_t& data)
 {
     next = data.empty() ? DialogueNext() : DialogueNext(data);
 }
@@ -73,6 +75,8 @@ dialogue_data_t Dialogue::to_map() const
         map_data["background_music"] = background_music;
     if (!character_images.empty())
         map_data["character_images"] = character_images;
+    if (!sound_effects.empty())
+        map_data["sound_effects"] = sound_effects;
     if (!contents.empty())
         map_data["contents"] = contents;
     if (!previous.empty())
@@ -86,7 +90,7 @@ dialogue_data_t Dialogue::to_map() const
     if (!events.empty())
     {
         std::vector<event_t> events_in_maps;
-        for (const Event &e: events)
+        for (const Event& e : events)
         {
             events_in_maps.push_back(e.to_map());
         }
@@ -104,6 +108,8 @@ nlohmann::json Dialogue::to_json() const
         json_data["background_music"] = background_music;
     if (!character_images.empty())
         json_data["character_images"] = character_images;
+    if (!sound_effects.empty())
+        json_data["sound_effects"] = sound_effects;
     if (!contents.empty())
         json_data["contents"] = contents;
     if (!previous.empty())
@@ -117,7 +123,7 @@ nlohmann::json Dialogue::to_json() const
     if (!events.empty())
     {
         std::vector<nlohmann::json> events_in_maps;
-        for (const Event &e: events)
+        for (const Event& e : events)
         {
             events_in_maps.push_back(e.to_json());
         }
