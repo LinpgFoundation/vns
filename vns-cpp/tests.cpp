@@ -94,7 +94,7 @@ void Tests::TestScriptProcessor()
 {
     ScriptProcessor test_processor;
     test_processor.process(EXAMPLE_VNS_TEST_FILE);
-    assert(test_processor.get_id() == "1");
+    assert(test_processor.get_id() == "chapter1_dialogs_English");
     assert(test_processor.get_language() == "English");
     // test split and join to make sure they are working
     const std::vector<std::string> vns_lines = load_file_as_lines(EXAMPLE_VNS_TEST_FILE);
@@ -106,28 +106,31 @@ void Tests::TestScriptProcessor()
     test_processor = ScriptProcessor();
     // test processing raw vns string
     test_processor.process(vns_raw);
-    assert(test_processor.get_id() == "1");
+    assert(test_processor.get_id() == "chapter1_dialogs_English");
     assert(test_processor.get_language() == "English");
 }
 
 void Tests::TestCompiler()
 {
-    // compile file
+    // compile the file
     Compiler::compile(EXAMPLE_VNS_TEST_FILE, EXAMPLE_VNS_TEST_FILES_DIR);
-    // make sure output file exists
+    // make sure the output file exists
     const std::filesystem::path outFileName = "chapter1_dialogs_English.json";
     const std::filesystem::path jsonPath = EXAMPLE_VNS_TEST_FILES_DIR / outFileName;
     assert(std::filesystem::exists(jsonPath));
-    // make sure file is in correct format
+    // make sure the file is in the correct format
     Validator::ensure(jsonPath);
-    // try load json file
+    // try to load the JSON file
     DialoguesManager test_dialogues_manager;
     test_dialogues_manager.load(jsonPath);
     // test_dialogues_manager's default section will be set to dialog_example
     assert(test_dialogues_manager.get_section() == "dialog_example");
     // test_dialogues_manager's default current dialogue will be set to head
     assert(test_dialogues_manager.get_current()->id == "head");
-    // test_dialogues_manager's head should have single target next
+    // test_dialogues_manager's head should have sound effects
+    assert(test_dialogues_manager.get_current()->sound_effects.size() == 1);
+    assert(test_dialogues_manager.get_current()->sound_effects[0] == "intro_chime.wav");
+    // test_dialogues_manager's head should have a single target next
     assert(test_dialogues_manager.get_current()->has_next());
     assert(test_dialogues_manager.get_current()->next.has_single_target());
     // test_dialogues_manager's head should have ~01 as the next
@@ -137,6 +140,8 @@ void Tests::TestCompiler()
     assert(test_dialogues_manager.get_current()->id == "~01");
     assert(test_dialogues_manager.get_current()->has_previous());
     assert(test_dialogues_manager.get_current()->previous == "head");
+    // sound effects should be cleared after each dialogue
+    assert(test_dialogues_manager.get_current()->sound_effects.empty());
     // test previous method
     test_dialogues_manager.previous();
     assert(test_dialogues_manager.get_current()->id == "head");
@@ -144,11 +149,20 @@ void Tests::TestCompiler()
     assert(test_dialogues_manager.get_current()->has_next());
     assert(test_dialogues_manager.get_current()->next.has_single_target());
     assert(test_dialogues_manager.get_current()->next.get_target() == "~01");
+    // test multiple sound effects on ~03 (Test Character 1's dialogue after scene change)
+    test_dialogues_manager.set_current_dialogue_id("~03");
+    assert(test_dialogues_manager.get_current()->sound_effects.size() == 2);
+    assert(test_dialogues_manager.get_current()->sound_effects[0] == "footsteps.wav");
+    assert(test_dialogues_manager.get_current()->sound_effects[1] == "door_open.wav");
     // assume branches are compiled correctly
     test_dialogues_manager.set_current_dialogue_id("branch_choices");
     assert(test_dialogues_manager.get_current()->has_next());
     assert(test_dialogues_manager.get_current()->next.has_multi_targets());
     assert(test_dialogues_manager.get_current()->next.get_targets().size() == 2);
+    // branch_choices should not have sound effects (they were only for ~03)
+    assert(test_dialogues_manager.get_current()->sound_effects.empty());
+    // Test that branches maintain correct previous dialogue references
+    // Both "last_one" and "jumping_point1" should track back to "branch_choices"
     test_dialogues_manager.set_current_dialogue_id("last_one");
     assert(test_dialogues_manager.get_current()->previous == "branch_choices");
     test_dialogues_manager.set_current_dialogue_id("jumping_point1");
@@ -156,14 +170,14 @@ void Tests::TestCompiler()
     test_dialogues_manager.next();
     assert(test_dialogues_manager.get_current()->previous == "jumping_point1");
     assert(!test_dialogues_manager.get_current()->has_next());
-    // remove output json file as it is no longer needed
+    // remove the output JSON file as it is no longer necessary
     std::filesystem::remove(jsonPath);
 
     // test folder compile
     const std::filesystem::path testFolderPath = EXAMPLE_VNS_TEST_FILES_DIR / "test_folder";
     const std::filesystem::path testChildFolderPath = testFolderPath / "child_folder";
     const std::filesystem::path testAnotherOutFolderPath = EXAMPLE_VNS_TEST_FILES_DIR / "test_out";
-    // remove possible caches due to error
+    // remove possible caches due to an error
     if (exists(testFolderPath))
         std::filesystem::remove_all(testFolderPath);
     if (exists(testAnotherOutFolderPath))
@@ -181,7 +195,7 @@ void Tests::TestCompiler()
     // make sure all vns files were compiled
     Validator::ensure(testFolderPath / "chapter1_dialogs_English.json");
     Validator::ensure(testChildFolderPath / "chapter1_dialogs_English.json");
-    // once files existence check pass, remove the files before next test
+    // once files existence check pass, remove the files before the next test
     std::filesystem::remove(testFolderPath / "chapter1_dialogs_English.json");
     std::filesystem::remove(testChildFolderPath / "chapter1_dialogs_English.json");
 
@@ -190,10 +204,10 @@ void Tests::TestCompiler()
     // make sure all vns files were compiled
     Validator::ensure(testAnotherOutFolderPath / "chapter1_dialogs_English.json");
     Validator::ensure(testAnotherOutFolderPath / testChildFolderPath.filename() / "chapter1_dialogs_English.json");
-    // make sure output are not saved to where it is not supposed to be saved
+    // make sure the output is not saved to where it is not supposed to be saved
     assert(!exists(testFolderPath / "chapter1_dialogs_English.json"));
     assert(!exists(testChildFolderPath / "chapter1_dialogs_English.json"));
-    // once files existence check pass, remove the files before next test
+    // once files existence check pass, remove the files before the next test
     std::filesystem::remove_all(testAnotherOutFolderPath);
 
     // try to compile the folder recursively, with multi-threading
@@ -201,7 +215,7 @@ void Tests::TestCompiler()
     // make sure all vns files were compiled
     Validator::ensure(testFolderPath / "chapter1_dialogs_English.json");
     Validator::ensure(testChildFolderPath / "chapter1_dialogs_English.json");
-    // once files existence check pass, remove the files before next test
+    // once files existence check pass, remove the files before the next test
     std::filesystem::remove(testFolderPath / "chapter1_dialogs_English.json");
     std::filesystem::remove(testChildFolderPath / "chapter1_dialogs_English.json");
 
@@ -210,10 +224,10 @@ void Tests::TestCompiler()
     // make sure all vns files were compiled
     Validator::ensure(testAnotherOutFolderPath / "chapter1_dialogs_English.json");
     Validator::ensure(testAnotherOutFolderPath / testChildFolderPath.filename() / "chapter1_dialogs_English.json");
-    // make sure output are not saved to where it is not supposed to be saved
+    // make sure output is not saved to where it is not supposed to be saved
     assert(!exists(testFolderPath / "chapter1_dialogs_English.json"));
     assert(!exists(testChildFolderPath / "chapter1_dialogs_English.json"));
-    // once files existence check pass, remove the files before next test
+    // once files existence check pass, remove the files before the next test
     std::filesystem::remove_all(testAnotherOutFolderPath);
 
     // remove test folder after finish testing
@@ -223,7 +237,7 @@ void Tests::TestCompiler()
 void Tests::TestDialoguesManager()
 {
     DialoguesManager test_dialogues_manager;
-    // make sure section has been init as empty string
+    // make sure the section has been init as an empty string
     assert(test_dialogues_manager.get_section().empty());
     // load test file
     test_dialogues_manager.load(EXAMPLE_VNS_TEST_FILE);
@@ -234,7 +248,7 @@ void Tests::TestDialoguesManager()
     // test set set_current_dialogue_id
     test_dialogues_manager.set_current_dialogue_id("~01");
     assert(test_dialogues_manager.get_current()->id == "~01");
-    // set section again and see whether current dialogue id has been set back to head
+    // set the section again and see whether the current dialogue id has been set back to head
     test_dialogues_manager.set_section("dialog_example");
     assert(test_dialogues_manager.get_current_dialogue_id() == "head");
     // test next
@@ -273,7 +287,7 @@ void Tests::TestDialoguesManager()
     assert(test_dialogues_manager.get_current()->has_next());
     assert(test_dialogues_manager.get_current()->next.has_single_target());
     assert(test_dialogues_manager.get_current()->next.get_target() == "~02");
-    // check if current head's next is correct
+    // check if the current head's next is correct
     test_dialogues_manager.next();
     assert(test_dialogues_manager.get_current()->id == "~02");
     assert(test_dialogues_manager.get_current()->previous == "head");
@@ -310,9 +324,9 @@ void Tests::TestBranching()
 {
     // try to compile the script
     // Compiler::compile(EXAMPLE_VNS_BRANCHES_TESTS_FILE);
-    // init a manage for loading the script
+    // init a manager for loading the script
     DialoguesManager test_dialogues_manager;
-    // make sure section has been init as empty string
+    // make sure the section has been init as an empty string
     assert(test_dialogues_manager.get_section().empty());
     // load test file
     test_dialogues_manager.load(EXAMPLE_VNS_BRANCHES_TESTS_FILE);

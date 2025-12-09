@@ -2,15 +2,19 @@
 #include "functions.hpp"
 #include "schema.hpp"
 
-// Initialize Validator's global VALIDATOR
-const nlohmann::json_schema::json_validator Validator::VALIDATOR(VNS_SCHEMA_JSON);
+// Lazy initialization of validator to avoid static initialization order fiasco
+const nlohmann::json_schema::json_validator& Validator::get_validator()
+{
+    static const nlohmann::json_schema::json_validator validator(VNS_SCHEMA_JSON);
+    return validator;
+}
 
 // validate whether given json object is valid vsn format dialogues
 bool Validator::validate(const nlohmann::json &jsonObj)
 {
     try
     {
-        VALIDATOR.validate(jsonObj); // validate the document - uses the default throwing error-handler
+        get_validator().validate(jsonObj); // validate the document - uses the default throwing error-handler
         return true;
     } catch ([[maybe_unused]] const std::exception &e) {
         return false;
