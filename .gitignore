@@ -161,10 +161,10 @@ vns-cpp/CMakeUserPresets.json
 vns-python/pyvns/vns.exe
 vns-python/pyvns/extern/vns-cpp/
 vns-python/pyvns/cmake-build-debug/
-*/.idea/
+**/.idea/
 vns-cpp/cmake-build-debug/
 vns-docs/site/
 vns-server/cmake-build-debug/
 vns-server/extern/vns-cpp/
 .DS_Store
-/.idea
+**/.claude

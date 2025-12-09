@@ -14,6 +14,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: Implementation :: CPython"
 ]
 dependencies = ["mypy"]
@@ -31,7 +32,7 @@ hook-dirs = "pyvns.__pyinstaller:get_hook_dirs"
 "Homepage" = "https://github.com/LinpgFoundation/vns"
 
 [tool.black]
-target-version = ['py313']
+target-version = ['py314']
 
 [tool.linpgtoolbox]
 cache_needs_removal = [
@@ -56,7 +57,7 @@ include_pyinstaller = true
 disallow_any_generics = true
 disallow_untyped_calls = true
 disallow_untyped_defs = true
-python_version = "3.13"
+python_version = "3.14"
 warn_redundant_casts = true
 warn_return_any = true
 warn_unreachable = true
