@@ -1,0 +1,56 @@
+name: Build on All Platforms
+on:
+    push:
+        branches:
+        - '**'
+jobs:
+    build:
+        runs-on: ${{ matrix.os }}
+        steps:
+        -   name: Checkout code
+            uses: actions/checkout@v4
+            with:
+                submodules: recursive
+        -   name: Set up Python ${{ matrix.python-version }}
+            uses: actions/setup-python@v5
+            with:
+                python-version: ${{ matrix.python-version }}
+        -   name: Install linpgtoolbox
+            run: pip install linpgtoolbox
+        -   name: Compile and pack
+            run: |
+                linpgtb --compile vns-python
+                linpgtb --pack vns-python
+        -   if: success()
+            name: Upload wheel artifacts
+            uses: actions/upload-artifact@v4
+            with:
+                name: pyvns-wheel-${{ matrix.os }}-py${{ matrix.python-version }}
+                path: vns-python/dist/*.whl
+        strategy:
+            fail-fast: false
+            matrix:
+                os:
+                - ubuntu-latest
+                - windows-latest
+                - macos-latest
+                python-version:
+                - '3.11'
+                - '3.12'
+                - '3.13'
+                - '3.14'
+    combine:
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
+        -   name: Download all artifacts
+            uses: actions/download-artifact@v4
+            with:
+                merge-multiple: true
+                path: all-wheels
+                pattern: pyvns-wheel-*
+        -   name: Upload combined wheels
+            uses: actions/upload-artifact@v4
+            with:
+                name: all-wheels
+                path: all-wheels/*.whl
