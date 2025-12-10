@@ -5,7 +5,7 @@
 
 class Validator
 {
-    static const nlohmann::json_schema::json_validator VALIDATOR;
+    static const nlohmann::json_schema::json_validator& get_validator();
 
 public:
     // validate whether given json object is valid vsn format dialogues

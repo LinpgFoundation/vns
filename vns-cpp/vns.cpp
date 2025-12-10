@@ -1,7 +1,4 @@
-﻿// vns-cpp.cpp : Defines the entry point for the application.
-//
-
-#include "vns.hpp"
+﻿#include "vns.hpp"
 #include <unordered_map>
 #include <unordered_set>
 #include "tests.hpp"
@@ -17,6 +14,11 @@ int main(const int argc, char *argv[])
     {
         if (arguments_with_input.contains(argv[i]))
         {
+            if (i + 1 >= argc)
+            {
+                std::cerr << "Error: " << argv[i] << " requires an argument\n";
+                return 1;
+            }
             arguments_map[argv[i]] = argv[i + 1];
             ++i;
         } else if (arguments_without_input.contains(argv[i]))
@@ -33,10 +35,10 @@ int main(const int argc, char *argv[])
         Tests::SetTestFolderPath(arguments_map.at("-t"));
         Tests::TestAll();
     }
-    // compile file and save as json
+    // compile a file and save as JSON
     if (arguments_map.contains("-i"))
     {
-        // save as json
+        // save as JSON
         if (arguments_map.contains("-s"))
         {
             std::cout << Compiler::load_as_string(arguments_map.at("-i")) << "\n";

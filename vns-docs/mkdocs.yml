@@ -20,10 +20,12 @@ nav:
 - Comments and Notes: tutorials/comments_and_notes.md
 - Dialogues: tutorials/dialogues.md
 - Visual Novel Script Enhancement Proposals:
+  - 'VEP 0 - VEP Purpose and Guidelines' : 'vep/0-VEP Purpose and Guidelines.md'
   - 'VEP 1 - Variables' : vep/1-Variables.md
   - 'VEP 2 - Language Standard and Compiler Version Management' : 'vep/2-Language Standard and Compiler Version Management.md'
   - 'VEP 3 - Introducing [jump] Tag' : 'vep/3-Introducing [jump] Tag.md'
+  - 'VEP 4 - Introducing [sfx] Tag' : 'vep/4-Introducing [sfx] Tag.md'
 site_name: VNS (Visual Novel Script), a universal scripting language for creating
   in-game dialogues
 theme:
-  name: material
+  name: dracula
