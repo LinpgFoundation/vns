@@ -22,7 +22,7 @@ description = "VNS (Visual Novel Script), a universal scripting language for cre
 name = "pyvns"
 readme = "README.md"
 requires-python = ">=3.11"
-version = "2.3.1"
+version = "2.4.0"
 
 [project.entry-points.pyinstaller40]
 hook-dirs = "pyvns.__pyinstaller:get_hook_dirs"
