@@ -2,7 +2,7 @@ name: Build on All Platforms
 on:
     push:
         branches:
-        - '**'
+        - main
 jobs:
     build:
         runs-on: ${{ matrix.os }}
