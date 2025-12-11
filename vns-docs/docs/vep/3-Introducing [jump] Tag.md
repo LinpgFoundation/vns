@@ -16,7 +16,7 @@ The [jump] tag offers explicit control over dialogue flow, crucial for developin
 ### Syntax
 The [jump] tag will follow a straightforward syntax:
 `[jump]/[jmp] <label>`
-Where <label> is the identifier of the dialog section to which the flow should be redirected. This label must be predefined in the script.
+Where <label> is the identifier of the labeled point to which the flow should be redirected. This label must be predefined in the script using the `[label]` tag.
 
 ### Example Usage
 Consider the following script snippet:
@@ -48,7 +48,7 @@ Initially considered, the [br] tag was deprecated in VNS 2.0 due to its limited 
 The introduction of the [jump] tag will not affect existing scripts as it introduces new functionality without altering the behavior of current tags.
 
 ## Conclusion
-The [jump] tag provides a standardized mechanism for non-linear dialogue flow in VNS scripts. By enabling explicit transitions between dialogue sections, developers gain greater control over narrative structure, allowing for more complex and engaging storytelling. This enhancement integrates seamlessly with existing tags while maintaining full backwards compatibility.
+The [jump] tag provides a standardized mechanism for non-linear dialogue flow in VNS scripts. By enabling explicit transitions between labeled points, developers gain greater control over narrative structure, allowing for more complex and engaging storytelling. This enhancement integrates seamlessly with existing tags while maintaining full backwards compatibility.
 
 ## VEP Development Process
 

@@ -5,15 +5,16 @@
 
 ## Abstract:
 
-This VEP proposes a standardized system for variable creation and management within the Visual Novel Script (VNS). By defining clear rules for local, global, and persistent variables, developers can streamline their code and facilitate future feature implementation within VNS.
+This VEP proposes a standardized system for variable creation and management within the Visual Novel Script (VNS). By defining clear rules for local and persistent variables, developers can streamline their code and facilitate future feature implementation within VNS.
+
+> **Note**: Global variables (prefixed with `@`) were removed in VNS 3.0. See VEP 6 for details.
 
 ## Rationale and Goals:
 Variables are fundamental components of any programming language, enabling developers to store and manipulate data. The primary objective of this proposal is to establish a unified approach to variable handling in VNS. This will not only enhance code readability and maintainability but also pave the way for implementing advanced features like conditional statements and explicit branching.
 
 ## Definition:
-In VNS, variables will be categorized into three types:
-- **Local Variables**: These variables are confined to specific sections and are not shared between sections. Each section can have its own set of local variables, allowing for encapsulation and modularization of code. However, developers must implement a robust system for persisting local variables if progress saving is enabled.
-- **Global Variables**: Global variables persist across sections within a particular dialogue. They are visible and accessible throughout the entire dialogue, facilitating data sharing between sections. Global variables should be carefully managed, especially when implementing progress-saving functionality.
+In VNS, variables are categorized into two types:
+- **Local Variables**: These variables are scoped to the current dialogue. Each dialogue can have its own set of local variables, allowing for encapsulation and modularization of code. However, developers must implement a robust system for persisting local variables if progress saving is enabled.
 - **Persistent Variables**: Persistent variables transcend individual dialogues and persist across sessions or even across the entire program/system. These variables require explicit management and should be saved persistently, typically on the client's device.
 
 ## Syntax:
@@ -22,8 +23,6 @@ Variables in VNS can store signed numbers (floats, ints), boolean, or strings. T
     // Local Variable Syntax:
     variable_name = 1
     does_variable_exist = false
-    // Global Variable Syntax:
-    @variable_name = -3.1415926 // (Global variables must start with '@')
     // Persistent Variable Syntax:
     &variable_name = "Hello world" // (Persistent variables must start with '&')
 

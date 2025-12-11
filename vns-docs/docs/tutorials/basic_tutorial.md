@@ -21,10 +21,6 @@ Here are some of the most commonly used tags in VNS:
 
   Specifies the language of the script.
 
-- **Section:** `[section]string`
-
-  Denotes a new section in the script.
-
 - **Background Image:** `[bgi]string`
 
   Sets the background image for the current and subsequent dialogues.
@@ -46,7 +42,6 @@ Let's put these tags into action with a simple example.
 ```vns
 [id]1
 [language]English
-[section]dialog_example
 
 [bgm]music1.ogg
 [bgi]bg1.png
@@ -60,7 +55,6 @@ Alex:
 
 - `[id]1`: Sets the script ID to "1".
 - `[language]English`: Specifies that the script is in English.
-- `[section]dialog_example`: Begins a new section called "dialog_example".
 - `[bgm]music1.ogg`: Plays "music1.ogg" as background music.
 - `[bgi]bg1.png`: Displays "bg1.png" as the background image.
 - `[show]character.png`: Shows "character.png" on the screen.
@@ -75,18 +69,16 @@ When compiled, the script should produce a JSON representation like this:
 {
     "compiler": {...},
     "dialogues": {
-        "dialog_example": {
-            "head": {
-                "background_image": "bg1.png",
-                "background_music": "music1.ogg",
-                "character_images": [
-                    "character.png"
-                ],
-                "contents": [
-                    "Hellow world!"
-                ],
-                "narrator": "Alex"
-            }
+        "head": {
+            "background_image": "bg1.png",
+            "background_music": "music1.ogg",
+            "character_images": [
+                "character.png"
+            ],
+            "contents": [
+                "Hellow world!"
+            ],
+            "narrator": "Alex"
         }
     },
     "id": "1",

@@ -21,7 +21,6 @@ Ultimately, the team opted for a design inspired by doubly linked list, but impl
 ```yaml
 compiler: ...
 dialogues:
-  dialog1:
     head:
       background_image: bg1.jpg
       background_music: bgm1.mp3
@@ -48,9 +47,6 @@ dialogues:
       previous: head
     ~02:
     ...
-  dialog2:
-    ...
-  ...
 id: 1
 language: English
 ```
@@ -66,8 +62,6 @@ Here is a simple example of a VNS script:
 ```vns
 [id]1
 [language]English
-
-[section]dialog_example
 
 [bgi]bg1.png
 [display]character1.png character2.png
