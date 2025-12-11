@@ -170,10 +170,6 @@ void ScriptProcessor::continue_process()
                     terminated("You cannot use reserved word '" + last_label + "' as a label", i);
                 }
             }
-            else if (tag == tags::section)
-            {
-                current_index = 0;
-            }
             else if (tag == tags::vns)
             {
                 // make sure a match exists, if not, then the given value is invalid
@@ -236,12 +232,6 @@ void ScriptProcessor::continue_process()
 
     convert(0);
     lines_.clear();
-
-    // making sure section_ is not empty, or the dialogue can be empty
-    if (section_.empty())
-    {
-        terminated("You have to set section!");
-    }
 }
 
 void ScriptProcessor::convert(const size_t starting_index)
@@ -296,30 +286,11 @@ void ScriptProcessor::convert(const size_t starting_index)
                     current_data_.character_images.push_back(name);
                 }
             }
-            else if (tag == tags::section)
-            {
-                if (!previous_.empty())
-                {
-                    output_.get_dialogue(section_, previous_).remove_next();
-                }
-                // if the section has no content, then remove the head
-                if (output_.contains_section(section_) && output_.get_dialogues(section_).size() == 1 &&
-                    output_.get_dialogue(section_, "head").to_json().empty())
-                {
-                    output_.set_dialogues(section_, dialogue_section_t());
-                }
-                section_ = extract_string(current_line);
-                output_.set_dialogues(section_, dialogue_section_t());
-                dialogue_data_t dialogue_data;
-                output_.set_dialogue(section_, "head", dialogue_data);
-                current_data_ = Dialogue("head");
-                previous_.clear();
-            }
             else if (tag == tags::end)
             {
                 if (!previous_.empty())
                 {
-                    output_.get_dialogue(section_, previous_).remove_next();
+                    output_.get_dialogue(previous_).remove_next();
                     previous_.clear();
                 }
             }
@@ -329,7 +300,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                 {
                     terminated("Cannot use scene tag when there is not previous dialogue.", line_index);
                 }
-                if (Dialogue& previous_dialogue = output_.get_dialogue(section_, previous_); previous_dialogue.next.
+                if (Dialogue& previous_dialogue = output_.get_dialogue(previous_); previous_dialogue.next.
                     has_multi_targets())
                 {
                     previous_dialogue.set_next("scene", previous_dialogue.next.get_targets());
@@ -353,9 +324,9 @@ void ScriptProcessor::convert(const size_t starting_index)
                 }
                 // get current targets
                 multi_targets_t current_targets;
-                if (output_.get_dialogue(section_, previous_).next.has_type("options"))
+                if (output_.get_dialogue(previous_).next.has_type("options"))
                 {
-                    current_targets = output_.get_dialogue(section_, previous_).next.get_targets();
+                    current_targets = output_.get_dialogue(previous_).next.get_targets();
                 }
                 // get value string
                 const std::string src_to_target = extract_string(current_line);
@@ -368,7 +339,7 @@ void ScriptProcessor::convert(const size_t starting_index)
                 });
                 branches_[option_points_to] = previous_;
                 // update next
-                output_.get_dialogue(section_, previous_).set_next("options", current_targets);
+                output_.get_dialogue(previous_).set_next("options", current_targets);
             }
             else if (tag == tags::jump || tag == tags::jump_)
             {
@@ -378,21 +349,21 @@ void ScriptProcessor::convert(const size_t starting_index)
                     terminated("Cannot use jump tag when there is not previous dialogue.", line_index);
                 }
                 // cannot jump when the previous dialogue has multiple targets
-                if (output_.get_dialogue(section_, previous_).next.has_multi_targets())
+                if (output_.get_dialogue(previous_).next.has_multi_targets())
                 {
                     terminated("Cannot use jump tag when previous dialogue already has multiple targets.", line_index);
                 }
                 // update previous dialogue's next
                 const std::string jump_target = extract_parameter(current_line);
-                output_.get_dialogue(section_, previous_).set_next(
-                    output_.get_dialogue(section_, previous_).next.get_type(), jump_target);
+                output_.get_dialogue(previous_).set_next(
+                    output_.get_dialogue(previous_).next.get_type(), jump_target);
                 // if the tag is jump not jump_, then we need to overwrite jump_target's previous
                 if (tag == tags::jump)
                 {
                     // if jump_target already exist, then update jump_target's previous
-                    if (output_.contains_dialogue(section_, jump_target))
+                    if (output_.contains_dialogue(jump_target))
                     {
-                        output_.get_dialogue(section_, jump_target).previous = previous_;
+                        output_.get_dialogue(jump_target).previous = previous_;
                     }
                     // write branch info into the lookup table for future reference
                     else
@@ -453,15 +424,6 @@ void ScriptProcessor::convert(const size_t starting_index)
                 current_data_.contents.push_back(trim(lines_[sub_index].substr(1)));
             }
 
-            if (section_.empty())
-            {
-                terminated("You have to specify section before script", line_index);
-            }
-            if (!output_.contains_section(section_))
-            {
-                output_.set_current_section_dialogues({});
-            }
-
             // update previous_ if it is supposed to be part of the branching operation
             if (branches_.contains(dialog_associate_key_[line_index]))
             {
@@ -486,20 +448,22 @@ void ScriptProcessor::convert(const size_t starting_index)
                     current_data_.previous = previous_;
                 }
 
-                if (output_.contains_dialogue(section_, previous_))
+                if (output_.contains_dialogue(previous_))
                 {
-                    if (output_.get_dialogue(section_, previous_).has_next())
+                    if (output_.get_dialogue(previous_).has_next())
                     {
-                        if (!output_.get_dialogue(section_, previous_).next.has_type("options"))
+                        if (!output_.get_dialogue(previous_).next.has_type("options"))
                         {
-                            output_.get_dialogue(section_, previous_).set_next(
-                                output_.get_dialogue(section_, previous_).next.get_type(),
+                            output_.get_dialogue(previous_).set_next(
+                                output_.get_dialogue(previous_).next.get_type(),
                                 dialog_associate_key_[line_index]);
                         }
                     }
                     else
                     {
-                        output_.get_dialogue(section_, previous_).set_next(output_.get_dialogue(section_, previous_).next.get_type(),dialog_associate_key_[line_index]);
+                        output_.get_dialogue(previous_).set_next(
+                            output_.get_dialogue(previous_).next.get_type(),
+                            dialog_associate_key_[line_index]);
                     }
                 }
                 else
@@ -510,7 +474,7 @@ void ScriptProcessor::convert(const size_t starting_index)
 
             previous_ = dialog_associate_key_[line_index];
             line_index += current_data_.contents.size();
-            output_.set_dialogue(section_, previous_, current_data_.to_map());
+            output_.set_dialogue(previous_, current_data_.to_map());
             current_data_.notes.clear();
             current_data_.events.clear();
             current_data_.sound_effects.clear();
@@ -518,7 +482,9 @@ void ScriptProcessor::convert(const size_t starting_index)
         else if (const size_t eql_location = current_line.find('='); eql_location != std::string::npos)
         {
             // get the operation, set (a=1), add (a+=1), and so on, which is why eql_location matters
-            const std::string_view variable_action = operation::has(current_line[eql_location - 1])? operation::get(current_line[eql_location - 1]): operation::set;
+            const std::string_view variable_action = operation::has(current_line[eql_location - 1])
+                                                         ? operation::get(current_line[eql_location - 1])
+                                                         : operation::set;
             // get the name of the variable
             const std::string variable_name = trim(
                 current_line.substr(0, variable_action != operation::set ? eql_location - 1 : eql_location));

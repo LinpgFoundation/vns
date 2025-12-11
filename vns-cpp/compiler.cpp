@@ -15,7 +15,7 @@ std::unordered_map<std::string, size_t> Compiler::get_compiler_info()
 }
 
 // load data from the file directly
-std::unordered_map<std::string, std::variant<dialogue_content_t, std::unordered_map<std::string, size_t>, std::string>>
+std::unordered_map<std::string, std::variant<dialogues_t, std::unordered_map<std::string, size_t>, std::string>>
 Compiler::load(const std::filesystem::path& path)
 {
     ScriptProcessor processor;

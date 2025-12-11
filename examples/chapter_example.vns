@@ -2,8 +2,6 @@
 [id]chapter1_dialogs_English
 [language]English
 
-[section]dialog_example
-
 // section 1
 [bgi]bg1.png
 [bgm]bgm1.ogg

@@ -9,7 +9,7 @@
 #include "functions.hpp"
 #include "version.hpp"
 
-void Tests::SetTestFolderPath(const std::filesystem::path &dir)
+void Tests::SetTestFolderPath(const std::filesystem::path& dir)
 {
     EXAMPLE_VNS_TEST_FILES_DIR = dir;
     EXAMPLE_VNS_TEST_FILE = EXAMPLE_VNS_TEST_FILES_DIR / "chapter_example.vns";
@@ -69,8 +69,10 @@ void Tests::TestNullNext()
 
 void Tests::TestSingleTargetNext()
 {
-    const DialogueNext single_target_next(dialogue_next_t({{"type",   "default"},
-                                                           {"target", "~1"}}));
+    const DialogueNext single_target_next(dialogue_next_t({
+        {"type", "default"},
+        {"target", "~1"}
+    }));
     assert(!single_target_next.is_null());
     assert(!single_target_next.has_multi_targets());
     assert(single_target_next.has_type("default"));
@@ -82,8 +84,10 @@ void Tests::TestMultiTargetsNext()
     const std::unordered_map<std::string, std::string> t1 = {{"hello1", "world1"}};
     const std::unordered_map<std::string, std::string> t2 = {{"hello2", "world2"}};
     const multi_targets_t target_v = {t1, t2};
-    const DialogueNext multi_targets_next(dialogue_next_t({{"type",   "default"},
-                                                           {"target", target_v}}));
+    const DialogueNext multi_targets_next(dialogue_next_t({
+        {"type", "default"},
+        {"target", target_v}
+    }));
     assert(!multi_targets_next.is_null());
     assert(multi_targets_next.has_multi_targets());
     assert(multi_targets_next.has_type("default"));
@@ -123,8 +127,6 @@ void Tests::TestCompiler()
     // try to load the JSON file
     DialoguesManager test_dialogues_manager;
     test_dialogues_manager.load(jsonPath);
-    // test_dialogues_manager's default section will be set to dialog_example
-    assert(test_dialogues_manager.get_section() == "dialog_example");
     // test_dialogues_manager's default current dialogue will be set to head
     assert(test_dialogues_manager.get_current()->id == "head");
     // test_dialogues_manager's head should have sound effects
@@ -237,19 +239,15 @@ void Tests::TestCompiler()
 void Tests::TestDialoguesManager()
 {
     DialoguesManager test_dialogues_manager;
-    // make sure the section has been init as an empty string
-    assert(test_dialogues_manager.get_section().empty());
     // load test file
     test_dialogues_manager.load(EXAMPLE_VNS_TEST_FILE);
-    // test_dialogues_manager's default section will be set to dialog_example
-    assert(test_dialogues_manager.get_section() == "dialog_example");
     // test_dialogues_manager's default current dialogue will be set to head
     assert(test_dialogues_manager.get_current()->id == "head");
     // test set set_current_dialogue_id
     test_dialogues_manager.set_current_dialogue_id("~01");
     assert(test_dialogues_manager.get_current()->id == "~01");
-    // set the section again and see whether the current dialogue id has been set back to head
-    test_dialogues_manager.set_section("dialog_example");
+    // reset to head and test next
+    test_dialogues_manager.set_current_dialogue_id("head");
     assert(test_dialogues_manager.get_current_dialogue_id() == "head");
     // test next
     test_dialogues_manager.next();
@@ -264,24 +262,21 @@ void Tests::TestDialoguesManager()
     assert(test_dialogues_manager.get_variable<int>("mod_n") == 2);
     assert(test_dialogues_manager.get_variable<int>("test_multi") == 9);
     assert(test_dialogues_manager.get_variable<int>("mod_result") ==
-           test_dialogues_manager.get_variable<int>("chapter_passed"));
-    assert(test_dialogues_manager.get_current_section_dialogues().size() == 8);
+        test_dialogues_manager.get_variable<int>("chapter_passed"));
+    assert(test_dialogues_manager.get_dialogues().size() == 8);
     assert(test_dialogues_manager.get_current()->has_next() &&
-           test_dialogues_manager.get_current()->next.has_single_target());
+        test_dialogues_manager.get_current()->next.has_single_target());
     assert(test_dialogues_manager.get_current()->next.has_single_target());
     assert(test_dialogues_manager.get_current()->next.get_target() == "branch_choices");
-    // test remove section
-    test_dialogues_manager.set_dialogues("test_remove_section", dialogue_section_t({{"head", {}}}));
-    test_dialogues_manager.set_section("test_remove_section");
-    test_dialogues_manager.remove_section("test_remove_section");
-    test_dialogues_manager.set_section("dialog_example");
+    // go back to head for removal tests
+    test_dialogues_manager.set_current_dialogue_id("head");
     assert(test_dialogues_manager.get_current()->id == "head");
     // test remove head
     assert(test_dialogues_manager.get_current()->has_next());
     assert(test_dialogues_manager.get_current()->next.has_single_target());
     assert(test_dialogues_manager.get_current()->next.get_target() == "~01");
     test_dialogues_manager.remove_current_dialogue();
-    assert(!test_dialogues_manager.contains_dialogue(test_dialogues_manager.get_section(), "~01"));
+    assert(!test_dialogues_manager.contains_dialogue("~01"));
     assert(test_dialogues_manager.get_current()->id == "head");
     assert(!test_dialogues_manager.get_current()->has_previous());
     assert(test_dialogues_manager.get_current()->has_next());
@@ -295,7 +290,7 @@ void Tests::TestDialoguesManager()
     assert(test_dialogues_manager.get_current()->next.get_target() == "~03");
     // remove ~02 and see whether everything is correct
     test_dialogues_manager.remove_current_dialogue();
-    assert(!test_dialogues_manager.contains_dialogue(test_dialogues_manager.get_section(), "~02"));
+    assert(!test_dialogues_manager.contains_dialogue("~02"));
     // not that current dialogue will be reset back to head
     assert(test_dialogues_manager.get_current()->id == "head");
     assert(!test_dialogues_manager.get_current()->has_previous());
@@ -309,8 +304,8 @@ void Tests::TestDialoguesManager()
     assert(test_dialogues_manager.get_current()->next.has_single_target());
     assert(test_dialogues_manager.get_current()->next.get_target() == "branch_choices");
     // remove jumping_point1 and see if branch_choices got updated correctly
-    test_dialogues_manager.remove_dialogue(test_dialogues_manager.get_section(), "jumping_point1");
-    assert(!test_dialogues_manager.contains_dialogue(test_dialogues_manager.get_section(), "jumping_point1"));
+    test_dialogues_manager.remove_dialogue("jumping_point1");
+    assert(!test_dialogues_manager.contains_dialogue("jumping_point1"));
     assert(test_dialogues_manager.get_current()->id == "~03");
     assert(test_dialogues_manager.get_current()->previous == "head");
     assert(test_dialogues_manager.get_current()->next.has_single_target());
@@ -326,12 +321,8 @@ void Tests::TestBranching()
     // Compiler::compile(EXAMPLE_VNS_BRANCHES_TESTS_FILE);
     // init a manager for loading the script
     DialoguesManager test_dialogues_manager;
-    // make sure the section has been init as an empty string
-    assert(test_dialogues_manager.get_section().empty());
     // load test file
     test_dialogues_manager.load(EXAMPLE_VNS_BRANCHES_TESTS_FILE);
-    // test_dialogues_manager's default section will be set to dialog_example
-    assert(test_dialogues_manager.get_section() == "dialog_example");
     // test_dialogues_manager's default current dialogue will be set to head
     assert(test_dialogues_manager.get_current()->id == "head");
     // assert next is ~01

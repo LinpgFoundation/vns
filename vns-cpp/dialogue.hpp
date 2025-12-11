@@ -7,18 +7,16 @@
 #include "dialogueNext.hpp"
 #include "event.hpp"
 
-using dialogue_data_t = std::unordered_map<std::string, std::variant<
-                                               std::string, std::vector<std::string>, dialogue_next_t, std::vector<
-                                                   event_t>>>;
+using dialogue_t = std::unordered_map<std::string, std::variant<
+                                          std::string, std::vector<std::string>, dialogue_next_t, std::vector<event_t>>>
+;
 
-using dialogue_section_t = std::unordered_map<std::string, dialogue_data_t>;
-
-using dialogue_content_t = std::unordered_map<std::string, dialogue_section_t>;
+using dialogues_t = std::unordered_map<std::string, dialogue_t>;
 
 class Dialogue
 {
     template <typename T>
-    static T cast(const dialogue_data_t& data, const std::string& k)
+    static T cast(const dialogue_t& data, const std::string& k)
     {
         return data.contains(k) ? std::get<T>(data.at(k)) : T();
     }
@@ -30,11 +28,11 @@ class Dialogue
     }
 
 public:
-    explicit Dialogue(const std::string&, const dialogue_data_t&);
+    explicit Dialogue(const std::string&, const dialogue_t&);
 
     explicit Dialogue(const std::string&, const nlohmann::json&);
 
-    explicit Dialogue(const std::string& content_id) : Dialogue(content_id, dialogue_data_t())
+    explicit Dialogue(const std::string& content_id) : Dialogue(content_id, dialogue_t())
     {
     }
 
@@ -52,7 +50,7 @@ public:
 
     void remove_next();
 
-    [[nodiscard]] dialogue_data_t to_map() const;
+    [[nodiscard]] dialogue_t to_map() const;
 
     [[nodiscard]] nlohmann::json to_json() const;
 

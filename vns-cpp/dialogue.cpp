@@ -1,6 +1,6 @@
 #include "dialogue.hpp"
 
-Dialogue::Dialogue(const std::string& content_id, const dialogue_data_t& data)
+Dialogue::Dialogue(const std::string& content_id, const dialogue_t& data)
 {
     id = content_id;
     background_image = cast<std::string>(data, "background_image");
@@ -66,9 +66,9 @@ void Dialogue::remove_next()
     set_next({});
 }
 
-dialogue_data_t Dialogue::to_map() const
+dialogue_t Dialogue::to_map() const
 {
-    dialogue_data_t map_data;
+    dialogue_t map_data;
     if (!background_image.empty())
         map_data["background_image"] = background_image;
     if (!background_music.empty())
