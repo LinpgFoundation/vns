@@ -4,9 +4,9 @@
 #include <string>
 
 // vns main version
-constexpr size_t VERSION = 2;
+constexpr size_t VERSION = 3;
 // vns revision
-constexpr size_t REVISION = 4;
+constexpr size_t REVISION = 0;
 // vns patch
 constexpr size_t PATCH = 0;
 
