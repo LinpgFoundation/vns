@@ -1,7 +1,6 @@
 #include <vector>
 #include <stdexcept>
 #include <fstream>
-#include <iostream>
 #include "functions.hpp"
 #include "scriptProcessor.hpp"
 #include "naming.hpp"
@@ -488,6 +487,13 @@ void ScriptProcessor::convert(const size_t starting_index)
             // get the name of the variable
             const std::string variable_name = trim(
                 current_line.substr(0, variable_action != operation::set ? eql_location - 1 : eql_location));
+            // reject global variables (VEP 6)
+            if (variable_name.starts_with('@'))
+            {
+                terminated(
+                    "Global variables (@) are removed in VNS 3.0. Use local variables (no prefix) or persistent variables (&) instead",
+                    line_index);
+            }
             // get the value of the variable
             const std::string variable_value = trim(current_line.substr(eql_location + 1));
             // make sure variable_value is not empty
@@ -565,12 +571,27 @@ void ScriptProcessor::convert(const size_t starting_index)
         }
         else if (current_line.ends_with("++"))
         {
-            current_data_.events.emplace_back(operation::add, trim(current_line.substr(0, current_line.size() - 2)), 1);
+            const std::string variable_name = trim(current_line.substr(0, current_line.size() - 2));
+            // reject global variables (VEP 6)
+            if (variable_name.starts_with('@'))
+            {
+                terminated(
+                    "Global variables (@) are removed in VNS 3.0. Use local variables (no prefix) or persistent variables (&) instead",
+                    line_index);
+            }
+            current_data_.events.emplace_back(operation::add, variable_name, 1);
         }
         else if (current_line.ends_with("--"))
         {
-            current_data_.events.emplace_back(operation::subtract,
-                                              trim(current_line.substr(0, current_line.size() - 2)), 1);
+            const std::string variable_name = trim(current_line.substr(0, current_line.size() - 2));
+            // reject global variables (VEP 6)
+            if (variable_name.starts_with('@'))
+            {
+                terminated(
+                    "Global variables (@) are removed in VNS 3.0. Use local variables (no prefix) or persistent variables (&) instead",
+                    line_index);
+            }
+            current_data_.events.emplace_back(operation::subtract, variable_name, 1);
         }
         else
         {
