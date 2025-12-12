@@ -16,4 +16,4 @@ with open(
 
 assert example1_exp["language"] == example1_result["language"]
 assert example1_exp["id"] == example1_result["id"]
-assert example1_exp["dialogs"] == example1_result["dialogs"]
+assert example1_exp["dialogues"] == example1_result["dialogues"]

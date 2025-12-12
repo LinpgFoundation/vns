@@ -69,7 +69,7 @@ PYBIND11_MODULE(vns_python_wrapper, m)
             .def_readonly("target", &Event::target);
 
     py::class_<Dialogue>(m, "Dialogue", "Class representing dialogue content")
-            .def(py::init<const std::string &, const dialogue_data_t &>())
+            .def(py::init<const std::string &, const dialogue_t &>())
             .def_readwrite("previous", &Dialogue::previous)
             .def_readwrite("next", &Dialogue::next)
             .def_readwrite("background_image", &Dialogue::background_image)
@@ -103,7 +103,7 @@ PYBIND11_MODULE(vns_python_wrapper, m)
             .def("load", &DialoguesManager::load, "load dialogue data from vns file")
             .def("empty", &DialoguesManager::empty, "Check if data is empty")
             .def("clear", &DialoguesManager::clear, "Clear data")
-            .def("update", py::overload_cast<const dialogue_content_t &>(&DialoguesManager::update), "Update data")
+            .def("update", py::overload_cast<const dialogues_t &>(&DialoguesManager::update), "Update data")
             .def("next", &DialoguesManager::next, "Go to next dialogue")
             .def("contains_variable", &DialoguesManager::contains_variable, "Contains variable")
             .def("get_variable",
@@ -125,27 +125,17 @@ PYBIND11_MODULE(vns_python_wrapper, m)
             .def("to_dict", &DialoguesManager::to_map, "Get data in dict")
             .def("get_current_dialogue_id", &DialoguesManager::get_current_dialogue_id, "Get current dialogue ID")
             .def("set_current_dialogue_id", &DialoguesManager::set_current_dialogue_id, "Set current dialogue ID")
-            .def("get_section", &DialoguesManager::get_section, "Get current section name")
-            .def("get_sections", &DialoguesManager::get_sections, "Get the names of all sections")
-            .def("set_section", &DialoguesManager::set_section, "Set current section name")
-            .def("contains_section", &DialoguesManager::contains_section, "Check if dialogues have given section name")
-            .def("remove_section", &DialoguesManager::remove_section, "Remove section")
-            .def("get_current_section_dialogues", &DialoguesManager::get_current_section_dialogues,
-                 py::return_value_policy::reference, "Get current section dialogue contents")
-            .def("set_current_section_dialogues", &DialoguesManager::set_current_section_dialogues,
-                 "Set current section dialogue contents")
-            .def("set_dialogues",
-                 py::overload_cast<const std::string &, const dialogue_section_t &>(&DialoguesManager::set_dialogues),
-                 "Set section dialogue contents by section name")
             .def("get_dialogues", &DialoguesManager::get_dialogues, py::return_value_policy::reference,
-                 "Get current dialogue data")
+                 "Get all dialogues")
+            .def("set_dialogues", py::overload_cast<const dialogues_t &>(&DialoguesManager::set_dialogues),
+                 "Set all dialogues")
             .def("get_dialogue", &DialoguesManager::get_dialogue, py::return_value_policy::reference,
                  "Get dialogue data by ID")
             .def("set_current_dialogue", &DialoguesManager::set_current_dialogue, "Set current dialogue data")
-            .def("set_dialogue", py::overload_cast<const std::string &, const std::string &, const dialogue_data_t &>(
-                    &DialoguesManager::set_dialogue), "Set current dialogue data by ID")
+            .def("set_dialogue", py::overload_cast<const std::string &, const dialogue_t &>(
+                    &DialoguesManager::set_dialogue), "Set dialogue data by ID")
             .def("contains_dialogue", &DialoguesManager::contains_dialogue,
-                 "Check if section contains given dialogue ID")
+                 "Check if dialogue with given ID exists")
             .def("remove_current_dialogue", &DialoguesManager::remove_current_dialogue, "Remove current dialogue")
             .def("remove_dialogue", &DialoguesManager::remove_dialogue, "Remove dialogue by ID");
 }

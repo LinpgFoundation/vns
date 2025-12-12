@@ -1,203 +1,209 @@
 {
     "compiler": {
-        "compiledAt": 1720842345,
+        "compiledAt": 1765502277,
         "patch": 0,
-        "reversion": 3,
-        "version": 2
+        "reversion": 0,
+        "version": 3
     },
     "dialogues": {
-        "dialog_example": {
-            "branch_choices": {
-                "background_image": "bg2.png",
-                "background_music": "bgm2.ogg",
-                "character_images": [
-                    "test_character1.png&silent",
-                    "test_character2.png&silent"
-                ],
-                "contents": [
-                    "Hello I am test character 2."
-                ],
-                "narrator": "Test Character 2",
-                "next": {
-                    "target": [
-                        {
-                            "id": "jumping_point1",
-                            "text": "click here to go to jump point 1"
-                        },
-                        {
-                            "id": "last_one",
-                            "text": "click here to go to the end"
-                        }
-                    ],
-                    "type": "options"
-                },
-                "notes": [
-                    "this the second dialogue of section 2"
-                ],
-                "previous": "~03"
-            },
-            "head": {
-                "background_image": "bg1.png",
-                "background_music": "bgm1.ogg",
-                "contents": [
-                    "This is a test message."
-                ],
-                "next": {
-                    "target": "~01",
-                    "type": "default"
-                },
-                "notes": [
-                    "this the first dialogue of section 1"
-                ]
-            },
-            "jumping_point1": {
-                "background_image": "bg2.png",
-                "background_music": "bgm2.ogg",
-                "character_images": [
-                    "test_character1.png&silent",
-                    "test_character2.png&silent"
-                ],
-                "contents": [
-                    "Welcome to jump point 1"
-                ],
-                "events": [
+        "branch_choices": {
+            "background_image": "bg2.png",
+            "background_music": "bgm2.ogg",
+            "character_images": [
+                "test_character1.png&silent",
+                "test_character2.png&silent"
+            ],
+            "contents": [
+                "Hello I am test character 2."
+            ],
+            "narrator": "Test Character 2",
+            "next": {
+                "target": [
                     {
-                        "target": "say",
-                        "type": "set",
-                        "value": "\"hi\""
+                        "id": "jumping_point1",
+                        "text": "click here to go to jump point 1"
+                    },
+                    {
+                        "id": "last_one",
+                        "text": "click here to go to the end"
                     }
                 ],
-                "narrator": "Test Character 3",
-                "next": {
-                    "target": "~07",
-                    "type": "default"
-                },
-                "previous": "branch_choices"
+                "type": "options"
             },
-            "last_one": {
-                "background_image": "bg2.png",
-                "background_music": "bgm2.ogg",
-                "character_images": [
-                    "test_character1.png&silent",
-                    "test_character2.png&silent"
-                ],
-                "contents": [
-                    "Ok this is the end"
-                ],
-                "narrator": "Test Character 2",
-                "previous": "branch_choices"
+            "notes": [
+                "this the second dialogue of section 2"
+            ],
+            "previous": "~03"
+        },
+        "head": {
+            "background_image": "bg1.png",
+            "background_music": "bgm1.ogg",
+            "contents": [
+                "This is a test message."
+            ],
+            "next": {
+                "target": "~01",
+                "type": "default"
             },
-            "~01": {
-                "background_image": "bg1.png",
-                "background_music": "bgm1.ogg",
-                "contents": [
-                    "I hope it works."
-                ],
-                "events": [
-                    {
-                        "target": "section1_end",
-                        "type": "set",
-                        "value": true
-                    },
-                    {
-                        "target": "chapter_passed",
-                        "type": "set",
-                        "value": 1
-                    },
-                    {
-                        "target": "chapter_passed",
-                        "type": "add",
-                        "value": 1
-                    },
-                    {
-                        "target": "chapter_passed",
-                        "type": "multiply",
-                        "value": 3
-                    },
-                    {
-                        "target": "chapter_passed",
-                        "type": "divide",
-                        "value": 3
-                    },
-                    {
-                        "target": "chapter_passed",
-                        "type": "subtract",
-                        "value": 1
-                    }
-                ],
-                "next": {
-                    "target": "~02",
-                    "type": "default"
-                },
-                "notes": [
-                    "this the second dialogue of section 1"
-                ],
-                "previous": "head"
-            },
-            "~02": {
-                "background_image": "bg1.png",
-                "background_music": "bgm1.ogg",
-                "contents": [
-                    "you cannot go back"
-                ],
-                "events": [
-                    {
-                        "target": "mod_n",
-                        "type": "set",
-                        "value": "chapter_passed + 1"
-                    },
-                    {
-                        "target": "test_multi",
-                        "type": "set",
-                        "value": "1 + mod_n * 4"
-                    },
-                    {
-                        "target": "mod_result",
-                        "type": "set",
-                        "value": "test_multi % 2"
-                    }
-                ],
-                "next": {
-                    "target": "~03",
-                    "type": "scene"
+            "notes": [
+                "Fundamental parameters",
+                "this the first dialogue of section 1"
+            ],
+            "sound_effects": [
+                "intro_chime.wav"
+            ]
+        },
+        "jumping_point1": {
+            "background_image": "bg2.png",
+            "background_music": "bgm2.ogg",
+            "character_images": [
+                "test_character1.png&silent",
+                "test_character2.png&silent"
+            ],
+            "contents": [
+                "Welcome to jump point 1"
+            ],
+            "events": [
+                {
+                    "target": "say",
+                    "type": "set",
+                    "value": "\"hi\""
                 }
+            ],
+            "narrator": "Test Character 3",
+            "next": {
+                "target": "~07",
+                "type": "default"
             },
-            "~03": {
-                "background_image": "bg2.png",
-                "background_music": "bgm2.ogg",
-                "character_images": [
-                    "test_character1.png&silent",
-                    "test_character2.png&silent"
-                ],
-                "contents": [
-                    "Hello I am test character 1."
-                ],
-                "narrator": "Test Character 1",
-                "next": {
-                    "target": "branch_choices",
-                    "type": "default"
+            "previous": "branch_choices"
+        },
+        "last_one": {
+            "background_image": "bg2.png",
+            "background_music": "bgm2.ogg",
+            "character_images": [
+                "test_character1.png&silent",
+                "test_character2.png&silent"
+            ],
+            "contents": [
+                "Ok this is the end"
+            ],
+            "narrator": "Test Character 2",
+            "previous": "branch_choices"
+        },
+        "~01": {
+            "background_image": "bg1.png",
+            "background_music": "bgm1.ogg",
+            "contents": [
+                "I hope it works."
+            ],
+            "events": [
+                {
+                    "target": "section1_end",
+                    "type": "set",
+                    "value": true
                 },
-                "notes": [
-                    "this the first dialogue of section 2,",
-                    "and there are more than one note"
-                ]
+                {
+                    "target": "chapter_passed",
+                    "type": "set",
+                    "value": 1
+                },
+                {
+                    "target": "chapter_passed",
+                    "type": "add",
+                    "value": 1
+                },
+                {
+                    "target": "chapter_passed",
+                    "type": "multiply",
+                    "value": 3
+                },
+                {
+                    "target": "chapter_passed",
+                    "type": "divide",
+                    "value": 3
+                },
+                {
+                    "target": "chapter_passed",
+                    "type": "subtract",
+                    "value": 1
+                }
+            ],
+            "next": {
+                "target": "~02",
+                "type": "default"
             },
-            "~07": {
-                "background_image": "bg2.png",
-                "background_music": "bgm2.ogg",
-                "character_images": [
-                    "test_character1.png&silent",
-                    "test_character2.png&silent"
-                ],
-                "contents": [
-                    "My previous should be jump point 1",
-                    "And the next should be None"
-                ],
-                "narrator": "Test Character 3",
-                "previous": "jumping_point1"
+            "notes": [
+                "this the second dialogue of section 1"
+            ],
+            "previous": "head"
+        },
+        "~02": {
+            "background_image": "bg1.png",
+            "background_music": "bgm1.ogg",
+            "contents": [
+                "you cannot go back"
+            ],
+            "events": [
+                {
+                    "target": "mod_n",
+                    "type": "set",
+                    "value": "chapter_passed + 1"
+                },
+                {
+                    "target": "test_multi",
+                    "type": "set",
+                    "value": "1 + mod_n * 4"
+                },
+                {
+                    "target": "mod_result",
+                    "type": "set",
+                    "value": "test_multi % 2"
+                }
+            ],
+            "next": {
+                "target": "~03",
+                "type": "scene"
             }
+        },
+        "~03": {
+            "background_image": "bg2.png",
+            "background_music": "bgm2.ogg",
+            "character_images": [
+                "test_character1.png&silent",
+                "test_character2.png&silent"
+            ],
+            "contents": [
+                "Hello I am test character 1."
+            ],
+            "narrator": "Test Character 1",
+            "next": {
+                "target": "branch_choices",
+                "type": "default"
+            },
+            "notes": [
+                "this the first dialogue of section 2,",
+                "and there are more than one note"
+            ],
+            "sound_effects": [
+                "footsteps.wav",
+                "door_open.wav"
+            ]
+        },
+        "~07": {
+            "background_image": "bg2.png",
+            "background_music": "bgm2.ogg",
+            "character_images": [
+                "test_character1.png&silent",
+                "test_character2.png&silent"
+            ],
+            "contents": [
+                "My previous should be jump point 1",
+                "And the next should be None"
+            ],
+            "narrator": "Test Character 3",
+            "previous": "jumping_point1"
         }
     },
-    "id": "1",
+    "id": "chapter1_dialogs_English",
     "language": "English"
 }

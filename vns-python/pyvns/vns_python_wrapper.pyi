@@ -30,13 +30,10 @@ class Compiler:
             str,
             dict[
                 str,
-                dict[
-                    str,
-                    str
-                    | list[str]
-                    | dict[str, str | list[dict[str, str]]]
-                    | list[dict[str, bool | int | float | str]],
-                ],
+                str
+                | list[str]
+                | dict[str, str | list[dict[str, str]]]
+                | list[dict[str, bool | int | float | str]],
             ],
         ]
         | dict[str, int]
@@ -178,14 +175,9 @@ class DialoguesManager:
         Clear data
         """
 
-    def contains_dialogue(self, arg0: str, arg1: str) -> bool:
+    def contains_dialogue(self, arg0: str) -> bool:
         """
-        Check if section contains given dialogue ID
-        """
-
-    def contains_section(self, arg0: str) -> bool:
-        """
-        Check if dialogues have given section name
+        Check if dialogue with given ID exists
         """
 
     def contains_variable(self, arg0: str) -> bool:
@@ -213,19 +205,14 @@ class DialoguesManager:
         Get current dialogue ID
         """
 
-    def get_current_section_dialogues(self) -> dict[str, Dialogue]:
-        """
-        Get current section dialogue contents
-        """
-
-    def get_dialogue(self, arg0: str, arg1: str) -> Dialogue:
+    def get_dialogue(self, arg0: str) -> Dialogue:
         """
         Get dialogue data by ID
         """
 
-    def get_dialogues(self, arg0: str) -> dict[str, Dialogue]:
+    def get_dialogues(self) -> dict[str, Dialogue]:
         """
-        Get current dialogue data
+        Get all dialogues
         """
 
     def get_float_variable(self, arg0: str) -> float:
@@ -241,16 +228,6 @@ class DialoguesManager:
     def get_previous(self) -> Dialogue:
         """
         Get previous dialogue
-        """
-
-    def get_section(self) -> str:
-        """
-        Get current section name
-        """
-
-    def get_sections(self) -> set[str]:
-        """
-        Get the names of all sections
         """
 
     def get_str_variable(self, arg0: str) -> str:
@@ -278,14 +255,9 @@ class DialoguesManager:
         Remove current dialogue
         """
 
-    def remove_dialogue(self, arg0: str, arg1: str) -> None:
+    def remove_dialogue(self, arg0: str) -> None:
         """
         Remove dialogue by ID
-        """
-
-    def remove_section(self, arg0: str) -> None:
-        """
-        Remove section
         """
 
     def set_current_dialogue(
@@ -307,7 +279,22 @@ class DialoguesManager:
         Set current dialogue ID
         """
 
-    def set_current_section_dialogues(
+    def set_dialogue(
+        self,
+        arg0: str,
+        arg1: dict[
+            str,
+            str
+            | list[str]
+            | dict[str, str | list[dict[str, str]]]
+            | list[dict[str, bool | int | float | str]],
+        ],
+    ) -> None:
+        """
+        Set dialogue data by ID
+        """
+
+    def set_dialogues(
         self,
         arg0: dict[
             str,
@@ -321,46 +308,7 @@ class DialoguesManager:
         ],
     ) -> None:
         """
-        Set current section dialogue contents
-        """
-
-    def set_dialogue(
-        self,
-        arg0: str,
-        arg1: str,
-        arg2: dict[
-            str,
-            str
-            | list[str]
-            | dict[str, str | list[dict[str, str]]]
-            | list[dict[str, bool | int | float | str]],
-        ],
-    ) -> None:
-        """
-        Set current dialogue data by ID
-        """
-
-    def set_dialogues(
-        self,
-        arg0: str,
-        arg1: dict[
-            str,
-            dict[
-                str,
-                str
-                | list[str]
-                | dict[str, str | list[dict[str, str]]]
-                | list[dict[str, bool | int | float | str]],
-            ],
-        ],
-    ) -> None:
-        """
-        Set section dialogue contents by section name
-        """
-
-    def set_section(self, arg0: str) -> None:
-        """
-        Set current section name
+        Set all dialogues
         """
 
     def set_variable(self, arg0: str, arg1: bool | int | float | str) -> None:
@@ -374,13 +322,10 @@ class DialoguesManager:
         str,
         dict[
             str,
-            dict[
-                str,
-                str
-                | list[str]
-                | dict[str, str | list[dict[str, str]]]
-                | list[dict[str, bool | int | float | str]],
-            ],
+            str
+            | list[str]
+            | dict[str, str | list[dict[str, str]]]
+            | list[dict[str, bool | int | float | str]],
         ],
     ]:
         """
@@ -393,13 +338,10 @@ class DialoguesManager:
             str,
             dict[
                 str,
-                dict[
-                    str,
-                    str
-                    | list[str]
-                    | dict[str, str | list[dict[str, str]]]
-                    | list[dict[str, bool | int | float | str]],
-                ],
+                str
+                | list[str]
+                | dict[str, str | list[dict[str, str]]]
+                | list[dict[str, bool | int | float | str]],
             ],
         ],
     ) -> None:
