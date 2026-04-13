@@ -15,13 +15,19 @@
             "include": "#double-slash"
         },
         {
+            "include": "#number-sign"
+        },
+        {
+            "include": "#reserved"
+        },
+        {
+            "include": "#variables"
+        },
+        {
             "include": "#keywords"
         },
         {
             "include": "#heading"
-        },
-        {
-            "include": "#number-sign"
         },
         {
             "include": "#boolean"
@@ -33,7 +39,7 @@
     "repository": {
         "boolean": {
             "match": "\\b(true|false)\\b",
-            "name": "constant.language.boolean"
+            "name": "constant.language.boolean.vns"
         },
         "contents": {
             "captures": {
@@ -41,7 +47,7 @@
                     "name": "string.unquoted.vns"
                 }
             },
-            "match": "^\\s*\\-\\s+\\s*(.*?)\n"
+            "match": "^\\s*-\\s+(.*?)(?=\\s*//|\\s*$)"
         },
         "double-slash": {
             "match": "//.*$",
@@ -54,18 +60,64 @@
         "keywords": {
             "patterns": [
                 {
+                    "comment": "Jump to reserved target (null / none / head)",
+                    "match": "\\[(jump_|jump|jmp_|jmp)\\]\\s*(null|none|head)\\b",
+                    "captures": {
+                        "0": {
+                            "name": "meta.label.vns"
+                        },
+                        "1": {
+                            "name": "keyword.control.vns"
+                        },
+                        "2": {
+                            "name": "constant.language.vns"
+                        }
+                    }
+                },
+                {
+                    "comment": "Label definition or jump with label name",
+                    "match": "\\[(label|jump_|jump|jmp_|jmp)\\]\\s*([a-zA-Z_][a-zA-Z0-9_]*)",
+                    "captures": {
+                        "0": {
+                            "name": "meta.label.vns"
+                        },
+                        "1": {
+                            "name": "keyword.control.vns"
+                        },
+                        "2": {
+                            "name": "entity.name.label.vns"
+                        }
+                    }
+                },
+                {
+                    "comment": "Hide all characters via wildcard",
+                    "match": "\\[(hide)\\]\\s*(\\*)",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.control.vns"
+                        },
+                        "2": {
+                            "name": "constant.language.vns"
+                        }
+                    }
+                },
+                {
                     "match": "\\[(.*?)\\]",
                     "name": "keyword.control.vns"
                 },
                 {
-                    "match": "\\+|\\-|\\*|\\/|\\>|\\<|\\=|\\%",
-                    "name": "keyword.operator.math"
+                    "match": "\\+\\+|--|\\+=|-=|\\*=|/=|\\+|-|\\*|/|>=|<=|>|<|=|%",
+                    "name": "keyword.operator.math.vns"
                 }
             ]
         },
         "number-sign": {
             "match": "#.*$",
             "name": "comment.line.number-sign.vns"
+        },
+        "reserved": {
+            "match": "\\b(null|none|head)\\b",
+            "name": "constant.language.vns"
         },
         "numbers": {
             "patterns": [
@@ -80,18 +132,43 @@
             ]
         },
         "option_prompt": {
-            "captures": {
-                "1": {
-                    "name": "keyword.control.vns"
+            "patterns": [
+                {
+                    "comment": "Option targeting a reserved target (null / none / head)",
+                    "match": "\\[(option|opt)\\]\\s*(.*?)\\s*(->)\\s*(null|none|head)\\b",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.control.vns"
+                        },
+                        "2": {
+                            "name": "string.unquoted.vns"
+                        },
+                        "3": {
+                            "name": "keyword.operator.vns"
+                        },
+                        "4": {
+                            "name": "constant.language.vns"
+                        }
+                    }
                 },
-                "2": {
-                    "name": "string.unquoted.vns"
-                },
-                "3": {
-                    "name": "keyword.operator.vns"
+                {
+                    "match": "\\[(option|opt)\\]\\s*(.*?)\\s*(->)\\s*([a-zA-Z_][a-zA-Z0-9_]*)",
+                    "captures": {
+                        "1": {
+                            "name": "keyword.control.vns"
+                        },
+                        "2": {
+                            "name": "string.unquoted.vns"
+                        },
+                        "3": {
+                            "name": "keyword.operator.vns"
+                        },
+                        "4": {
+                            "name": "entity.name.label.vns"
+                        }
+                    }
                 }
-            },
-            "match": "\\[(.+?)\\]\\s*(.*?)\\s*(->)"
+            ]
         },
         "strings": {
             "patterns": [
@@ -136,6 +213,45 @@
                             "name": "constant.character.escape.vns"
                         }
                     ]
+                }
+            ]
+        },
+        "variables": {
+            "patterns": [
+                {
+                    "comment": "Global variables were removed in VNS 3.0 (VEP 6)",
+                    "match": "@[a-zA-Z_][a-zA-Z0-9_]*",
+                    "name": "invalid.illegal.global-variable.vns"
+                },
+                {
+                    "comment": "Persistent variable with & prefix",
+                    "match": "&([a-zA-Z_][a-zA-Z0-9_]*)",
+                    "captures": {
+                        "0": {
+                            "name": "variable.other.persistent.vns"
+                        }
+                    }
+                },
+                {
+                    "comment": "Variable assignment or operation",
+                    "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(\\+\\+|--|\\+=|-=|\\*=|/=|=)",
+                    "captures": {
+                        "1": {
+                            "name": "variable.other.local.vns"
+                        },
+                        "2": {
+                            "name": "keyword.operator.assignment.vns"
+                        }
+                    }
+                },
+                {
+                    "comment": "Variable reference in expression (RHS of = or math operator)",
+                    "match": "(?<=[=+\\-*/%])\\s*(?!(?:true|false|null|none|head)\\b)([a-zA-Z_][a-zA-Z0-9_]*)",
+                    "captures": {
+                        "1": {
+                            "name": "variable.other.local.vns"
+                        }
+                    }
                 }
             ]
         }
